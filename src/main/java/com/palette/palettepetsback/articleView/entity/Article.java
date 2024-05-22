@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +19,8 @@ import java.time.LocalDateTime;
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long article_id;
+    @Column(name = "article_id")
+    private Long articleId;
 
     @Column(name="created_who")
     private Long created_who;
@@ -49,7 +51,7 @@ public class Article {
     @Column(name="is_deleted", nullable = false)
     private Integer is_deleted;
 
-    @PrePersist
+    @PrePersist //Entity 실행 전 수행하는 마라미터로 default 값을 지정O
     public void prePersist(){
         this.created_at = LocalDateTime.now();
         this.count_loves = 0;

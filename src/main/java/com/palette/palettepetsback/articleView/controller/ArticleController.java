@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -27,7 +28,11 @@ public class ArticleController {
     @Autowired
     private final ArticleService articleService;
     @GetMapping("/list")
-    public ResponseEntity<Page<Article>> getList(@PageableDefault(size = 10, sort = "article_id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok().body(articleService.getList(pageable));
+    public ResponseEntity<Page<Article>> getList(@RequestParam(value = "page", defaultValue = "0" ) int page,
+                                                 @RequestParam(value = "sort", defaultValue = "articleId") String sort,
+                                                 @RequestParam(value = "dir", defaultValue = "desc") String dir) {
+        PageRequest pageRequest = PageRequest.of(page, Sort.by(dir, sort));
+
+        return ResponseEntity.ok().body(articleService.getList(pageRequest));
     }
 }
