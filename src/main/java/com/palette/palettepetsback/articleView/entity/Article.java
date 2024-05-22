@@ -2,13 +2,16 @@ package com.palette.palettepetsback.articleView.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
+@Builder
 @Table(name = "article")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,13 +37,26 @@ public class Article {
 
     @Column(name = "count_loves")
     private Integer count_loves;
+
     @Column(name = "count_report")
     private Integer count_report;
+
     @Column(name = "count_views")
     private Integer count_views;
     @Column(name = "count_review")
     private Integer count_review;
 
-    @Column(name="is_deleted")
+    @Column(name="is_deleted", nullable = false)
     private Integer is_deleted;
+
+    @PrePersist
+    public void prePersist(){
+        this.created_at = LocalDateTime.now();
+        this.count_loves = 0;
+        this.count_report = 0;
+        this.count_review = 0;
+        this.count_views = 0;
+        this.is_deleted = 0;
+        this.state = "ACTIVE";
+    }
 }
