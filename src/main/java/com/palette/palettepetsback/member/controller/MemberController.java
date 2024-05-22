@@ -28,7 +28,7 @@ public class MemberController {
     public Member getMembers() {
         log.info("예외 테스트!!");
         Member test = memberService.test("test123123");
-
+System.out.println( );
         return test;
     }
 
