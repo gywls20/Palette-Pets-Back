@@ -1,7 +1,7 @@
 package com.palette.palettepetsback.articleView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palette.palettepetsback.articleView.DTO.ArticleSaveDTO;
+import com.palette.palettepetsback.articleView.dto.ArticleSaveDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

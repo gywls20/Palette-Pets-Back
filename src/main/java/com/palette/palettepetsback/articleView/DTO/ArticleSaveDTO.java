@@ -1,4 +1,4 @@
-package com.palette.palettepetsback.articleView.DTO;
+package com.palette.palettepetsback.articleView.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;

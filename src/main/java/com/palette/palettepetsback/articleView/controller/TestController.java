@@ -1,6 +1,6 @@
 package com.palette.palettepetsback.articleView.controller;
 
-import com.palette.palettepetsback.articleView.DTO.ArticleSaveDTO;
+import com.palette.palettepetsback.articleView.dto.ArticleSaveDTO;
 import com.palette.palettepetsback.articleView.entity.Article;
 import com.palette.palettepetsback.articleView.service.ArticleServiceExam;
 import lombok.RequiredArgsConstructor;
