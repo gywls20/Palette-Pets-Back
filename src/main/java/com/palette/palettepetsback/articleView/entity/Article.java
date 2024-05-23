@@ -18,9 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Article {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "article_id")
-    private Long articleId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) private Long articleId;
 
     @Column(name="created_who")
     private Long created_who;
