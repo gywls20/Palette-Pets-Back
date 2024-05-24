@@ -1,6 +1,5 @@
 package com.palette.palettepetsback.config.exceptions;
 
-import com.palette.palettepetsback.member.entity.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

@@ -2,18 +2,20 @@ spring:
   application:
     name: PalettePetsBack
 
-# \uB85C\uCEFD \uD14C\uC2A4\uD2B8 \uD658\uACBD : ddl-auto: create-drop or create / \uC2E4\uC81C \uD300 DB\uC5D0\uB294 ddl-auto: validate 
   jpa:
-    hibernate:
-      ddl-auto: create-drop 
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
 
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://{\uC5EC\uAE30\uB2E4 \uC8FC\uC18C}:3306/{DB \uC2A4\uD0A4\uB9C8 \uC5EC\uAE30\uB2E4}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
-#    username: {id}
-#    password: {password}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db-n0ucm-kr.vpc-pub-cdb.ntruss.com:3306/PalettePets?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
+    username: member
+    password: 1q2w3e4r!
 
-# logging \uC124\uC815 - \uCF58\uC194\uC5D0 \uB85C\uADF8\uAC00 \uB108\uBB34 \uB9CE\uC774 \uB728\uB294\uAC8C \uC2EB\uB2E4\uBA74 \uC8FC\uC11D\uD574\uC11C \uAEBC\uB3C4\uB428
 logging:
   level:
     com:
