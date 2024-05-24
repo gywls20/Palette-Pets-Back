@@ -8,6 +8,7 @@ build/
 src/main/resources/application.yml
 src/main/resources/application-test.yml
 src/main/resources/banned_words.json
+src/main/resources/naver.properties
 
 ### STS ###
 .apt_generated
