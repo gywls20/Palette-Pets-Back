@@ -2,6 +2,7 @@ package com.palette.palettepetsback.pet.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,4 +20,9 @@ public class ImgPet {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
+    @Builder
+    public ImgPet(String imgUrl, Pet pet) {
+        this.imgUrl = imgUrl;
+        this.pet = pet;
+    }
 }

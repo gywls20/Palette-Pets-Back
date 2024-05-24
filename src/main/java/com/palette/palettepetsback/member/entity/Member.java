@@ -11,19 +11,18 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Member extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Long memberId;
-    private String email;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_no")
+    private Long memberNo;
+    private String memberId;
     private String name;
     @Enumerated(EnumType.STRING)
     private Role role;
     private String password;
 
     @Builder
-    public Member(String email, String name, Role role, String password) {
-        this.email = email;
+    public Member(String memberId, String name, Role role, String password) {
+        this.memberId = memberId;
         this.name = name;
         this.role = role;
         this.password = password;

@@ -11,4 +11,5 @@ public class ImgPetResponseDto {
 
     private Long imgPetId;
     private String imgUrl;
+    private Long petId;
 }
