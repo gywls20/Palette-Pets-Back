@@ -1,7 +1,8 @@
 package com.palette.palettepetsback.articleView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palette.palettepetsback.articleView.dto.ArticleSaveDTO;
+import static org.junit.jupiter.api.Assertions.fail;
+import com.palette.palettepetsback.articleView.DTO.ArticleSaveDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +43,12 @@ public class TestControllerTest {
                 .andExpect(content().string("Hello, World!"));
     }
 
-    @DisplayName("쓰기 작업(/api/save/article)에 성공")
+    @DisplayName("쓰기 작업")
     @Test
     public void shouldSaveArticle() throws Exception {
         //given
         final String url = "/api/save/article";
-        ArticleSaveDTO request = new ArticleSaveDTO("내용", "태그");
+        ArticleSaveDTO request = new ArticleSaveDTO("제목","내용", "태그");
 
         String requestJson = objectMapper.writeValueAsString(request);
 

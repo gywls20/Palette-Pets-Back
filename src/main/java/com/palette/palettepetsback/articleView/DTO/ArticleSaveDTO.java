@@ -1,4 +1,4 @@
-package com.palette.palettepetsback.articleView.dto;
+package com.palette.palettepetsback.articleView.DTO;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleSaveDTO {
+    @NotEmpty
+    private String title;
     @NotEmpty
     private String content;
     private String tags;

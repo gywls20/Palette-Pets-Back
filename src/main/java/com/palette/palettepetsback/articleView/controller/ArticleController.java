@@ -5,16 +5,12 @@ import com.palette.palettepetsback.articleView.entity.Article;
 import com.palette.palettepetsback.articleView.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,18 +19,18 @@ import java.util.List;
 @RequestMapping("/article")
 @RequiredArgsConstructor
 public class ArticleController {
-
-    @Autowired
+    //@Autowired
     private final ArticleService articleService;
-    @GetMapping("/list")
-    public ResponseEntity<?> getList(@ModelAttribute PageableDTO pageableDTO) {
-        String direction = pageableDTO.getDir().equals("desc") ? "desc" : "asc";
-        PageRequest pageRequest = PageRequest.of(pageableDTO.getPage(),
-                         10,
-                                  Sort.by(Sort.Direction.fromString(direction),
-                                  pageableDTO.getSort()));
+    private final Integer PAGE_SIZE;
 
-        Page<Article> articles = articleService.getList(pageRequest);
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+    @GetMapping("/list")
+    public ResponseEntity<?> getList(@ModelAttribute PageableDTO request) {
+        int startPage = (request.getPage()-1) * PAGE_SIZE;
+        Sort sort = Sort.by(Sort.Direction.ASC, request.getSort());
+        Pageable pageable = PageRequest.of(startPage,startPage + 10, sort);
+
+        Page<Article> articles = articleService.getList(pageable);
+
+        return ResponseEntity.ok().body(articles);
     }
 }

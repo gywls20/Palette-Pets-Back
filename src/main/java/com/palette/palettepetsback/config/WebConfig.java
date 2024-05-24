@@ -12,8 +12,9 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry
                 .addMapping("/**")
-                .allowedOriginPatterns("http://localhost:3000")
-                .allowedHeaders("OPTIONS", "GET", "POST", "PUT", "DELETE")
-                .allowCredentials(true);
+                .allowedOriginPatterns("*") //모든 도메인 허용
+                .allowedMethods("*") // 모든 HTTP 메서드 허용
+                .allowCredentials(true)
+                .allowedHeaders("*");// 모든 HTTP 헤더 허용
     }
 }

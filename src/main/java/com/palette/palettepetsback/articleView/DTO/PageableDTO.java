@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageableDTO {
-    private int page = 0;
-    private String sort = "article_id";
-    private String dir = "desc";
+    private int page;
+    private String sort;
+    private String dir;
 }
