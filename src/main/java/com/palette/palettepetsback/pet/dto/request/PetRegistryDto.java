@@ -1,10 +1,12 @@
 package com.palette.palettepetsback.pet.dto.request;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
 @Data
 @ToString
+@Builder
 public class PetRegistryDto {
     /**
      * Pet 등록 요청 Dto

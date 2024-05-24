@@ -1,19 +1,16 @@
 package com.palette.palettepetsback.pet.entity;
 
-import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.pet.dto.request.PetUpdateDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(exclude = {"petImageList"})
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Pet {
 
     @Id
@@ -40,6 +37,19 @@ public class Pet {
 
     @Builder
     public Pet(Long createdWho, String petName, String petImage, String petCategory1, String petCategory2, String petBirth, String petGender, Integer petWeight) {
+        this.createdWho = createdWho;
+        this.petName = petName;
+        this.petImage = petImage;
+        this.petCategory1 = petCategory1;
+        this.petCategory2 = petCategory2;
+        this.petBirth = petBirth;
+        this.petGender = petGender;
+        this.petWeight = petWeight;
+    }
+
+    @Builder(builderMethodName = "fullBuilder")
+    public Pet(Long id, Long createdWho, String petName, String petImage, String petCategory1, String petCategory2, String petBirth, String petGender, Integer petWeight) {
+        this.id = id;
         this.createdWho = createdWho;
         this.petName = petName;
         this.petImage = petImage;

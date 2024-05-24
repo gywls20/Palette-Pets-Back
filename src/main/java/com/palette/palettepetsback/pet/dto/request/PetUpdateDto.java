@@ -1,10 +1,12 @@
 package com.palette.palettepetsback.pet.dto.request;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 @Data
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PetUpdateDto {
     /**
      * Pet 수정 요청 Dto

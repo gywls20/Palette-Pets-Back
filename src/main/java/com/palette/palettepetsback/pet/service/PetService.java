@@ -29,8 +29,11 @@ public class PetService {
 
     // 펫 등록
     @Transactional
-    public boolean registerPet(PetRegistryDto dto) {
+    public Long registerPet(PetRegistryDto dto) {
 
+        log.info("dto = {}", dto.toString());
+
+        // 펫 등록
         Pet saved = petRepository.save(
                 Pet.builder()
                         .createdWho(dto.getCreatedWho())
@@ -44,12 +47,17 @@ public class PetService {
                         .build()
         );
 
-        return saved.getId() != null;
+        log.info("saved = {}", saved);
+
+        // todo 펫 이미지 등록
+
+//        return saved.getId() != null;
+        return saved.getId();
     }
 
     // 등록된 펫 관련 이미지 등록 TODO - 나중에 S3로 저장하는 코드 작성하기
     @Transactional
-    public boolean registerImgPet(ImgPetRegistryDto dto) {
+    public Long registerImgPet(ImgPetRegistryDto dto) {
 
         Pet pet = petRepository.findById(dto.getPetId()).orElseThrow(() -> new NoSuchPetException("pet not found"));
 
@@ -60,7 +68,7 @@ public class PetService {
                         .build()
         );
 
-        return saved.getId() != null;
+        return saved.getId();
     }
 
     // 펫 등록 정보 수정
@@ -74,14 +82,19 @@ public class PetService {
 
     // 펫 등록 정보 삭제 -> 물리적 삭제
     @Transactional
-    public boolean deletePet(Long petId) {
-        petRepository.deleteById(petId);
-        Pet pet = petRepository.findById(petId).orElse(null);
-        return pet == null;
+    public void deletePet(Long petId) {
+        petRepository.deleteById(petId); // JPA cascade로 imgPet에 연관된 이미지도 삭제
     }
 
     // 펫 등록 정보 -> 펫 이미지 삭제 (다중)
+    @Transactional
+    public void deleteImgPet(List<Long> imgIds) {
+        for (Long imgId : imgIds) {
+            imgPetRepository.deleteById(imgId);
+        }
+    }
 
+    // todo queryDsl 최적화 할 수 있을 듯
     // 펫 정보 가져오기 (한건)
     public PetResponseDto findByPetId(Long petId) {
         Pet pet = petRepository.findById(petId)
@@ -113,6 +126,7 @@ public class PetService {
                 .build();
     }
 
+    // todo queryDsl 최적화 할 수 있을 듯
     // 펫 정보 가져오기 (한 회원에 연결된 펫 List)
     public List<PetResponseDto> findAllByMemberId(Long memberId) {
 
