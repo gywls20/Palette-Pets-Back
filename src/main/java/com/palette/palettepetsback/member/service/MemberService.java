@@ -19,12 +19,12 @@ public class MemberService {
 
     private final MemberRepositoryCustomImpl memberRepositoryCustom;
 
-    public Member login(String email, String password) {
-        Optional<Member> findMember = memberRepositoryCustom.findByEmail(email);
-        if(!findMember.orElseThrow(()->new NotCorrespondingEmailException("해당 이메일이 존재하지 않습니다.")).checkPassword(password)){
-            throw new IllegalStateException("이메일과 비밀번호가 일치하지 않습니다.");
-        }
-        return findMember.get();
-    }
+//    public Member login(String email, String password) {
+//        Optional<Member> findMember = memberRepositoryCustom.findByEmail(email);
+//        if(!findMember.orElseThrow(()->new NotCorrespondingEmailException("해당 이메일이 존재하지 않습니다.")).checkPassword(password)){
+//            throw new IllegalStateException("이메일과 비밀번호가 일치하지 않습니다.");
+//        }
+//        return findMember.get();
+//    }
 
 }
