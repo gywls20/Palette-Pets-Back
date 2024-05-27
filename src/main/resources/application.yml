@@ -3,12 +3,19 @@ spring:
     name: PalettePetsBack
 
   jpa:
+<<<<<<< HEAD
 #    database-platform: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
+=======
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+    show-sql: true
+>>>>>>> 946a83eb65948bcf6e16908d2445cd6111cce26a
     properties:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+<<<<<<< HEAD
     hibernate:
       ddl-auto: validate
 
@@ -17,6 +24,14 @@ spring:
 #    url: jdbc:mysql://db-n0ucm-kr.vpc-pub-cdb.ntruss.com:3306/PalettePets?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
 #    username: member
 #    password: 1q2w3e4r!
+=======
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db-n0ucm-kr.vpc-pub-cdb.ntruss.com:3306/PalettePets?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
+    username: member
+    password: 1q2w3e4r!
+>>>>>>> 946a83eb65948bcf6e16908d2445cd6111cce26a
 
 logging:
   level:
