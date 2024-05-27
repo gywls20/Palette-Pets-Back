@@ -2,6 +2,8 @@ package com.palette.palettepetsback.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.member.entity.Member;
+import com.palette.palettepetsback.member.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -29,6 +31,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
+    private final MemberRepository memberRepository;
     // todo 추후 redis로 리프레시 토큰 저장소 사용 추가 필요
 //    private final RefreshTokenRepository refreshTokenRepository;
 
@@ -64,18 +67,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
 
-        // userDetails 추출
+        // todo 회원 정보 테스트 필요
+        // userDetails -> member, role 추출
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        // todo 회원 정보 추출
+        Member member = userDetails.getMember();
         // role
         String role = authentication.getAuthorities().iterator().next().getAuthority();
         log.info("role = {}", role);
 
-        // todo 임시 jwt 정보
         Map<String, Object> claims = new HashMap<>();
-        claims.put("memberId", "1L");
-        claims.put("email", "dodobird@gmail.com");
+        claims.put("memberId", member.getMemberId());
+        claims.put("email", member.getEmail());
         claims.put("role", role);
 
         // token 발급

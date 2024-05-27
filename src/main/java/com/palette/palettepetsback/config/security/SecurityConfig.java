@@ -73,7 +73,7 @@ public class SecurityConfig {
 //        http
 //                .sessionManagement(session -> session
 //                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
+//        // 시큐리티 에러 핸들링 (401 , 403)
 //        http
 //                .exceptionHandling(ex ->
 //                        ex

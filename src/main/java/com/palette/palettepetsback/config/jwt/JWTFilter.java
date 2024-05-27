@@ -59,10 +59,11 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 클레임에서 저장할 정보 가져오기
         Claims claims = jwtUtil.getClaims(token);
+        Long memberId = claims.get("memberId", Long.class);
         String email = claims.get("email", String.class);
         String role = claims.get("role", String.class);
 
-        // 시큐리티 인증 토큰 생성 -> todo 회원 정보 등록
+        // 시큐리티 인증 토큰 생성
         CustomUserDetails userDetails = CustomUserDetails.builder().build();
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
