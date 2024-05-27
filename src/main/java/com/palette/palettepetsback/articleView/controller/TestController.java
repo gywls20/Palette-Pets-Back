@@ -1,16 +1,14 @@
 package com.palette.palettepetsback.articleView.controller;
 
-import com.palette.palettepetsback.articleView.DTO.ArticleSaveDTO;
-import com.palette.palettepetsback.articleView.DTO.PageableDTO;
-import com.palette.palettepetsback.articleView.DTO.QueryDSLDTO;
+import com.palette.palettepetsback.articleView.DTO.Test.ArticleSaveDTO;
+import com.palette.palettepetsback.articleView.DTO.Test.QueryDSLDTO;
+import com.palette.palettepetsback.articleView.DTO.Test.SearchDSLDTO;
 import com.palette.palettepetsback.articleView.entity.Article;
-import com.palette.palettepetsback.articleView.entity.QArticle;
 import com.palette.palettepetsback.articleView.service.ArticleServiceExam;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +51,18 @@ public class TestController {
 
         List<Article> articles = articleService.queryDSLTestService(orderSpecifiers, request.getPage());
         System.out.println(articles.size());
+
+        return ResponseEntity.ok().body(articles);
+    }
+
+    @GetMapping("/test/querydsl/search")
+    public ResponseEntity<?> searchDSL(@ModelAttribute SearchDSLDTO request){
+        String[] searchList = request.getSearch().split(",");
+        PathBuilder<?> entityPath = new PathBuilder<>(Article.class, "article");
+        Order order = request.isAsc() ? Order.ASC : Order.DESC;
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+        orderSpecifiers.add(new OrderSpecifier(order, entityPath.get(request.getSort())));
+        List<Article> articles = articleService.queryDSLTestSearch(orderSpecifiers, request.getPage(), searchList);
 
         return ResponseEntity.ok().body(articles);
     }

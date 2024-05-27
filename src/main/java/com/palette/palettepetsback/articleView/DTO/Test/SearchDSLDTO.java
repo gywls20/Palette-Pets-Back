@@ -1,4 +1,4 @@
-package com.palette.palettepetsback.articleView.DTO;
+package com.palette.palettepetsback.articleView.DTO.Test;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QueryDSLDTO {
+public class SearchDSLDTO {
     private int page;
+    private String search;
     private String sort;
     private boolean asc;
 }

@@ -11,6 +11,7 @@ public class Singleton {
         return 10;
     }
 
+
     @Bean
     public String BUCKET_NAME(){
         return "palettepets";
