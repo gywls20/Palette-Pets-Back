@@ -1,9 +1,9 @@
-package com.palette.palettepetsback.config.jwt;
+package com.palette.palettepetsback.config.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.entity.Member;
-import com.palette.palettepetsback.member.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -31,7 +31,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
-    private final MemberRepository memberRepository;
     // todo 추후 redis로 리프레시 토큰 저장소 사용 추가 필요
 //    private final RefreshTokenRepository refreshTokenRepository;
 
@@ -73,7 +72,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Member member = userDetails.getMember();
         // role
         String role = authentication.getAuthorities().iterator().next().getAuthority();
-        log.info("role = {}", role);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("memberId", member.getMemberId());
@@ -82,7 +80,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // token 발급
         String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L);// 어세스 토큰 - 10분 만료
-        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 10 * 60 * 1000L);// 리프레시 토큰 - 24시간 만료
+        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L);// 리프레시 토큰 - 24시간 만료
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
 //        addRefreshTokenRepository()

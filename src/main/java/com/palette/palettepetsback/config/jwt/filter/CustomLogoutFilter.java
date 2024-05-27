@@ -1,5 +1,6 @@
-package com.palette.palettepetsback.config.jwt;
+package com.palette.palettepetsback.config.jwt.filter;
 
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

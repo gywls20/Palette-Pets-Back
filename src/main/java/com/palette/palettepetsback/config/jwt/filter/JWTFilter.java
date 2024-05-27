@@ -1,6 +1,9 @@
-package com.palette.palettepetsback.config.jwt;
+package com.palette.palettepetsback.config.jwt.filter;
 
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.member.dto.Role;
+import com.palette.palettepetsback.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,7 +34,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
 
         // --- Authorization 토큰 헤더 검증
-        if (authorization == null && !authorization.startsWith("Bearer ")) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
             // 어세스 토큰이 없음 -> jwt 인증이 필요 없는 요청
             filterChain.doFilter(request, response);
             return;
@@ -63,8 +66,14 @@ public class JWTFilter extends OncePerRequestFilter {
         String email = claims.get("email", String.class);
         String role = claims.get("role", String.class);
 
+        // 회원 정보 넣기 - todo : test / refactor
+        Member member = new Member(memberId, email, Role.valueOf(role.split("_")[1]));
+
         // 시큐리티 인증 토큰 생성
-        CustomUserDetails userDetails = CustomUserDetails.builder().build();
+        CustomUserDetails userDetails = CustomUserDetails
+                .builder()
+                .member(member)
+                .build();
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 

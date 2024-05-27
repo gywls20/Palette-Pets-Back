@@ -1,6 +1,6 @@
 package com.palette.palettepetsback.jwt;
 
-import com.palette.palettepetsback.config.jwt.JWTFilter;
+import com.palette.palettepetsback.config.jwt.filter.JWTFilter;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;

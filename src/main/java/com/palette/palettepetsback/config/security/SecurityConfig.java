@@ -1,22 +1,22 @@
 package com.palette.palettepetsback.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palette.palettepetsback.config.jwt.CustomLogoutFilter;
-import com.palette.palettepetsback.config.jwt.JWTFilter;
+import com.palette.palettepetsback.config.jwt.filter.CustomLogoutFilter;
+import com.palette.palettepetsback.config.jwt.filter.JWTFilter;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
-import com.palette.palettepetsback.config.jwt.LoginFilter;
+import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
 import com.palette.palettepetsback.config.security.handlers.CustomAccessDeniedHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -57,12 +57,14 @@ public class SecurityConfig {
 //                .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
         // 경로 별 인가
-        http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/logout", "/", "/members/**").permitAll()
-                        .anyRequest().permitAll()
-//                        .anyRequest().authenticated()
-                );
+//        http
+//                .authorizeHttpRequests((auth) -> auth
+//                                .requestMatchers(HttpMethod.POST, "/login").permitAll()
+//                                .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
+//                                .requestMatchers("/logout", "/", "/members/**").permitAll()
+//                                .anyRequest().permitAll()
+////                        .anyRequest().authenticated()
+//                );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
 //        http
 //                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
@@ -74,12 +76,12 @@ public class SecurityConfig {
 //                .sessionManagement(session -> session
 //                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //        // 시큐리티 에러 핸들링 (401 , 403)
-//        http
-//                .exceptionHandling(ex ->
-//                        ex
-//                                .authenticationEntryPoint(authenticationEntryPoint())
-//                                .accessDeniedHandler(accessDeniedHandler())
-//                );
+        http
+                .exceptionHandling(ex ->
+                        ex
+                                .authenticationEntryPoint(authenticationEntryPoint())
+                                .accessDeniedHandler(accessDeniedHandler())
+                );
 
         return http.build();
     }
@@ -87,7 +89,18 @@ public class SecurityConfig {
     // password encoder : Bcrypt 타입 사용
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+//        return new BCryptPasswordEncoder();
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return rawPassword.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return rawPassword.toString().equals(encodedPassword);
+            }
+        };
     }
 
     // 인증 매니저 -> 로그인 필터 사용
