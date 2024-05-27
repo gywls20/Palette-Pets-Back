@@ -47,7 +47,9 @@ public class JWTUtil {
      * @param expiredMs
      * @return
      */
-    public String generateToken(Map<String, Object> claims, Long expiredMs) {
+    public String generateToken(String category, Map<String, Object> claims, Long expiredMs) {
+
+        claims.put("category", category);
 
         return Jwts.builder()
                 .claims(claims)
