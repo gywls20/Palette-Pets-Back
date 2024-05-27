@@ -9,6 +9,10 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
+import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
+import kr.co.shineware.nlp.komoran.core.Komoran;
+import kr.co.shineware.nlp.komoran.model.KomoranResult;
+import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +54,7 @@ public class TestController {
         orderSpecifiers.add(new OrderSpecifier(order, entityPath.get(request.getSort())));
 
         List<Article> articles = articleService.queryDSLTestService(orderSpecifiers, request.getPage());
-        System.out.println(articles.size());
+
 
         return ResponseEntity.ok().body(articles);
     }
@@ -63,6 +67,17 @@ public class TestController {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
         orderSpecifiers.add(new OrderSpecifier(order, entityPath.get(request.getSort())));
         List<Article> articles = articleService.queryDSLTestSearch(orderSpecifiers, request.getPage(), searchList);
+
+        Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
+        String input = "아버지가방구에들어가신다";
+        KomoranResult analyzeResultList = komoran.analyze(input);
+        List<Token> tokenList = analyzeResultList.getTokenList();
+        for (Token token : tokenList) {
+            if ("NNG".equals(token.getPos())) { // NNG 품사만 필터링
+                System.out.format("(%2d, %2d) %s/%s\n", token.getBeginIndex(), token.getEndIndex(), token.getMorph(), token.getPos());
+                System.out.println(token.getMorph());
+            }
+        }
 
         return ResponseEntity.ok().body(articles);
     }
