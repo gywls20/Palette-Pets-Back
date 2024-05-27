@@ -2,7 +2,6 @@ spring:
   application:
     name: PalettePetsBack
 
-# \uB85C\uCEFD \uD14C\uC2A4\uD2B8 \uD658\uACBD : ddl-auto: create-drop or create / \uC2E4\uC81C \uD300 DB\uC5D0\uB294 ddl-auto: validate 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
@@ -18,7 +17,6 @@ spring:
     username: member
     password: 1q2w3e4r!
 
-# logging \uC124\uC815 - \uCF58\uC194\uC5D0 \uB85C\uADF8\uAC00 \uB108\uBB34 \uB9CE\uC774 \uB728\uB294\uAC8C \uC2EB\uB2E4\uBA74 \uC8FC\uC11D\uD574\uC11C \uAEBC\uB3C4\uB428
 logging:
   level:
     com:
@@ -28,3 +26,7 @@ logging:
         security: DEBUG
     org.hibernate.orm.jdbc.bind: trace
     org.hibernate.SQL: debug
+
+# jwt secret Key
+jwt:
+  secret: sasfjkvnweor1230gfdj560912-49gflkdgj340459bjvb;l4lfo40-go5i6-sl4
