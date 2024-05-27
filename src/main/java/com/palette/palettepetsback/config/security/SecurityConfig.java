@@ -1,14 +1,22 @@
 package com.palette.palettepetsback.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palette.palettepetsback.config.jwt.CustomLogoutFilter;
 import com.palette.palettepetsback.config.jwt.JWTFilter;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Collections;
@@ -17,6 +25,10 @@ import java.util.Collections;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JWTUtil jwtUtil;
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -45,10 +57,29 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
 //                        .anyRequest().authenticated()
                 );
-        // jwt 관련 필터들 적용
+        // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+        // 세션 매니저 설정 - STATELESS (JWT 사용을 위한 무상태 설정)
+        http
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
 //        http
-//                .addFilterBefore(new JWTFilter(), LoginFilter.class);
+//                .exceptionHandling(ex ->
+//                        ex
+//                                .authenticationEntryPoint(null)
+//                                .accessDeniedHandler(null)
+//                );
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
