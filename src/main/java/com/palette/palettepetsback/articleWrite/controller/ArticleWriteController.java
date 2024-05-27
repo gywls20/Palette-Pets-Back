@@ -37,7 +37,6 @@ public class ArticleWriteController {
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
     }
 
 

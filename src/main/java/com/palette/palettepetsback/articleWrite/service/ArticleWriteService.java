@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.palette.palettepetsback.articleWrite.entity.QArticleWrite.articleWrite;
-
 @Service
 @Slf4j
 public class ArticleWriteService {
@@ -39,7 +37,6 @@ public class ArticleWriteService {
     }
 
     @Transactional
-
     public ArticleWrite update(Long id, ArticleWriteDto dto) {
         // 1. DTO -> 엔티티 변환하기
         ArticleWrite articleWrite = ArticleWrite.builder()
