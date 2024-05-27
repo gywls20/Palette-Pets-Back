@@ -13,7 +13,6 @@ public class NoMemberExistException extends RuntimeException {
 
     public NoMemberExistException(String message) {
         super(message);
-        log.info("이건 어떨까~ㅏ~ㅏ~ㅏ~ㅏ~ㅏ~ㅏ~");
     }
 
     public NoMemberExistException(String message, Throwable cause) {
