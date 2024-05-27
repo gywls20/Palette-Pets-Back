@@ -74,8 +74,10 @@ public class PetService {
     // 펫 등록 정보 수정
     @Transactional
     public void updatePet(PetUpdateDto dto) {
+
         Pet pet = petRepository.findById(dto.getPetId())
                 .orElseThrow(() -> new NoSuchPetException("pet not found"));
+
         // dirty checking
         pet.updatePet(dto);
     }
@@ -89,6 +91,7 @@ public class PetService {
     // 펫 등록 정보 -> 펫 이미지 삭제 (다중)
     @Transactional
     public void deleteImgPet(List<Long> imgIds) {
+
         for (Long imgId : imgIds) {
             imgPetRepository.deleteById(imgId);
         }
@@ -97,6 +100,7 @@ public class PetService {
     // todo queryDsl 최적화 할 수 있을 듯
     // 펫 정보 가져오기 (한건)
     public PetResponseDto findByPetId(Long petId) {
+
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new NoSuchPetException("pet not found"));
 
