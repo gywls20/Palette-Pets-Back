@@ -28,7 +28,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("JWT Filter");
 
         // request -> Authorization header 추출 및 access token 추출
         String authorization = request.getHeader("Authorization");
@@ -67,7 +66,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String role = claims.get("role", String.class);
 
         // 회원 정보 넣기 - todo : test / refactor
-        Member member = new Member(memberId, email, Role.valueOf(role.split("_")[1]));
+        Member member = new Member(memberId, email, Role.valueOf(role));
 
         // 시큐리티 인증 토큰 생성
         CustomUserDetails userDetails = CustomUserDetails

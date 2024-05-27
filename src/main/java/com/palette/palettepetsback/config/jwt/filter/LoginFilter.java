@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -76,7 +77,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Map<String, Object> claims = new HashMap<>();
         claims.put("memberId", member.getMemberId());
         claims.put("email", member.getEmail());
-        claims.put("role", role);
+        claims.put("role", member.getRole().name());
 
         // token 발급
         String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L);// 어세스 토큰 - 10분 만료
@@ -91,6 +92,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // refresh 토큰 : HttpOnly 쿠키에 넣어서 반환
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpServletResponse.SC_OK);
+        // payload : JSON 값 반환
+        MemberResponseDto dto = MemberResponseDto.builder()
+                .memberId(member.getMemberId())
+                .email(member.getEmail())
+                .role(member.getRole().name())
+                .build();
+        response.setContentType("application/json");
+        response.getWriter().write(objectMapper.writeValueAsString(dto));
     }
 
     // 실패
@@ -118,5 +127,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     static class LoginRequest {
         private String username;
         private String password;
+    }
+
+    // 로그인 성공 JSON 반환값
+    @Getter
+    @Setter
+    @Builder
+    static class MemberResponseDto {
+        private Long memberId;
+        private String email;
+        private String role;
     }
 }
