@@ -2,7 +2,7 @@ package com.palette.palettepetsback.articleView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.junit.jupiter.api.Assertions.fail;
-import com.palette.palettepetsback.articleView.DTO.Test.ArticleSaveDTO;
+import com.palette.palettepetsback.Article.articleView.DTO.Test.ArticleSaveDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
