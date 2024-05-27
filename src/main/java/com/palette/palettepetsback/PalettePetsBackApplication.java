@@ -23,15 +23,13 @@ public class PalettePetsBackApplication {
         SpringApplication.run(PalettePetsBackApplication.class, args);
     }
 
-    @PostConstruct
-    public void init() {
-        memberRepository.save(
-                Member.builder()
-                        .memberId("test")
-                        .name("김승원")
-                        .password("1234")
-                        .role(Role.USER)
-                        .build()
-        );
-    }
+//    @PostConstruct
+//    public void init() {
+//        memberRepository.save(
+//                Member.builder()
+//                        .password("1234")
+//                        .role(Role.USER)
+//                        .build()
+//        );
+//    }
 }

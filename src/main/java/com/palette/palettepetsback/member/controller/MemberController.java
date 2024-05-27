@@ -24,16 +24,21 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("")
-    public Member getMembers() {
-        log.info("예외 테스트!!");
-        Member test = memberService.test("test123123");
+//    @GetMapping("")
+//    public Member getMembers() {
+//        log.info("예외 테스트!!");
+//        Member test = memberService.test("test123123");
+//
+//        return test;
+//    }
 
-        return test;
+    @GetMapping("/login")
+    public MemberResponseDto getMemberByMemberId(@PathVariable String email, String passworld) {
+
+        return null;
     }
-
-    @GetMapping("/{id}")
-    public MemberResponseDto getMemberByMemberId(@PathVariable String memberId) {
+    @GetMapping("/join")
+    public MemberResponseDto postMember(@PathVariable String memberId) {
 
         return null;
     }
