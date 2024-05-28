@@ -2,14 +2,18 @@ package com.palette.palettepetsback.member.entity;
 
 import com.palette.palettepetsback.config.auditing.BaseEntity;
 import com.palette.palettepetsback.member.dto.Role;
+import com.palette.palettepetsback.pet.entity.Pet;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Member extends BaseEntity {
+public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -35,6 +39,9 @@ public class Member extends BaseEntity {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Pet> pets = new ArrayList<>();
+
     @Builder
     public Member(String email, String password, String memberName, String memberAddress,
                   String memberGender, String memberPhone,
@@ -47,6 +54,12 @@ public class Member extends BaseEntity {
         this.memberGender = memberGender;
         this.memberPhone = memberPhone;
         this.memberImage = memberImage;
+        this.role = role;
+    }
+
+    public Member(Long memberId, String email, Role role) {
+        this.memberId = memberId;
+        this.email = email;
         this.role = role;
     }
 

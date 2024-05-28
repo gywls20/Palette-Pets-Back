@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -93,13 +95,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpServletResponse.SC_OK);
         // payload : JSON 값 반환
-        MemberResponseDto dto = MemberResponseDto.builder()
-                .memberId(member.getMemberId())
-                .email(member.getEmail())
-                .role(member.getRole().name())
-                .build();
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(dto));
+//        MemberResponseDto dto = MemberResponseDto.builder()
+//                .memberId(member.getMemberId())
+//                .email(member.getEmail())
+//                .role(member.getRole().name())
+//                .build();
+//        response.setContentType("application/json");
+//        response.getWriter().write(objectMapper.writeValueAsString(dto));
     }
 
     // 실패
@@ -107,7 +109,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         
         // 로그인 실패 -> 401 인증 실패 에러 반환
+        log.info("login fail!!");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write(objectMapper.writeValueAsString(false));
     }
 
     // HttpOnly 쿠키 생성 메서드

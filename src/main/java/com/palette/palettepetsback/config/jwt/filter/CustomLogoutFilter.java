@@ -44,6 +44,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
             chain.doFilter(request, response);
             return;
         }
+        
+        log.info("로그아웃 수행 시작");
 
         // refresh token 가져오기
         String refresh = null;
@@ -54,19 +56,24 @@ public class CustomLogoutFilter extends GenericFilterBean {
             }
         }
 
+        log.info("refresh 토큰 가져오기 = {}", refresh);
+
         // null check
         if (refresh == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("refresh token is null");
             return;
         }
         // 만료 체크 -> 이미 로그아웃 됨 todo 어떤 응답 코드로 보낼지 나중에 정하기
         if (jwtUtil.isExpired(refresh)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("refresh token is expired");
             return;
         }
         // 받은 토큰이 refresh 인지 확인
         if (!jwtUtil.getCategory(refresh).equals("refresh")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("refresh token invalid");
             return;
         }
 
@@ -83,5 +90,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 응답
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().print("logout success");
     }
 }

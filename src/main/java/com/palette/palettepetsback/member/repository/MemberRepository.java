@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 아이디로 찾기
-    Optional<Member> findByMemberId(Long memberId);
+    Optional<Member> findByEmail(String email);
     // 아이디 중복 여부
     Boolean existsByMemberId(Long memberId);
 
