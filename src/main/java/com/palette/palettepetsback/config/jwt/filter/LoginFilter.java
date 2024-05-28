@@ -82,8 +82,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         claims.put("role", member.getRole().name());
 
         // token 발급
-        String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L);// 어세스 토큰 - 10분 만료
-        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L);// 리프레시 토큰 - 24시간 만료
+//        String access = jwtUtil.generateToken("access", claims, 60L); // 어세스 토큰 - 테스트용 바로 만료
+        String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L); // 어세스 토큰 - 10분 만료
+//        String refresh = jwtUtil.generateToken("refresh", claims, 60L); // 리프레시 토큰 - 테스트용 바로 만료
+        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
 //        addRefreshTokenRepository()

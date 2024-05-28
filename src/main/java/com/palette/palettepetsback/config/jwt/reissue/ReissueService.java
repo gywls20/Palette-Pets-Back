@@ -45,6 +45,11 @@ public class ReissueService {
         }
         // 만료 체크
         if (jwtUtil.isExpired(refresh)) {
+            // 만료된 리프레시 토큰은 서버에서 제거
+            Cookie cookie = new Cookie("refresh", null);
+            cookie.setMaxAge(0);
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
             return new ResponseEntity<>("refresh token expired, login plz", HttpStatus.BAD_REQUEST);
         }
         // refresh 토큰인지 category 검증
