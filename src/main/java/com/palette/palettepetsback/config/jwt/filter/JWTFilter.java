@@ -1,6 +1,9 @@
-package com.palette.palettepetsback.config.jwt;
+package com.palette.palettepetsback.config.jwt.filter;
 
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.member.dto.Role;
+import com.palette.palettepetsback.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,13 +28,12 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("JWT Filter");
 
         // request -> Authorization header 추출 및 access token 추출
         String authorization = request.getHeader("Authorization");
 
         // --- Authorization 토큰 헤더 검증
-        if (authorization == null && !authorization.startsWith("Bearer ")) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
             // 어세스 토큰이 없음 -> jwt 인증이 필요 없는 요청
             filterChain.doFilter(request, response);
             return;
@@ -59,11 +61,18 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 클레임에서 저장할 정보 가져오기
         Claims claims = jwtUtil.getClaims(token);
+        Long memberId = claims.get("memberId", Long.class);
         String email = claims.get("email", String.class);
         String role = claims.get("role", String.class);
 
-        // 시큐리티 인증 토큰 생성 -> todo 회원 정보 등록
-        CustomUserDetails userDetails = CustomUserDetails.builder().build();
+        // 회원 정보 넣기 - todo : test / refactor
+        Member member = new Member(memberId, email, Role.valueOf(role));
+
+        // 시큐리티 인증 토큰 생성
+        CustomUserDetails userDetails = CustomUserDetails
+                .builder()
+                .member(member)
+                .build();
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
