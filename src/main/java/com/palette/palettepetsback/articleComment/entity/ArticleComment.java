@@ -1,6 +1,7 @@
 package com.palette.palettepetsback.articleComment.entity;
 
-import com.palette.palettepetsback.articleWrite.entity.ArticleWrite;
+import com.palette.palettepetsback.Article.Article;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,7 @@ public class ArticleComment {
     private Long articleCommentId;
     @ManyToOne(fetch = FetchType.LAZY) // LAZY 로딩 지연로딩 하면좋음
     @JoinColumn(name="article_id")
-    private ArticleWrite articleWrite;
+    private Article article;
     @Column(name="created_who")
     private Long createdWho;
     @Column(name="created_at")

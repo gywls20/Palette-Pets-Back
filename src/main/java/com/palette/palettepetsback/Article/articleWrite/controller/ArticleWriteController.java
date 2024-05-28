@@ -2,6 +2,8 @@ package com.palette.palettepetsback.Article.articleWrite.controller;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
+
+
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
 import jakarta.validation.Valid;
@@ -21,10 +23,12 @@ import java.util.List;
 public class ArticleWriteController {
 
     private final ArticleWriteService articleWriteService;
+    private final ArticleWriteRepository articleWriteRepository;
 
     @Autowired
-    public ArticleWriteController(ArticleWriteService articleWriteService) {
+    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
         this.articleWriteService = articleWriteService;
+        this.articleWriteRepository = articleWriteRepository;
     } // 이거 대신에 @RequiredArgsConstructor 이거를 붙이면 된다
 
     //GET
