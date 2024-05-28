@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors((cors) -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                    configuration.setAllowedOrigins(Collections.singletonList("*"));
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);
@@ -64,22 +64,22 @@ public class SecurityConfig {
 //                        .anyRequest().authenticated()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
-        http
-                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper),
-                        UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
-        // 세션 매니저 설정 - STATELESS (JWT 사용을 위한 무상태 설정)
-        http
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
-        http
-                .exceptionHandling(ex ->
-                        ex
-                                .authenticationEntryPoint(authenticationEntryPoint())
-                                .accessDeniedHandler(accessDeniedHandler())
-                );
+//        http
+//                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
+//                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper),
+//                        UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+//        // 세션 매니저 설정 - STATELESS (JWT 사용을 위한 무상태 설정)
+//        http
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
+//        http
+//                .exceptionHandling(ex ->
+//                        ex
+//                                .authenticationEntryPoint(authenticationEntryPoint())
+//                                .accessDeniedHandler(accessDeniedHandler())
+//                );
 
         return http.build();
     }
