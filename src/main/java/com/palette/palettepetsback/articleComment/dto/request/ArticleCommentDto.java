@@ -21,13 +21,13 @@ public class ArticleCommentDto {
     private Long createdWho;
     @NotBlank(message = "content 비워둘수없음 ")
     private String content;
-    private Long parentId;
+    private int parentId;
 
 
     //  패런트 아이디가 없으면 null 있으면 0 부모글 pk값 가져와서부모글
     public static ArticleCommentDto createArticleCommentDto(ArticleComment articleComment) {
-        Long parentId = null; //기본값은 null
-        if (articleComment.getParentId() != null) {
+        int parentId = 0; //기본값은 null
+        if (articleComment.getParentId() !=0) {
             parentId = articleComment.getParentId();//부모 댓글이 있는 경우 부모 댓글의 articleCommentId 가져오기
         }
         return new ArticleCommentDto(
