@@ -58,6 +58,16 @@ public class JWTUtil {
                 .signWith(secretKey)
                 .compact();
     }
+    public String createJwt(String username, String role, Long expiredMs) {
+
+        return Jwts.builder()
+                .claim("username", username)
+                .claim("role", role)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiredMs))
+                .signWith(secretKey)
+                .compact();
+    }
 
     /**
      * JWT 검증 메서드 -> JWT 만료일 검증

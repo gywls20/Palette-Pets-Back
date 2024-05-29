@@ -5,8 +5,10 @@ import com.palette.palettepetsback.config.jwt.filter.CustomLogoutFilter;
 import com.palette.palettepetsback.config.jwt.filter.JWTFilter;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
+import com.palette.palettepetsback.config.oauth2.CustomSuccessHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAccessDeniedHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAuthenticationEntryPoint;
+import com.palette.palettepetsback.member.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +37,8 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -77,11 +81,19 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 //        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
+//        http
+//                .exceptionHandling(ex ->
+//                        ex
+//                                .authenticationEntryPoint(authenticationEntryPoint())
+//                                .accessDeniedHandler(accessDeniedHandler())
+//                );
         http
-                .exceptionHandling(ex ->
-                        ex
-                                .authenticationEntryPoint(authenticationEntryPoint())
-                                .accessDeniedHandler(accessDeniedHandler())
+                .oauth2Login((oauth2) -> oauth2
+//                    .loginPage("/login")
+                    .userInfoEndpoint((userInfoEndpointConfig) ->
+                            userInfoEndpointConfig
+                                    .userService(customOAuth2UserService))
+                                .successHandler(customSuccessHandler)
                 );
 
         return http.build();

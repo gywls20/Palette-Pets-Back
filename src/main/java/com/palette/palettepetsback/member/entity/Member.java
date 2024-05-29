@@ -1,6 +1,5 @@
 package com.palette.palettepetsback.member.entity;
 
-import com.palette.palettepetsback.config.auditing.BaseEntity;
 import com.palette.palettepetsback.member.dto.Role;
 import com.palette.palettepetsback.pet.entity.Pet;
 import jakarta.persistence.*;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Member {
 
@@ -22,6 +21,8 @@ public class Member {
     private String password;
     @Column(name = "member_name")
     private String memberName;
+    @Column(name = "member_nickname")
+    private String memberNickname;
     @Column(name = "member_address")
     private String memberAddress;
     @Column(name = "member_birth")
@@ -43,13 +44,14 @@ public class Member {
     private List<Pet> pets = new ArrayList<>();
 
     @Builder
-    public Member(String email, String password, String memberName, String memberAddress,
+    public Member(String email, String password, String memberName,String memberNickname, String memberAddress,
                   String memberGender, String memberPhone,
                   String memberImage,
                   Role role ){
         this.email = email;
         this.password = password;
         this.memberName = memberName;
+        this.memberNickname = memberNickname;
         this.memberAddress = memberAddress;
         this.memberGender = memberGender;
         this.memberPhone = memberPhone;
