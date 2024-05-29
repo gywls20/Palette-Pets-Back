@@ -19,4 +19,9 @@ public class ArticleService {
     public Page<Article> getList(Pageable pageable) {
         return articleRepository.findAll(pageable);
     }
+
+    @Transactional(readOnly = true)
+    public Article findById(Long id) {
+        return articleRepository.findById(id).orElse(null);
+    }
 }
