@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     // 아이디로 찾기
-    Optional<Member> findByMemberId(Long memberId);
+    Optional<Member> findByEmail(String email);
     // 아이디 중복 여부
     Boolean existsByMemberId(Long memberId);
 

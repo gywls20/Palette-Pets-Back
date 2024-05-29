@@ -1,10 +1,8 @@
 package com.palette.palettepetsback.member.controller;
 
-import com.palette.palettepetsback.config.exceptions.NoMemberExistException;
-import com.palette.palettepetsback.member.dto.response.MemberResponseDto;
-import com.palette.palettepetsback.member.entity.Member;
+
 import com.palette.palettepetsback.member.service.MemberService;
-import lombok.Getter;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,16 +30,16 @@ public class MemberController {
 //        return test;
 //    }
 
-    @GetMapping("/login")
-    public MemberResponseDto getMemberByMemberId(@PathVariable String email, String passworld) {
-
-        return null;
-    }
-    @GetMapping("/join")
-    public MemberResponseDto postMember(@PathVariable String memberId) {
-
-        return null;
-    }
+//    @GetMapping("/login")
+//    public MemberResponseDto getMemberByMemberId(@PathVariable String email, String passworld) {
+//
+//        return null;
+//    }
+//    @GetMapping("/join")
+//    public MemberResponseDto postMember(@PathVariable String memberId) {
+//
+//        return null;
+//    }
 
     @GetMapping("/test")
     public ResponseEntity<?> test() {

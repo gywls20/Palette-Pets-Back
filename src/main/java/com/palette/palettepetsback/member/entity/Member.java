@@ -5,11 +5,11 @@ import com.palette.palettepetsback.member.dto.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
+@Getter @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Member extends BaseEntity {
+public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -18,6 +18,8 @@ public class Member extends BaseEntity {
     private String password;
     @Column(name = "member_name")
     private String memberName;
+    @Column(name = "member_nickname")
+    private String memberNickname;
     @Column(name = "member_address")
     private String memberAddress;
     @Column(name = "member_birth")
@@ -36,17 +38,24 @@ public class Member extends BaseEntity {
     private boolean isDeleted;
 
     @Builder
-    public Member(String email, String password, String memberName, String memberAddress,
+    public Member(String email, String password, String memberName,String memberNickname, String memberAddress,
                   String memberGender, String memberPhone,
                   String memberImage,
                   Role role ){
         this.email = email;
         this.password = password;
         this.memberName = memberName;
+        this.memberNickname = memberNickname;
         this.memberAddress = memberAddress;
         this.memberGender = memberGender;
         this.memberPhone = memberPhone;
         this.memberImage = memberImage;
+        this.role = role;
+    }
+
+    public Member(Long memberId, String email, Role role) {
+        this.memberId = memberId;
+        this.email = email;
         this.role = role;
     }
 
