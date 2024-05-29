@@ -45,8 +45,8 @@ public class ArticleCommentService {
     }
     //댓글 작성
     @Transactional
-    public ArticleCommentDto create(Long articleId,ArticleCommentDto dto){
-        Article article = articleRepository.findById(articleId)
+    public ArticleCommentDto create(ArticleCommentDto dto){
+        Article article = articleRepository.findById(dto.getArticleId())
                 .orElseThrow(()->new IllegalArgumentException("댓글 생성 실패" + "대상 게시글이 없습니다."));
 
         //부모 댓글이 있는 경우
@@ -58,7 +58,9 @@ public class ArticleCommentService {
 
         ArticleComment articleComment = ArticleComment.createComment(dto,article,parentComment);
         ArticleComment created =articleCommentRepository.save(articleComment);
+        created.setRef(created.getArticleCommentId().intValue());
         return ArticleCommentDto.createArticleCommentDto(created);
+
 
     }
 
