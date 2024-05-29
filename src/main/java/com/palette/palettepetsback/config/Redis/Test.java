@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -12,4 +13,5 @@ import java.io.Serializable;
 public class Test implements Serializable {
     private String id;
     private String name;
+    private LocalDateTime createdAt;
 }

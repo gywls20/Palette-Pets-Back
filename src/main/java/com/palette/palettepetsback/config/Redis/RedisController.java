@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -16,13 +17,17 @@ public class RedisController {
 
     @PostMapping("/save")
     public void save() {
-        Test test = new Test("555", "changeTest22");
+        Test test = new Test("555", "changeTest22", LocalDateTime.now());
         redisRepository.save("2", test);
     }
 
     @GetMapping("/find")
     public Test find() {
         return redisRepository.findById("2");
+    }
+    @GetMapping("/findAll")
+    public void findAll() {
+        redisRepository.findAll();
     }
 
     @PostMapping("/delete")
@@ -32,7 +37,7 @@ public class RedisController {
 
     @PostMapping("/setWithExpiration")
     public void setWithExpiration() {
-        Test test = new Test("1", "test");
+        Test test = new Test("1", "test",LocalDateTime.now());
         redisRepository.setWithExpiration("1", test, 10L, TimeUnit.SECONDS);
     }
 }
