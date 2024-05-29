@@ -5,6 +5,7 @@ import com.palette.palettepetsback.config.jwt.filter.CustomLogoutFilter;
 import com.palette.palettepetsback.config.jwt.filter.JWTFilter;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
+import com.palette.palettepetsback.config.oauth2.CustomSuccessHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAccessDeniedHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAuthenticationEntryPoint;
 import com.palette.palettepetsback.member.service.CustomOAuth2UserService;
@@ -37,6 +38,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -91,6 +93,7 @@ public class SecurityConfig {
                     .userInfoEndpoint((userInfoEndpointConfig) ->
                             userInfoEndpointConfig
                                     .userService(customOAuth2UserService))
+                                .successHandler(customSuccessHandler)
                 );
 
         return http.build();
