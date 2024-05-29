@@ -21,10 +21,10 @@ import java.util.Map;
  *  - JWT 검증 메서드 : isExpired()
  *
  *  JWT 기본 스펙 (2024.05.27)
- *  - memberId : pk가 필요한지는 잘모르겠음 -> email로만 검색?
- *  - category : 어세스 토큰인지 리프레시 토큰인지 구분
+ *  - memberId : pk값
  *  - email : 회원 아이디 겸 이메일
  *  - role : 회원 권한
+ *  - category : 어세스 토큰인지 리프레시 토큰인지 구분
  *  - 발행일
  *  - 만료기한
  *

@@ -1,5 +1,6 @@
-package com.palette.palettepetsback.config.jwt;
+package com.palette.palettepetsback.config.jwt.filter;
 
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -9,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.log.LogMessage;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -45,6 +44,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
             chain.doFilter(request, response);
             return;
         }
+        
+        log.info("로그아웃 수행 시작");
 
         // refresh token 가져오기
         String refresh = null;
@@ -55,19 +56,24 @@ public class CustomLogoutFilter extends GenericFilterBean {
             }
         }
 
+        log.info("refresh 토큰 가져오기 = {}", refresh);
+
         // null check
         if (refresh == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("refresh token is null");
             return;
         }
         // 만료 체크 -> 이미 로그아웃 됨 todo 어떤 응답 코드로 보낼지 나중에 정하기
         if (jwtUtil.isExpired(refresh)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("refresh token is expired");
             return;
         }
         // 받은 토큰이 refresh 인지 확인
         if (!jwtUtil.getCategory(refresh).equals("refresh")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("refresh token invalid");
             return;
         }
 
@@ -84,5 +90,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 응답
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().print("logout success");
     }
 }
