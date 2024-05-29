@@ -21,10 +21,10 @@ import java.util.Map;
  *  - JWT 검증 메서드 : isExpired()
  *
  *  JWT 기본 스펙 (2024.05.27)
- *  - memberId : pk가 필요한지는 잘모르겠음 -> email로만 검색?
- *  - category : 어세스 토큰인지 리프레시 토큰인지 구분
+ *  - memberId : pk값
  *  - email : 회원 아이디 겸 이메일
  *  - role : 회원 권한
+ *  - category : 어세스 토큰인지 리프레시 토큰인지 구분
  *  - 발행일
  *  - 만료기한
  *
@@ -55,6 +55,16 @@ public class JWTUtil {
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis())) // 현재 발행시간
                 .expiration(new Date(System.currentTimeMillis() + expiredMs)) // 만료 시간
+                .signWith(secretKey)
+                .compact();
+    }
+    public String createJwt(String username, String role, Long expiredMs) {
+
+        return Jwts.builder()
+                .claim("username", username)
+                .claim("role", role)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
     }

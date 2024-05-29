@@ -1,6 +1,8 @@
 package com.palette.palettepetsback.pet.service;
 
 import com.palette.palettepetsback.config.exceptions.NoSuchPetException;
+import com.palette.palettepetsback.member.entity.Member;
+import com.palette.palettepetsback.member.repository.MemberRepository;
 import com.palette.palettepetsback.pet.dto.request.ImgPetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetUpdateDto;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetService {
 
+    private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final ImgPetRepository imgPetRepository;
 
@@ -33,10 +36,13 @@ public class PetService {
 
         log.info("dto = {}", dto.toString());
 
+        Member member = memberRepository.findById(dto.getCreatedWho())
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
         // 펫 등록
         Pet saved = petRepository.save(
                 Pet.builder()
-                        .createdWho(dto.getCreatedWho())
+                        .member(member)
                         .petName(dto.getPetName())
                         .petImage(dto.getPetImage())
                         .petCategory1(dto.getPetCategory1())
@@ -118,7 +124,7 @@ public class PetService {
 
         return PetResponseDto.builder()
                 .petId(pet.getId())
-                .createdWho(pet.getCreatedWho())
+                .createdWho(pet.getMember().getMemberId())
                 .petName(pet.getPetName())
                 .petImage(pet.getPetImage())
                 .petCategory1(pet.getPetCategory1())
@@ -155,7 +161,7 @@ public class PetService {
             // 펫 정보를 반환할 dto로 변환해서 리스트에 저장
             PetResponseDto dto = PetResponseDto.builder()
                     .petId(pet.getId())
-                    .createdWho(pet.getCreatedWho())
+                    .createdWho(pet.getMember().getMemberId())
                     .petName(pet.getPetName())
                     .petImage(pet.getPetImage())
                     .petCategory1(pet.getPetCategory1())

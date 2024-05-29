@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.pet.entity;
 
+import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.pet.dto.request.PetUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,10 +19,10 @@ public class Pet {
     @Column(name = "pet_id")
     private Long id;
     // 나중에 member_id 연관관계 맺기
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "created_who", referencedColumnName = "member_id")
-//    private Member member;
-    private Long createdWho;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_who", referencedColumnName = "member_id")
+    private Member member;
+
     private String petName;
     private String petImage;
     @Column(name = "pet_category_1")
@@ -36,8 +37,8 @@ public class Pet {
     private List<ImgPet> petImageList = new ArrayList<>();
 
     @Builder
-    public Pet(Long createdWho, String petName, String petImage, String petCategory1, String petCategory2, String petBirth, String petGender, Integer petWeight) {
-        this.createdWho = createdWho;
+    public Pet(Member member, String petName, String petImage, String petCategory1, String petCategory2, String petBirth, String petGender, Integer petWeight) {
+        this.member = member;
         this.petName = petName;
         this.petImage = petImage;
         this.petCategory1 = petCategory1;
@@ -48,9 +49,9 @@ public class Pet {
     }
 
     @Builder(builderMethodName = "fullBuilder")
-    public Pet(Long id, Long createdWho, String petName, String petImage, String petCategory1, String petCategory2, String petBirth, String petGender, Integer petWeight) {
+    public Pet(Long id, Member member, String petName, String petImage, String petCategory1, String petCategory2, String petBirth, String petGender, Integer petWeight) {
         this.id = id;
-        this.createdWho = createdWho;
+        this.member = member;
         this.petName = petName;
         this.petImage = petImage;
         this.petCategory1 = petCategory1;
@@ -62,7 +63,6 @@ public class Pet {
 
     // 펫 수정 메서드 (전체)
     public void updatePet(PetUpdateDto dto) {
-        this.createdWho = dto.getCreatedWho();
         this.petName = dto.getPetName();
         this.petImage = dto.getPetImage();
         this.petCategory1 = dto.getPetCategory1();

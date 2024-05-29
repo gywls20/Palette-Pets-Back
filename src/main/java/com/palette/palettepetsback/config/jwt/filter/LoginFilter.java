@@ -1,16 +1,20 @@
-package com.palette.palettepetsback.config.jwt;
+package com.palette.palettepetsback.config.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.member.entity.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +23,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,23 +69,23 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
 
-        // userDetails 추출
+        // todo 회원 정보 테스트 필요
+        // userDetails -> member, role 추출
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        // todo 회원 정보 추출
+        Member member = userDetails.getMember();
         // role
         String role = authentication.getAuthorities().iterator().next().getAuthority();
-        log.info("role = {}", role);
 
-        // todo 임시 jwt 정보
         Map<String, Object> claims = new HashMap<>();
-        claims.put("memberId", "1L");
-        claims.put("email", "dodobird@gmail.com");
-        claims.put("role", role);
+        claims.put("memberId", member.getMemberId());
+        claims.put("email", member.getEmail());
+        claims.put("role", member.getRole().name());
 
         // token 발급
-        String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L);// 어세스 토큰 - 10분 만료
-        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 10 * 60 * 1000L);// 리프레시 토큰 - 24시간 만료
+//        String access = jwtUtil.generateToken("access", claims, 60L); // 어세스 토큰 - 테스트용 바로 만료
+        String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L); // 어세스 토큰 - 10분 만료
+//        String refresh = jwtUtil.generateToken("refresh", claims, 60L); // 리프레시 토큰 - 테스트용 바로 만료
+        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
 //        addRefreshTokenRepository()
@@ -91,6 +96,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // refresh 토큰 : HttpOnly 쿠키에 넣어서 반환
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpServletResponse.SC_OK);
+        // payload : JSON 값 반환
+//        MemberResponseDto dto = MemberResponseDto.builder()
+//                .memberId(member.getMemberId())
+//                .email(member.getEmail())
+//                .role(member.getRole().name())
+//                .build();
+//        response.setContentType("application/json");
+//        response.getWriter().write(objectMapper.writeValueAsString(dto));
     }
 
     // 실패
@@ -98,7 +111,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         
         // 로그인 실패 -> 401 인증 실패 에러 반환
+        log.info("login fail!!");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write(objectMapper.writeValueAsString(false));
     }
 
     // HttpOnly 쿠키 생성 메서드
@@ -118,5 +135,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     static class LoginRequest {
         private String username;
         private String password;
+    }
+
+    // 로그인 성공 JSON 반환값
+    @Getter
+    @Setter
+    @Builder
+    static class MemberResponseDto {
+        private Long memberId;
+        private String email;
+        private String role;
     }
 }
