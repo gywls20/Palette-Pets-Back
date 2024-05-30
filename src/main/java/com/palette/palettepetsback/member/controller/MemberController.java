@@ -38,7 +38,7 @@ public class MemberController {
                 return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
             }
         }
-
+        //보안상 에러메시지는 간소화 했습니다.
         if (memberService.login(loginRequest.getEmail(), loginRequest.getPassword())==null) {
             return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 잘못되었습니다.");
         }
