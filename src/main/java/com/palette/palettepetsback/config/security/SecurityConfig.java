@@ -61,14 +61,15 @@ public class SecurityConfig {
 //                .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
         // 경로 별 인가
-//        http
-//                .authorizeHttpRequests((auth) -> auth
-//                                .requestMatchers(HttpMethod.POST, "/login").permitAll()
-//                                .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
-//                                .requestMatchers("/logout", "/", "/members/**").permitAll()
-//                                .anyRequest().permitAll()
-////                        .anyRequest().authenticated()
-//                );
+        http
+                .authorizeHttpRequests((auth) -> auth
+                                .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "basic/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
+                                .requestMatchers("/logout", "/", "/members/**").permitAll()
+                                .anyRequest().permitAll()
+//                        .anyRequest().authenticated()
+                );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
 //        http
 //                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
@@ -89,11 +90,11 @@ public class SecurityConfig {
 //                );
         http
                 .oauth2Login((oauth2) -> oauth2
-//                    .loginPage("/login")
+                    .loginPage("/login")
                     .userInfoEndpoint((userInfoEndpointConfig) ->
                             userInfoEndpointConfig
                                     .userService(customOAuth2UserService))
-                                .successHandler(customSuccessHandler)
+                                    .successHandler(customSuccessHandler)
                 );
 
         return http.build();

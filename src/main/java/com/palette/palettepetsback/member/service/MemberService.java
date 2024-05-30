@@ -1,6 +1,7 @@
 package com.palette.palettepetsback.member.service;
 
 import com.palette.palettepetsback.config.exceptions.NoMemberExistException;
+import com.palette.palettepetsback.member.dto.LoginRequest;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
 import com.palette.palettepetsback.member.repository.MemberRepositoryCustomImpl;
@@ -17,7 +18,27 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberRepositoryCustomImpl memberRepositoryCustom;
+    private final MemberRepository memberRepository;
+
+    //일반 로그인
+    public Member login(String email, String password) {
+
+        Optional<Member> member = memberRepository.findByEmail(email);
+
+
+        if (member.isEmpty()) {
+            System.out.println("그런 사람 없습니다.");
+            return null;
+        }else {
+            Member member1 = member.get();
+
+            if(member1.getPassword().equals(password)){
+                return member1;
+            }
+        }
+        System.out.println("비번 잘못 쳤습니다.");
+        return null;
+    }
 
 //    public Member login(String email, String password) {
 //        Optional<Member> findMember = memberRepositoryCustom.findByEmail(email);

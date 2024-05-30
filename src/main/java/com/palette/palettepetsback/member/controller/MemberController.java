@@ -1,42 +1,53 @@
 package com.palette.palettepetsback.member.controller;
 
 
+import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
+import com.palette.palettepetsback.member.dto.LoginRequest;
 import com.palette.palettepetsback.member.service.MemberService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
 
-//    @GetMapping("")
-//    public Member getMembers() {
-//        log.info("예외 테스트!!");
-//        Member test = memberService.test("test123123");
-//
-//        return test;
-//    }
+    //로그인 페이지
+    @GetMapping("/login")
+    public String loginPage() {
 
-//    @GetMapping("/login")
-//    public MemberResponseDto getMemberByMemberId(@PathVariable String email, String passworld) {
-//
-//        return null;
-//    }
+        return "login";
+    }
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) { //에러출력
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for(FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        if (memberService.login(loginRequest.getEmail(), loginRequest.getPassword())==null) {
+            return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 잘못되었습니다.");
+        }
+
+        return ResponseEntity.ok("로그인 성공");
+    }
+
 //    @GetMapping("/join")
-//    public MemberResponseDto postMember(@PathVariable String memberId) {
+//    public MemberResponseDto postMember(@c String memberId) {
 //
 //        return null;
 //    }
