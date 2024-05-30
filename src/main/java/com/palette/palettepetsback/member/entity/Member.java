@@ -1,15 +1,22 @@
 package com.palette.palettepetsback.member.entity;
 
-import com.palette.palettepetsback.config.auditing.BaseEntity;
 import com.palette.palettepetsback.member.dto.Role;
+import com.palette.palettepetsback.pet.entity.Pet;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter @Setter
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Member {
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Pet> pets = new ArrayList<>();
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -59,7 +66,8 @@ public class Member {
         this.role = role;
     }
 
-    public boolean checkPassword(String password){
-        return this.password.equals(password);
-    }
+//    public boolean checkPassword(String password){
+//        return this.password.equals(password);
+//    }
+
 }

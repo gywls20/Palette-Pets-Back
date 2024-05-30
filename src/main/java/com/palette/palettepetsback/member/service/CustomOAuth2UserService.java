@@ -2,7 +2,7 @@ package com.palette.palettepetsback.member.service;
 
 import com.palette.palettepetsback.member.dto.*;
 import com.palette.palettepetsback.member.entity.Member;
-import com.palette.palettepetsback.member.repository.UserRepository;
+import com.palette.palettepetsback.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
@@ -38,20 +38,23 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         //리소스 서버에서 발급 받은 정보로 사용자를 특정할 아이디값을 만듬
         String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-        Member existData = userRepository.findByPassword(username);
+        Member existData = memberRepository.findByPassword(username);
 
         if (existData == null) {
 
-            Member member = new Member();
-            member.setPassword(username);
-            member.setEmail(oAuth2Response.getEmail());
-            member.setMemberName(oAuth2Response.getName());
-            member.setMemberNickname(oAuth2Response.getNickname());
-            member.setMemberBirth(oAuth2Response.getBirthday());
-            member.setMemberGender(oAuth2Response.getGender());
-            member.setMemberPhone(oAuth2Response.getPhone_number());
+              Member member = Member.builder()
+                      .password(username)
+                      .email(oAuth2Response.getEmail())
+                      .memberName(oAuth2Response.getName())
+                      .memberNickname(oAuth2Response.getNickname())
+                      .memberBirth(oAuth2Response.getBirthday())
+                      .memberGender(oAuth2Response.getGender())
+                      .memberPhone(oAuth2Response.getPhone_number())
+                      .memberImage(oAuth2Response.getProfile_image())
+                      .role(Role.USER)
+                      .build();
 
-            userRepository.save(member);
+            memberRepository.save(member);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername(username);
@@ -68,7 +71,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             existData.setMemberBirth(oAuth2Response.getBirthday());
             existData.setMemberGender(oAuth2Response.getGender());
             existData.setMemberPhone(oAuth2Response.getPhone_number());
-            userRepository.save(existData);
+            memberRepository.save(existData);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername(existData.getPassword());
