@@ -21,9 +21,15 @@ public class PetController {
     private final PetService petService;
 
     // 한 회원이 등록한 반려동물 정보 리스트 쿼리
-    @GetMapping("")
-    public List<PetResponseDto> getPetListByMemberId(@RequestParam("memberId") Long memberId) {
+    @GetMapping("/list/{memberId}")
+    public List<PetResponseDto> getPetListByMemberId(@PathVariable("memberId") Long memberId) {
         return petService.findAllByMemberId(memberId);
+    }
+
+    // 등록된 반려동물 정보 상세 정보 쿼리
+    @GetMapping("/{petId}")
+    public PetResponseDto getPetByPetId(@PathVariable("petId") Long petId) {
+        return petService.findByPetId(petId);
     }
 
     // 펫 등록
@@ -56,9 +62,19 @@ public class PetController {
     }
 
     // 펫 이미지 삭제
-    @DeleteMapping("{petId}/img")
-    public boolean deletePetImg(@PathVariable("petId") Long petId, List<Long> imgIds) {
-        petService.deleteImgPet(imgIds);
+    @DeleteMapping("/img/{imgId}")
+    public boolean deletePetImg(@PathVariable("imgId") Long imgId) {
+        petService.deleteImgPet(imgId);
+        return true;
+    }
+
+    // 이미지 업로드  테스트
+    @PostMapping("/img/test")
+    public boolean imgUpdateTest(@RequestPart(value = "dto") ImgPetRegistryDto dto,
+                                 @RequestPart(value = "file") MultipartFile file) {
+        String s3Result = petService.fileUpload(file);
+        log.info("dto ={}", dto);
+        log.info("s3Result ={}", s3Result);
         return true;
     }
 }

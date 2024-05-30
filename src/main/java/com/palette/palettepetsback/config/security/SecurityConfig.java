@@ -81,12 +81,12 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 //        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
-//        http
-//                .exceptionHandling(ex ->
-//                        ex
-//                                .authenticationEntryPoint(authenticationEntryPoint())
-//                                .accessDeniedHandler(accessDeniedHandler())
-//                );
+        http
+                .exceptionHandling(ex ->
+                        ex
+                                .authenticationEntryPoint(authenticationEntryPoint())
+                                .accessDeniedHandler(accessDeniedHandler())
+                );
         http
                 .oauth2Login((oauth2) -> oauth2
 //                    .loginPage("/login")
