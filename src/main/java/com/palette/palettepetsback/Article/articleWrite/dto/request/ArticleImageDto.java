@@ -1,11 +1,13 @@
 package com.palette.palettepetsback.Article.articleWrite.dto.request;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 @Data
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ArticleImageDto {
-    private String img;
-    private Long article_id;
+    private String imgUrl;
+    private Long articleId;
 }

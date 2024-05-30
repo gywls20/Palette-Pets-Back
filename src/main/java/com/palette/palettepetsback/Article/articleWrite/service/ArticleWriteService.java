@@ -1,21 +1,43 @@
 package com.palette.palettepetsback.Article.articleWrite.service;
 
 import com.palette.palettepetsback.Article.Article;
+import com.palette.palettepetsback.Article.ArticleImage;
+import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
+import com.palette.palettepetsback.Article.articleWrite.repository.ImgArticleRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ArticleWriteService {
     @Autowired
     private ArticleWriteRepository articleWriteRepository;
+    @Autowired
+    private ImgArticleRepository imgArticleRepository;
+
+    @Transactional
+    public  Long  createImgArticle(ArticleImageDto dto) {
+        Article article = articleWriteRepository.findById(dto.getArticleId()).orElseThrow(()->new IllegalArgumentException("article not found"));
+
+        ArticleImage saved = imgArticleRepository.save(
+                ArticleImage.builder()
+                        .imgUrl(dto.getImgUrl())
+                        .article(article)
+                        .build()
+        );
+        return saved.getId();
+    }
 
     //get
     public List<Article> index() {
@@ -79,6 +101,15 @@ public class ArticleWriteService {
         // 3. 대상 삭제하기
         articleWriteRepository.delete(target);
         return target; //DB에서 삭제한 대상을 컨트롤러에 반환
+    }
+
+    // 게시글 이미지 삭제
+    @Transactional
+    public void deleteImgArticle(List<Long> imgIds) {
+
+        for(Long imgId : imgIds){
+            imgArticleRepository.deleteById(imgId);
+        }
     }
 }
 
