@@ -7,13 +7,12 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ImgArticleRepository;
+import com.palette.palettepetsback.Article.articleWrite.repository.ArticleLikeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Service
@@ -21,11 +20,14 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ArticleWriteService {
-    @Autowired
-    private ArticleWriteRepository articleWriteRepository;
-    @Autowired
-    private ImgArticleRepository imgArticleRepository;
 
+    private final ArticleWriteRepository articleWriteRepository;
+
+    private final ImgArticleRepository imgArticleRepository;
+    private final ArticleLikeRepository likeArticleRepository;
+
+
+    //게시글 이미지 등록
     @Transactional
     public  Long  createImgArticle(ArticleImageDto dto) {
         Article article = articleWriteRepository.findById(dto.getArticleId()).orElseThrow(()->new IllegalArgumentException("article not found"));
@@ -111,6 +113,11 @@ public class ArticleWriteService {
             imgArticleRepository.deleteById(imgId);
         }
     }
+
+
+
+
+
 }
 
 
