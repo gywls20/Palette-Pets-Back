@@ -7,6 +7,7 @@ import com.palette.palettepetsback.pet.dto.response.PetResponseDto;
 import com.palette.palettepetsback.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,8 +35,12 @@ public class PetController {
 
     // 펫 등록
     @PostMapping("")
-    public boolean registerPet(@RequestBody PetRegistryDto dto) {
-        // todo S3 저장 메서드 + 펫 이미지 리스트 저장
+    public boolean registerPet(@Validated @RequestPart("dto") PetRegistryDto dto,
+                               @RequestPart("file") MultipartFile file) {
+        // todo S3 저장 메서드 test 필요
+        String petImage = petService.fileUpload(file, "pet");
+        dto.setPetImage(petImage);
+        log.info("dto={}", dto);
         return petService.registerPet(dto) != null;
     }
 
@@ -48,9 +53,15 @@ public class PetController {
 
     // 펫 수정 - 펫 + 펫 이미지 추가
     @PutMapping("/{petId}")
-    public boolean updatePet(@PathVariable("petId") Long petId, PetUpdateDto dto) {
+    public boolean updatePet(@PathVariable("petId") Long petId,
+                             @Validated @RequestPart("dto") PetUpdateDto dto,
+                             @RequestPart(value = "file", required = false) MultipartFile file) {
+        // todo S3 저장 메서드 test 필요
+        if (file != null) {
+            String petImage = petService.fileUpload(file, "pet");
+            dto.setPetImage(petImage);
+        }
         petService.updatePet(dto);
-        // todo S3 저장 메서드 + 추가 펫 이미지 리스트 저장
         return true;
     }
 
@@ -70,9 +81,9 @@ public class PetController {
 
     // 이미지 업로드  테스트
     @PostMapping("/img/test")
-    public boolean imgUpdateTest(@RequestPart(value = "dto") ImgPetRegistryDto dto,
-                                 @RequestPart(value = "file") MultipartFile file) {
-        String s3Result = petService.fileUpload(file);
+    public boolean imgUpdateTest(@RequestPart("dto") ImgPetRegistryDto dto,
+                                 @RequestPart("file") MultipartFile file) {
+        String s3Result = petService.fileUpload(file, "test");
         log.info("dto ={}", dto);
         log.info("s3Result ={}", s3Result);
         return true;

@@ -35,8 +35,8 @@ public class PetService {
     private final NCPObjectStorageService objectStorageService;
 
     // 파일 저장 테스트
-    public String fileUpload(MultipartFile file) {
-        return objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, "test", file);
+    public String fileUpload(MultipartFile file, String dirPath) {
+        return objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, dirPath, file);
     }
 
     // 펫 등록
@@ -47,6 +47,10 @@ public class PetService {
 
         Member member = memberRepository.findById(dto.getCreatedWho())
                 .orElseThrow(() -> new RuntimeException("member not found"));
+
+        String substring = dto.getPetBirth().substring(0, 17);
+        dto.setPetBirth(substring);
+        log.info("substring = {}", substring);
 
         // 펫 등록
         Pet saved = petRepository.save(
@@ -91,6 +95,9 @@ public class PetService {
 
         Pet pet = petRepository.findById(dto.getPetId())
                 .orElseThrow(() -> new NoSuchPetException("pet not found"));
+
+        String substring = dto.getPetBirth().substring(0, 17);
+        dto.setPetBirth(substring);
 
         // dirty checking
         pet.updatePet(dto);
