@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -64,7 +65,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "basic/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/join").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
                                 .requestMatchers("/logout", "/", "/members/**").permitAll()
                                 .anyRequest().permitAll()
@@ -103,18 +104,18 @@ public class SecurityConfig {
     // password encoder : Bcrypt 타입 사용
     @Bean
     public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword);
-            }
-        };
+        return new BCryptPasswordEncoder();
+//        return new PasswordEncoder() {
+//            @Override
+//            public String encode(CharSequence rawPassword) {
+//                return rawPassword.toString();
+//            }
+//
+//            @Override
+//            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+//                return rawPassword.toString().equals(encodedPassword);
+//            }
+//        };
     }
 
     // 인증 매니저 -> 로그인 필터 사용

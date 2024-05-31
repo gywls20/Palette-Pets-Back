@@ -2,6 +2,7 @@ package com.palette.palettepetsback.member.controller;
 
 
 import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
+import com.palette.palettepetsback.member.dto.JoinRequest;
 import com.palette.palettepetsback.member.dto.LoginRequest;
 import com.palette.palettepetsback.member.service.MemberService;
 
@@ -46,11 +47,33 @@ public class MemberController {
         return ResponseEntity.ok("로그인 성공");
     }
 
-//    @GetMapping("/join")
-//    public MemberResponseDto postMember(@c String memberId) {
-//
-//        return null;
-//    }
+    @PostMapping("/join")
+    public ResponseEntity<String> signup (@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) { //에러출력
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for(FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
+            }
+        }
+        if (memberService.checkEmailDuplicate(joinRequest.getEmail())) {
+            return ResponseEntity.badRequest().body("이미 존재하는 이메일입니다.");
+        }
+
+        memberService.join(joinRequest);
+        return ResponseEntity.ok("회원가입이 완료되었습니다.");
+
+
+    }
+
+    //닉네임 중복확인 버튼
+    //중복시 true 반환
+    @PostMapping("/checkNickname")
+    public Boolean checkNickname(@RequestBody String nickname) {
+        if (memberService.checkNicknameDuplicate(nickname)) {
+            return true;
+        }
+        return false;
+    }
 
     @GetMapping("/test")
     public ResponseEntity<?> test() {

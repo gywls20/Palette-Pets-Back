@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-    // 아이디로 찾기
+    // 이메일 찾기
     Optional<Member> findByEmail(String email);
-    // 아이디 중복 여부
-    boolean existsByMemberId(Long memberId);
+    // 이메일 중복 여부
     boolean existsByEmail(String email);
+    //닉네임 중복 확인
     boolean existsByMemberNickname(String memberNickname);
 
     Member findByPassword(String password);

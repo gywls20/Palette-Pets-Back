@@ -60,14 +60,13 @@ public class Member {
         this.role = role;
     }
 
+
+    //근데 이건 어따 쓰는 거임?? 규찬님?
     public Member(Long memberId, String email, Role role) {
         this.memberId = memberId;
         this.email = email;
         this.role = role;
     }
 
-//    public boolean checkPassword(String password){
-//        return this.password.equals(password);
-//    }
 
 }
