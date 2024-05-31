@@ -83,6 +83,8 @@ public class Article {
         this.state= State.valueOf(modified);
     }
 
+
+
     public enum State{
         ACTIVE,MODIFIED,DELETED
     }

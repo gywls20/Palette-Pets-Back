@@ -58,7 +58,7 @@ public class ArticleCommentService {
 
         ArticleComment articleComment = ArticleComment.createComment(dto,article,parentComment);
         ArticleComment created =articleCommentRepository.save(articleComment);
-        created.setRef(created.getArticleCommentId().intValue());
+//        created.setRef(created.getArticleCommentId().intValue());
         return ArticleCommentDto.createArticleCommentDto(created);
 
 

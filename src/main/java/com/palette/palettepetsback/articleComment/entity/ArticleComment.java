@@ -32,7 +32,7 @@ public class ArticleComment {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @Setter
+    @Column(name = "ref")
     private int ref;
     @Column(name = "parent_id")
     private int parentId;
@@ -64,7 +64,7 @@ public class ArticleComment {
                     .content(articleCommentDto.getContent())
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
-                    .ref(0)
+                    .ref(articleCommentDto.getRef())
                     .parentId(parentComment.getArticleCommentId().intValue())
                     .build();
         }
@@ -77,7 +77,7 @@ public class ArticleComment {
                     .content(articleCommentDto.getContent())
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
-                    .ref(0)
+                    .ref(articleCommentDto.getRef())
                     .parentId(0) //parentId가 0이면 부모가 없는 최상위 댓글임
                     .build();
         }

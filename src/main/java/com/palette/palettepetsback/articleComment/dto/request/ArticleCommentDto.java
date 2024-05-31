@@ -22,6 +22,7 @@ public class ArticleCommentDto {
     @NotBlank(message = "content 비워둘수없음 ")
     private String content;
     private int parentId;
+    private int ref;
 
 
     //  패런트 아이디가 없으면 null 있으면 0 부모글 pk값 가져와서부모글
@@ -35,6 +36,7 @@ public class ArticleCommentDto {
                 articleComment.getArticle().getArticleId(),//댓글 엔티티가 속한 부모 게시글의 id
                 articleComment.getCreatedWho(),//댓글 엔티티의 createdWho
                 articleComment.getContent(), //댓글 엔티티의 content
+                articleComment.getRef(),
                 parentId //부모 댓글 ID설정
         );
     }

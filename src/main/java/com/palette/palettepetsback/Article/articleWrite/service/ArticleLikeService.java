@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +25,43 @@ public class ArticleLikeService {
     private final ArticleRepository articleRepository;
     private final MemberRepository memberRepository;
 
+    public void likeArticle(Long articleId,Long memberId){
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(()->new IllegalArgumentException("게시글 찾을수없음"));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new IllegalArgumentException("Member not found"));
 
-//    @Transactional
-//    public String likeArticle(Long id){
-//        Article article = articleRepository.findById(id).orElseThrow(ArticleNotFoundException::new);
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//    }
+        Optional<ArticleLike>existingLike= articleLikeRepository.findByArticleAndMember(article,member);
+        if(existingLike.isPresent()){
+            return;
+        }
+
+        ArticleLike articleLike = ArticleLike.builder()
+                .article(article)
+                .member(member)
+                .createdAt(LocalDateTime.now())
+                .build();
+        articleLikeRepository.save(articleLike);
+    }
+
+    public void unlikeArticle(Long articleId,Long memberId){
+        Article article =articleRepository.findById(articleId)
+                .orElseThrow(()->new IllegalArgumentException("Article not found"));
+        Member member =memberRepository.findById(memberId)
+                .orElseThrow(()->new IllegalArgumentException("Member not found"));
+
+        Optional<ArticleLike>existingLike = articleLikeRepository.findByArticleAndMember(article,member);
+        existingLike.ifPresent(articleLikeRepository::delete);
+    }
+
+    public List<ArticleLike>getArticleLikes(Long articleId){
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(()->new IllegalArgumentException("Article not found"));
+        return articleLikeRepository.findByArticle(article);
+    }
+    public long getArticleLikeCount(Long articleId){
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(()->new IllegalArgumentException("Article not found"));
+        return articleLikeRepository.countByArticle(article);
+    }
 }

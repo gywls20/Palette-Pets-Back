@@ -12,4 +12,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 아이디 중복 여부
     Boolean existsByMemberId(Long memberId);
 
+    Optional<Object> findByMemberName(String name);
 }

@@ -8,7 +8,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
@@ -24,22 +23,18 @@ public class ArticleLike {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "article_id",nullable = false)
+    @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="created_who",referencedColumnName = "member_id")
+    @JoinColumn(name = "created_who", referencedColumnName = "member_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    @DateTimeFormat(pattern = "yyyy-mm-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;
 
-    public void createdAt(){
+    public void createdAt() {
         this.createdAt = LocalDateTime.now();
     }
-
-
-
 }
-

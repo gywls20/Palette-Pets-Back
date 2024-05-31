@@ -1,11 +1,17 @@
 package com.palette.palettepetsback.Article.articleWrite.dto.request;
 
 
-import lombok.Getter;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 
-@Getter
-
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ArticleLikeRequestDto {
+    private Long articleId;
+    private Long memberId;
 
 }
