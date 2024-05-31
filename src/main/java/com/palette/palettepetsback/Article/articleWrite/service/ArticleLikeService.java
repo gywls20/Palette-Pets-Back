@@ -25,10 +25,10 @@ public class ArticleLikeService {
     private final MemberRepository memberRepository;
 
 
-    @Transactional
-    public String likeArticle(Long id){
-        Article article = articleRepository.findById(id).orElseThrow(ArticleNotFoundException::new);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    }
+//    @Transactional
+//    public String likeArticle(Long id){
+//        Article article = articleRepository.findById(id).orElseThrow(ArticleNotFoundException::new);
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//    }
 }

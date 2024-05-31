@@ -60,8 +60,7 @@ public class ArticleWriteController {
     @PatchMapping("/Patch/{id}")
     public ResponseEntity<Article> update( @PathVariable Long id,
                                                 @Valid
-                                              @RequestBody ArticleWriteDto dto
-    ){
+                                              @RequestBody ArticleWriteDto dto){
         Article updated = articleWriteService.update(id,dto); // 서비스를 통해 게시글 수정
         return (updated != null)?//수정되면 정상, 안되면 오류 응답
                 ResponseEntity.status(HttpStatus.OK).body(updated):
@@ -86,8 +85,8 @@ public class ArticleWriteController {
     }
 
     //게시글 이미지 삭제
-    @DeleteMapping("{articleId}/img")
-    public boolean deleteArticleImg(@PathVariable ("articleId")Long articleId,List<Long>imgIds ){
+    @DeleteMapping("{id}/img")
+    public boolean deleteArticleImg(@PathVariable ("id")Long id,@RequestBody List<Long>imgIds ){
         articleWriteService.deleteImgArticle(imgIds);
         return true;
     }
