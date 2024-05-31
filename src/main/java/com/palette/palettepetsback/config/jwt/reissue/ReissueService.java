@@ -53,7 +53,8 @@ public class ReissueService {
             cookie.setMaxAge(0);
             cookie.setHttpOnly(true);
             response.addCookie(cookie);
-            return new ResponseEntity<>("refresh token expired, login plz", HttpStatus.BAD_REQUEST);
+            // REFRESH_TOKEN_EXPIRED_ERROR 에러를 프론트에 반환
+            return new ResponseEntity<>("REFRESH_TOKEN_EXPIRED_ERROR", HttpStatus.BAD_REQUEST);
         }
         // refresh 토큰인지 category 검증
         if (!jwtUtil.getCategory(refresh).equals("refresh")) {

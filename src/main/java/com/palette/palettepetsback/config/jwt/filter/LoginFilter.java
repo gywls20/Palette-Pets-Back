@@ -85,10 +85,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         claims.put("role", member.getRole().name());
 
         // token 발급
-        String access = jwtUtil.generateToken("access", claims, 10 * 1000L); // 어세스 토큰 - 테스트용 10초 만료
-//        String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L); // 어세스 토큰 - 10분 만료
+//        String access = jwtUtil.generateToken("access", claims, 10 * 1000L); // 어세스 토큰 - 테스트용 10초 만료
+        String access = jwtUtil.generateToken("access", claims, 60 * 60 * 1000L); // 어세스 토큰 - 1시간 만료 (12-24시간)
 //        String refresh = jwtUtil.generateToken("refresh", claims, 60L); // 리프레시 토큰 - 테스트용 바로 만료
-        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료
+        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료 (1일~한달)
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
         RefreshToken refreshToken = RefreshToken.builder()
@@ -97,6 +97,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000).getTime())
                 .build();
         RefreshToken saved = refreshTokenRepository.save(refreshToken);
+        log.info("refresh token 저장소 저장 = {}", saved);
         if (saved.getRefreshToken() == null) {
             throw new RuntimeException("redis 리프레시 토큰 저장소 저장 실패");
         }
@@ -107,14 +108,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // refresh 토큰 : HttpOnly 쿠키에 넣어서 반환
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpServletResponse.SC_OK);
-        // payload : JSON 값 반환
-//        MemberResponseDto dto = MemberResponseDto.builder()
-//                .memberId(member.getMemberId())
-//                .email(member.getEmail())
-//                .role(member.getRole().name())
-//                .build();
-//        response.setContentType("application/json");
-//        response.getWriter().write(objectMapper.writeValueAsString(dto));
     }
 
     // 실패
