@@ -30,6 +30,7 @@ public class JoinRequest { //유저 이탈을 막기위해 최소한의 정보�
                 .email(this.email)
                 .password(encodedPassword)
                 .memberNickname(this.nickName)
+                .role(Role.USER)
                 .build();
     }
 

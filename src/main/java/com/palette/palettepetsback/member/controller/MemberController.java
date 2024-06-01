@@ -2,8 +2,10 @@ package com.palette.palettepetsback.member.controller;
 
 
 import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
+import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.dto.JoinRequest;
 import com.palette.palettepetsback.member.dto.LoginRequest;
+import com.palette.palettepetsback.member.dto.MemberRequest;
 import com.palette.palettepetsback.member.service.MemberService;
 
 import jakarta.validation.Valid;
@@ -11,9 +13,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,7 +51,16 @@ public class MemberController {
 
         return ResponseEntity.ok("로그인 성공");
     }
+    //로그아웃 어떻게하지??
+    //?0?
 
+
+    //회원가입
+    @GetMapping("/join")
+    public String joinPage() {
+
+        return "join";
+    }
     @PostMapping("/join")
     public ResponseEntity<String> signup (@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) { //에러출력
@@ -61,8 +75,6 @@ public class MemberController {
 
         memberService.join(joinRequest);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
-
-
     }
 
     //닉네임 중복확인 버튼
@@ -75,6 +87,119 @@ public class MemberController {
         return false;
     }
 
+    // 비밀번호 수정
+    @PutMapping("/password")
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody MemberRequest.Password passwordRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) { // 에러 출력
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for (FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // SecurityContext에서 인증 정보 추출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long memberId = userDetails.getMember().getMemberId();
+            // 서비스 메서드 호출하여 비밀번호 업데이트
+            memberService.updatePassword(memberId, passwordRequest);
+        } else {
+            return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
+        }
+
+
+
+
+        return ResponseEntity.ok("비밀번호가 수정되었습니다.");
+    }
+
+    // 닉네임 변경
+    @PutMapping("/nickname")
+    public ResponseEntity<String> updateNickname(@Valid @RequestBody MemberRequest.Nickname nicknameRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) { // 에러 출력
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for (FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        //닉네임 중복 확인
+        if (memberService.checkNicknameDuplicate(nicknameRequest.getNickName())) {
+            return ResponseEntity.badRequest().body("이미 존재하는 닉네임입니다.");
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long memberId = userDetails.getMember().getMemberId();
+            // 서비스 메서드 호출하여 비밀번호 업데이트
+            memberService.updateNickname(memberId,nicknameRequest);
+        } else {
+            return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
+        }
+
+        return ResponseEntity.ok("닉네임이 수정되었습니다.");
+    }
+
+    // 주소지 입력 -> 실명, 폰번호, 주소
+    @PutMapping("/address")
+    public ResponseEntity<String> updateAddress(@Valid @RequestBody MemberRequest.Address addressRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) { // 에러 출력
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for (FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        // SecurityContext에서 인증 정보 추출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long memberId = userDetails.getMember().getMemberId();
+            // 서비스 메서드 호출하여 비밀번호 업데이트
+            memberService.updateAddress(memberId, addressRequest);
+        } else {
+            return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
+        }
+
+        return ResponseEntity.ok("주소지가 입력되었습니다.");
+    }
+
+
+
+    // 생일, 성별 변경
+    @PutMapping("/other")
+    public ResponseEntity<String> updateBirthGender(@Valid @RequestBody MemberRequest.BirthGender birthGenderRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) { // 에러 출력
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for (FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        // SecurityContext에서 인증 정보 추출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long memberId = userDetails.getMember().getMemberId();
+            // 서비스 메서드 호출하여 비밀번호 업데이트
+            memberService.updateBirthGender(memberId, birthGenderRequest);
+        } else {
+            return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
+        }
+
+        return ResponseEntity.ok("생일과 성별이 입력되었습니다.");
+    }
+
+    // 프로필 이미지 설정
+    @PutMapping("/image")
+    public ResponseEntity<String> updateProfileImage(@RequestParam("image") MultipartFile image) {
+        try {
+            //String imageUrl = memberService.uploadImageToStorage(image);
+            //memberService.updateProfileImage(memberId, imageUrl);
+            return ResponseEntity.ok("프로필 이미지가 수정되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("프로필 이미지 업데이트에 실패하였습니다.");
+        }
+    }
     @GetMapping("/test")
     public ResponseEntity<?> test() {
 

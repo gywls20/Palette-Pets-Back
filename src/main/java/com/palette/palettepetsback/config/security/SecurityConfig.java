@@ -66,6 +66,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/join").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/password").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/nickname").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/address").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/other").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
                                 .requestMatchers("/logout", "/", "/members/**").permitAll()
                                 .anyRequest().permitAll()
