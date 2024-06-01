@@ -2,6 +2,8 @@ package com.palette.palettepetsback.config.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
+import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
+import com.palette.palettepetsback.config.jwt.redis.entity.RefreshToken;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.servlet.FilterChain;
@@ -14,6 +16,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +25,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +38,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
     // todo 추후 redis로 리프레시 토큰 저장소 사용 추가 필요
-//    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -80,11 +85,22 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         claims.put("role", member.getRole().name());
 
         // token 발급
-        String access = jwtUtil.generateToken("access", claims, 10 * 60 * 1000L);// 어세스 토큰 - 10분 만료
-        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L);// 리프레시 토큰 - 24시간 만료
+//        String access = jwtUtil.generateToken("access", claims, 10 * 1000L); // 어세스 토큰 - 테스트용 10초 만료
+        String access = jwtUtil.generateToken("access", claims, 60 * 60 * 1000L); // 어세스 토큰 - 1시간 만료 (12-24시간)
+//        String refresh = jwtUtil.generateToken("refresh", claims, 60L); // 리프레시 토큰 - 테스트용 바로 만료
+        String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료 (1일~한달)
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
-//        addRefreshTokenRepository()
+        RefreshToken refreshToken = RefreshToken.builder()
+                .refreshToken(refresh)
+                .email(member.getEmail())
+                .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000).getTime())
+                .build();
+        RefreshToken saved = refreshTokenRepository.save(refreshToken);
+        log.info("refresh token 저장소 저장 = {}", saved);
+        if (saved.getRefreshToken() == null) {
+            throw new RuntimeException("redis 리프레시 토큰 저장소 저장 실패");
+        }
 
         // response 설정
         // access 토큰 -> Authorization 헤더에 넣어서 반환
@@ -92,14 +108,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // refresh 토큰 : HttpOnly 쿠키에 넣어서 반환
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpServletResponse.SC_OK);
-        // payload : JSON 값 반환
-        MemberResponseDto dto = MemberResponseDto.builder()
-                .memberId(member.getMemberId())
-                .email(member.getEmail())
-                .role(member.getRole().name())
-                .build();
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(dto));
     }
 
     // 실패
@@ -107,7 +115,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         
         // 로그인 실패 -> 401 인증 실패 에러 반환
+        log.info("login fail!!");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write(objectMapper.writeValueAsString(false));
     }
 
     // HttpOnly 쿠키 생성 메서드

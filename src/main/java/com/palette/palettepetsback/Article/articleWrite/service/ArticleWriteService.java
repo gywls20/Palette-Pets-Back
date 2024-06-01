@@ -37,7 +37,6 @@ public class ArticleWriteService {
     }
 
     @Transactional
-
     public Article update(Long id, ArticleWriteDto dto) {
         // 1. DTO -> 엔티티 변환하기
         Article articleWrite = Article.builder()

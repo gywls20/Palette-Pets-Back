@@ -5,6 +5,7 @@ import com.palette.palettepetsback.config.jwt.filter.CustomLogoutFilter;
 import com.palette.palettepetsback.config.jwt.filter.JWTFilter;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
+import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
 import com.palette.palettepetsback.config.oauth2.CustomSuccessHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAccessDeniedHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAuthenticationEntryPoint;
@@ -40,6 +41,7 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -49,7 +51,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors((cors) -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                    configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);
@@ -59,7 +61,7 @@ public class SecurityConfig {
 
                     return configuration;
                     }))
-//                .formLogin(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
         // 경로 별 인가
         http
@@ -76,23 +78,24 @@ public class SecurityConfig {
 //                        .anyRequest().authenticated()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
-//        http
-//                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
-//                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper),
-//                        UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),
+                                jwtUtil, objectMapper, refreshTokenRepository),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 //        // 세션 매니저 설정 - STATELESS (JWT 사용을 위한 무상태 설정)
-//        http
-//                .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 //        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
-//        http
-//                .exceptionHandling(ex ->
-//                        ex
-//                                .authenticationEntryPoint(authenticationEntryPoint())
-//                                .accessDeniedHandler(accessDeniedHandler())
-//                );
+        http
+                .exceptionHandling(ex ->
+                        ex
+                                .authenticationEntryPoint(authenticationEntryPoint())
+                                .accessDeniedHandler(accessDeniedHandler())
+                );
         http
                 .oauth2Login((oauth2) -> oauth2
                     .loginPage("/login")
@@ -108,18 +111,18 @@ public class SecurityConfig {
     // password encoder : Bcrypt 타입 사용
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-//        return new PasswordEncoder() {
-//            @Override
-//            public String encode(CharSequence rawPassword) {
-//                return rawPassword.toString();
-//            }
-//
-//            @Override
-//            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-//                return rawPassword.toString().equals(encodedPassword);
-//            }
-//        };
+     //   return new BCryptPasswordEncoder();
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return rawPassword.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return rawPassword.toString().equals(encodedPassword);
+            }
+        };
     }
 
     // 인증 매니저 -> 로그인 필터 사용

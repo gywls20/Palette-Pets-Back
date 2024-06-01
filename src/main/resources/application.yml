@@ -11,6 +11,13 @@ spring:
         format_sql: true
     defer-datasource-initialization: true
 
+  # REDIS
+  data:
+    redis:
+      host: 175.106.99.78
+      port: 6379
+      password: 1234
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://db-n0ucm-kr.vpc-pub-cdb.ntruss.com:3306/PalettePets?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul

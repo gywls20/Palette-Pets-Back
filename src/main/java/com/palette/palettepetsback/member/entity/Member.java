@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.member.entity;
 
+import com.palette.palettepetsback.config.auditing.BaseEntity;
 import com.palette.palettepetsback.member.dto.Role;
 import com.palette.palettepetsback.pet.entity.Pet;
 import jakarta.persistence.*;
@@ -60,13 +61,13 @@ public class Member {
         this.role = role;
     }
 
-
-    //근데 이건 어따 쓰는 거임?? 규찬님?
     public Member(Long memberId, String email, Role role) {
         this.memberId = memberId;
         this.email = email;
         this.role = role;
     }
 
-
+    public boolean checkPassword(String password){
+        return this.password.equals(password);
+    }
 }

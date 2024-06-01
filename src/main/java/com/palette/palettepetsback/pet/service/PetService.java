@@ -1,5 +1,7 @@
 package com.palette.palettepetsback.pet.service;
 
+import com.palette.palettepetsback.config.SingleTon.Singleton;
+import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.exceptions.NoSuchPetException;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,12 @@ public class PetService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final ImgPetRepository imgPetRepository;
+    private final NCPObjectStorageService objectStorageService;
+
+    // 파일 저장 테스트
+    public String fileUpload(MultipartFile file, String dirPath) {
+        return objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, dirPath, file);
+    }
 
     // 펫 등록
     @Transactional
@@ -38,6 +47,10 @@ public class PetService {
 
         Member member = memberRepository.findById(dto.getCreatedWho())
                 .orElseThrow(() -> new RuntimeException("member not found"));
+
+        String substring = dto.getPetBirth().substring(0, 17);
+        dto.setPetBirth(substring);
+        log.info("substring = {}", substring);
 
         // 펫 등록
         Pet saved = petRepository.save(
@@ -57,7 +70,6 @@ public class PetService {
 
         // todo 펫 이미지 등록
 
-//        return saved.getId() != null;
         return saved.getId();
     }
 
@@ -84,6 +96,9 @@ public class PetService {
         Pet pet = petRepository.findById(dto.getPetId())
                 .orElseThrow(() -> new NoSuchPetException("pet not found"));
 
+        String substring = dto.getPetBirth().substring(0, 17);
+        dto.setPetBirth(substring);
+
         // dirty checking
         pet.updatePet(dto);
     }
@@ -91,16 +106,13 @@ public class PetService {
     // 펫 등록 정보 삭제 -> 물리적 삭제
     @Transactional
     public void deletePet(Long petId) {
-        petRepository.deleteById(petId); // JPA cascade로 imgPet에 연관된 이미지도 삭제
+        petRepository.deleteById(petId); // JPA cascade 로 imgPet 에 연관된 이미지도 삭제
     }
 
-    // 펫 등록 정보 -> 펫 이미지 삭제 (다중)
+    // 펫 등록 정보 -> 펫 이미지 삭제
     @Transactional
-    public void deleteImgPet(List<Long> imgIds) {
-
-        for (Long imgId : imgIds) {
-            imgPetRepository.deleteById(imgId);
-        }
+    public void deleteImgPet(Long imgId) {
+        imgPetRepository.deleteById(imgId);
     }
 
     // todo queryDsl 최적화 할 수 있을 듯

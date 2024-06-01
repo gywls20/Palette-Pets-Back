@@ -45,7 +45,7 @@ public class NCPObjectStorageService {
 
             PutObjectRequest putObjectRequest =
                     new PutObjectRequest(bucketName
-                            , directoryPath + fileName
+                            , directoryPath + "/" + fileName
                             , fileIn
                             , objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead);
             s3.putObject(putObjectRequest);

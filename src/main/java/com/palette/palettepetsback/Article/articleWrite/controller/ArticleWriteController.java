@@ -2,11 +2,14 @@ package com.palette.palettepetsback.Article.articleWrite.controller;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
+
+
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +19,17 @@ import java.util.List;
 @RestController
 @CrossOrigin //리액트에서 넘어올때 포트가 다르면 오류가 생기는걸 해결해줌
 @Log4j2
-@RequiredArgsConstructor
+//@RequiredArgsConstructor //final이 붙은 필드들을 자동 생성해주는 생성자 -> Autowired안써도 되게 해주는거
 public class ArticleWriteController {
 
     private final ArticleWriteService articleWriteService;
     private final ArticleWriteRepository articleWriteRepository;
+
+    @Autowired
+    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
+        this.articleWriteService = articleWriteService;
+        this.articleWriteRepository = articleWriteRepository;
+    } // 이거 대신에 @RequiredArgsConstructor 이거를 붙이면 된다
 
     //GET
     @GetMapping("/Get/articleWrite")
@@ -37,7 +46,6 @@ public class ArticleWriteController {
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
     }
 
 

@@ -78,7 +78,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 시큐리티 컨텍스트에 인증 정보 등록
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        log.info("security context getAuthentication : {}", SecurityContextHolder.getContext().getAuthentication());
+//        log.info("security context getAuthentication : {}", SecurityContextHolder.getContext().getAuthentication());
 
         filterChain.doFilter(request, response);
     }
