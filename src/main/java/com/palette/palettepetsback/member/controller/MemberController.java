@@ -1,13 +1,9 @@
 package com.palette.palettepetsback.member.controller;
 
-
-import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.dto.JoinRequest;
-import com.palette.palettepetsback.member.dto.LoginRequest;
 import com.palette.palettepetsback.member.dto.MemberRequest;
 import com.palette.palettepetsback.member.service.MemberService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,39 +26,44 @@ public class MemberController {
     private final MemberService memberService;
 
     //로그인 페이지
-    @GetMapping("/login")
-    public String loginPage() {
-
-        return "login";
-    }
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) { //에러출력
-            List<FieldError> list = bindingResult.getFieldErrors();
-            for(FieldError error : list) {
-                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
-            }
-        }
-        //보안상 에러메시지는 간소화 했습니다.
-        if (memberService.login(loginRequest.getEmail(), loginRequest.getPassword())==null) {
-            return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 잘못되었습니다.");
-        }
-
-        return ResponseEntity.ok("로그인 성공");
-    }
+//    @GetMapping("/login")
+//    public String loginPage() {
+//
+//        return "login";
+//    }
+//    @PostMapping("/login")
+//    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
+//
+//        if (bindingResult.hasErrors()) { //에러출력
+//            List<FieldError> list = bindingResult.getFieldErrors();
+//            for(FieldError error : list) {
+//                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
+//            }
+//        }
+//        //보안상 에러메시지는 간소화 했습니다.
+//        if (memberService.login(loginRequest.getUsername(), loginRequest.getPassword())==null) {
+//            return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 잘못되었습니다.");
+//        }
+//
+//        return ResponseEntity.ok("로그인 성공");
+//    }
     //로그아웃 어떻게하지??
     //?0?
 
 
     //회원가입
-    @GetMapping("/join")
-    public String joinPage() {
-
-        return "join";
-    }
+//    @GetMapping("/join")
+//    public String joinPage() {
+//
+//        return "join";
+//    }
     @PostMapping("/join")
     public ResponseEntity<String> signup (@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
+
+        log.info("joinRequest.getEmail() = ",joinRequest.getEmail());
+        log.info("joinRequest.getPassword() = ",joinRequest.getPassword());
+        log.info("joinRequest.getNickName() = ",joinRequest.getNickName());
+
         if (bindingResult.hasErrors()) { //에러출력
             List<FieldError> list = bindingResult.getFieldErrors();
             for(FieldError error : list) {
@@ -74,8 +75,12 @@ public class MemberController {
         }
 
         memberService.join(joinRequest);
+        log.info("joinRequest =", joinRequest.getPassword());
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
+    //비밀번호 찾기
+
+
 
     //닉네임 중복확인 버튼
     //중복시 true 반환
@@ -100,8 +105,7 @@ public class MemberController {
         // SecurityContext에서 인증 정보 추출
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            Long memberId = userDetails.getMember().getMemberId();
+            Long memberId = getMemberId(authentication);
             // 서비스 메서드 호출하여 비밀번호 업데이트
             memberService.updatePassword(memberId, passwordRequest);
         } else {
@@ -129,8 +133,7 @@ public class MemberController {
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            Long memberId = userDetails.getMember().getMemberId();
+            Long memberId = getMemberId(authentication);
             // 서비스 메서드 호출하여 비밀번호 업데이트
             memberService.updateNickname(memberId,nicknameRequest);
         } else {
@@ -138,6 +141,12 @@ public class MemberController {
         }
 
         return ResponseEntity.ok("닉네임이 수정되었습니다.");
+    }
+
+    private static Long getMemberId(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long memberId = userDetails.getMember().getMemberId();
+        return memberId;
     }
 
     // 주소지 입력 -> 실명, 폰번호, 주소
@@ -152,8 +161,7 @@ public class MemberController {
         // SecurityContext에서 인증 정보 추출
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            Long memberId = userDetails.getMember().getMemberId();
+            Long memberId = getMemberId(authentication);
             // 서비스 메서드 호출하여 비밀번호 업데이트
             memberService.updateAddress(memberId, addressRequest);
         } else {
@@ -177,8 +185,7 @@ public class MemberController {
         // SecurityContext에서 인증 정보 추출
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            Long memberId = userDetails.getMember().getMemberId();
+            Long memberId = getMemberId(authentication);
             // 서비스 메서드 호출하여 비밀번호 업데이트
             memberService.updateBirthGender(memberId, birthGenderRequest);
         } else {
@@ -187,6 +194,7 @@ public class MemberController {
 
         return ResponseEntity.ok("생일과 성별이 입력되었습니다.");
     }
+
 
     // 프로필 이미지 설정
     @PutMapping("/image")

@@ -7,13 +7,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+import static com.palette.palettepetsback.member.entity.QMember.member;
 
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final MemberRepository memberRepository;
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
@@ -23,6 +29,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
+
         if (registrationId.equals("naver")) {
 
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
@@ -36,9 +43,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
+
+
+
         //리소스 서버에서 발급 받은 정보로 사용자를 특정할 아이디값을 만듬
         String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
         Member existData = memberRepository.findByPassword(username);
+
+        String email = oAuth2Response.getEmail();
+        Optional<Member> findEmail = memberRepository.findByEmail(email);
+
+        //이메일 중복 확인 - 중복시 에러 반환
+        if (findEmail != null) {
+            OAuth2Error oAuth2Error = new OAuth2Error("error");
+            throw new OAuth2AuthenticationException(oAuth2Error, oAuth2Error.toString());
+        }
 
         if (existData == null) {
 
@@ -65,12 +84,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         else {
             //데이터 업데이트
-            existData.setEmail(oAuth2Response.getEmail());
-            existData.setMemberName(oAuth2Response.getName());
-            existData.setMemberNickname(oAuth2Response.getNickname());
-            existData.setMemberBirth(oAuth2Response.getBirthday());
-            existData.setMemberGender(oAuth2Response.getGender());
-            existData.setMemberPhone(oAuth2Response.getPhone_number());
+            existData.existData(
+                    oAuth2Response.getEmail(),
+                    oAuth2Response.getName(),
+                    oAuth2Response.getNickname(),
+                    oAuth2Response.getBirthday(),
+                    oAuth2Response.getGender(),
+                    oAuth2Response.getPhone_number()
+            );
+
             memberRepository.save(existData);
 
             UserDTO userDTO = new UserDTO();

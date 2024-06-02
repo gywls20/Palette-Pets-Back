@@ -9,7 +9,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter
+@Getter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -67,7 +67,31 @@ public class Member {
         this.role = role;
     }
 
-    public boolean checkPassword(String password){
-        return this.password.equals(password);
+    public void existData(String email, String memberName, String memberNickname, String memberBirth, String memberGender, String memberPhone){
+        this.email = email;
+        this.memberName = memberName;
+        this.memberNickname = memberNickname;
+        this.memberBirth=memberBirth;
+        this.memberGender=memberGender;
+        this.memberPhone = memberPhone;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateNickname(String memberNickname) {
+        this.memberNickname = memberNickname;
+    }
+
+    public void createNameAndPhoneAndAddress(String memberName, String memberPhone, String memberAddress) {
+        this.memberName = memberName;
+        this.memberPhone = memberPhone;
+        this.memberAddress = memberAddress;
+    }
+
+    public void updateBirthGender(String memberBirth, String memberGender) {
+        this.memberBirth=memberBirth;
+        this.memberGender=memberGender;
     }
 }

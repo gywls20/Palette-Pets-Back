@@ -66,6 +66,7 @@ public class SecurityConfig {
         // 경로 별 인가
         http
                 .authorizeHttpRequests((auth) -> auth
+//                                .requestMatchers(HttpMethod.GET, "/login").permitAll() //
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/join").permitAll()
                                 .requestMatchers(HttpMethod.PUT, "/password").permitAll()
@@ -98,7 +99,7 @@ public class SecurityConfig {
                 );
         http
                 .oauth2Login((oauth2) -> oauth2
-                    .loginPage("/login")
+//                    .loginPage("/login")
                     .userInfoEndpoint((userInfoEndpointConfig) ->
                             userInfoEndpointConfig
                                     .userService(customOAuth2UserService))
@@ -111,18 +112,18 @@ public class SecurityConfig {
     // password encoder : Bcrypt 타입 사용
     @Bean
     public PasswordEncoder passwordEncoder() {
-     //   return new BCryptPasswordEncoder();
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword);
-            }
-        };
+        return new BCryptPasswordEncoder();
+//        return new PasswordEncoder() {
+//            @Override
+//            public String encode(CharSequence rawPassword) {
+//                return rawPassword.toString();
+//            }
+//
+//            @Override
+//            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+//                return rawPassword.toString().equals(encodedPassword);
+//            }
+//        };
     }
 
     // 인증 매니저 -> 로그인 필터 사용

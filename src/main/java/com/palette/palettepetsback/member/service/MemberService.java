@@ -37,7 +37,7 @@ public class MemberService {
         Optional<Member> member = memberRepository.findByEmail(email);
 
         if (member.isEmpty()) {
-            System.out.println("그런 사람 없습니다.");
+            log.info("그런 사람 없습니다.");
             return null;
         }else {
             Member member1 = member.get();
@@ -47,7 +47,7 @@ public class MemberService {
                 return member1;
             }
         }
-        System.out.println("비번 잘못 쳤습니다.");
+        log.info("비번 잘못 쳤습니다.");
         return null;
     }
     //이메일 중복확인
@@ -58,12 +58,18 @@ public class MemberService {
     public boolean checkNicknameDuplicate(String nickname) {
         return memberRepository.existsByMemberNickname(nickname);
     }
+
     //회원가입
     public void join(JoinRequest req) {
+        log.info("JoinRequest = ",req.getPassword());
         String encodedPassword = passwordEncoder.encode(req.getPassword());
+        log.info("encodedPassword = ", encodedPassword);
         memberRepository.save(req.toEntity(encodedPassword));
 
     }
+
+
+
     // 비밀번호 수정
     public void updatePassword(Long memberId, MemberRequest.Password passwordRequest) {
         // DTO에서 비밀번호와 비밀번호 확인이 일치하는지 검증
@@ -71,22 +77,11 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
-        // 비밀번호 유효성 검증
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<MemberRequest.Password>> violations = validator.validate(passwordRequest);
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<MemberRequest.Password> violation : violations) {
-                sb.append(violation.getMessage()).append("\n");
-            }
-            throw new IllegalArgumentException("비밀번호 유효성 검증 실패: " + sb.toString());
-        }
-
         Optional<Member> optionalMember = memberRepository.findByMemberId(memberId);
 
         optionalMember.ifPresent(member -> {
             // 비밀번호 암호화
-            member.setPassword(passwordEncoder.encode(passwordRequest.getPassword()));
+            member.updatePassword(passwordEncoder.encode(passwordRequest.getPassword()));
 
             memberRepository.save(member);
         });
@@ -100,7 +95,7 @@ public class MemberService {
 
         optionalMember.ifPresent(member -> {
             // 비밀번호 암호화
-            member.setMemberNickname(nicknameRequest.getNickName());
+            member.updateNickname(nicknameRequest.getNickName());
 
             memberRepository.save(member);
         });
@@ -112,10 +107,11 @@ public class MemberService {
         // memberId로 DB에서 해당 회원 정보 조회
         Optional<Member> optionalMember = memberRepository.findByMemberId(memberId);
         optionalMember.ifPresent(member -> {
-            // 비밀번호 암호화
-            member.setMemberName(addressRequest.getName());
-            member.setMemberPhone(addressRequest.getPhone());
-            member.setMemberAddress(addressRequest.getAddress());
+
+            member.createNameAndPhoneAndAddress(
+                    addressRequest.getName(),
+                    addressRequest.getPhone(),
+                    addressRequest.getAddress());
 
             memberRepository.save(member);
         });
@@ -132,9 +128,10 @@ public class MemberService {
         // memberId로 DB에서 해당 회원 정보 조회
         Optional<Member> optionalMember = memberRepository.findByMemberId(memberId);
         optionalMember.ifPresent(member -> {
-            // 비밀번호 암호화
-            member.setMemberGender(BirthGenderRequest.getGender());
-            member.setMemberBirth(BirthGenderRequest.getBirth());
+            member.updateBirthGender(
+                    BirthGenderRequest.getGender()
+                    ,BirthGenderRequest.getBirth()
+            );
 
             memberRepository.save(member);
         });
