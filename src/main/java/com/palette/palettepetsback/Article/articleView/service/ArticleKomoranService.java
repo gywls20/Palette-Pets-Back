@@ -50,7 +50,7 @@ public class ArticleKomoranService {
 
         //정렬 조건
         PathBuilder<?> entityPath = new PathBuilder<>(Article.class, "article");
-        Order order = pd.isDir() ? Order.ASC : Order.DESC;
+        Order order = pd.getDir() ? Order.ASC : Order.DESC;
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
         orderSpecifiers.add(new OrderSpecifier(order, entityPath.get(pd.getSort())));
 

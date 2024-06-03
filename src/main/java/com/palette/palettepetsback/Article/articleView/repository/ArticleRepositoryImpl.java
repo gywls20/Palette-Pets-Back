@@ -19,11 +19,7 @@ import java.util.List;
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 2a380810984207a9a2ae82de4ad2a84917f81d0b
     @Override
     public Page<Article> findDsl(PageableDTO pd) {
         QArticle article = QArticle.article;

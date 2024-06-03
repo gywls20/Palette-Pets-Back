@@ -55,7 +55,7 @@ public class ArticleService {
         QArticle qArticle = QArticle.article;
 
         PathBuilder<?> entityPath = new PathBuilder<>(Article.class, "article"); // 나는 Article Entity를 조회할거야
-        Order order = pd.isDir() ? Order.ASC : Order.DESC; // 오름차순, 내림차순 정하기
+        Order order = pd.getDir() ? Order.ASC : Order.DESC; // 오름차순, 내림차순 정하기
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>(); // 정렬 조건 모음
         orderSpecifiers.add(new OrderSpecifier(order, entityPath.get(pd.getSort()))); // 정렬 조건 넣기
 

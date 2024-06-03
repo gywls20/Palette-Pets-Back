@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PageableDTO {
     private int page;
+    private String where;
     private String sort;
-    private String dir;
+    private Boolean dir;
 }
