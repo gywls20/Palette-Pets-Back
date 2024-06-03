@@ -7,6 +7,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
@@ -14,14 +15,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
+
     private final JPAQueryFactory queryFactory;
-
-    @Autowired
-    public ArticleRepositoryImpl(EntityManager entityManager) {
-        this.queryFactory = new JPAQueryFactory(entityManager);
-    }
-
     @Override
     public Page<Article> findDsl(PageableDTO pd) {
         QArticle article = QArticle.article;
