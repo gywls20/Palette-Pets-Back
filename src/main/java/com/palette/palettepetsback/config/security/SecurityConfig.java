@@ -9,6 +9,7 @@ import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
 import com.palette.palettepetsback.config.oauth2.CustomSuccessHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAccessDeniedHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAuthenticationEntryPoint;
+import com.palette.palettepetsback.member.dto.Role;
 import com.palette.palettepetsback.member.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -66,15 +67,11 @@ public class SecurityConfig {
         // 경로 별 인가
         http
                 .authorizeHttpRequests((auth) -> auth
-//                                .requestMatchers(HttpMethod.GET, "/login").permitAll() //
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/member/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/join").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/password").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/nickname").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/address").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/other").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
-                                .requestMatchers("/logout", "/", "/members/**").permitAll()
+                                .requestMatchers("/logout", "/").permitAll()
                                 .anyRequest().permitAll()
 //                        .anyRequest().authenticated()
                 );

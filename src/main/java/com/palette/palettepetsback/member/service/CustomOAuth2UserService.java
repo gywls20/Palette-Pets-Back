@@ -50,16 +50,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
         Member existData = memberRepository.findByPassword(username);
 
-        String email = oAuth2Response.getEmail();
-        Optional<Member> findEmail = memberRepository.findByEmail(email);
 
-        //이메일 중복 확인 - 중복시 에러 반환
-        if (findEmail != null) {
-            OAuth2Error oAuth2Error = new OAuth2Error("error");
-            throw new OAuth2AuthenticationException(oAuth2Error, oAuth2Error.toString());
-        }
+        if (existData == null) { //oauth로 처음 로그인 한 사람
 
-        if (existData == null) {
+            String email = oAuth2Response.getEmail();
+            Optional<Member> findEmail = memberRepository.findByEmail(email);
+            
+            //이메일 중복 확인
+            if (findEmail.isPresent()) { //이메일이 이미 존재하는 경우
+                System.out.println("findEmail = " + findEmail);
+                OAuth2Error oAuth2Error = new OAuth2Error("error");
+                throw new OAuth2AuthenticationException(oAuth2Error, oAuth2Error.toString());
+            }
 
               Member member = Member.builder()
                       .password(username)

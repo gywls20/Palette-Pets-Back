@@ -47,16 +47,7 @@ public class MemberController {
 //
 //        return ResponseEntity.ok("로그인 성공");
 //    }
-    //로그아웃 어떻게하지??
-    //?0?
 
-
-    //회원가입
-//    @GetMapping("/join")
-//    public String joinPage() {
-//
-//        return "join";
-//    }
     @PostMapping("/join")
     public ResponseEntity<String> signup (@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
 
@@ -84,7 +75,7 @@ public class MemberController {
 
     //닉네임 중복확인 버튼
     //중복시 true 반환
-    @PostMapping("/checkNickname")
+    @PostMapping("/member/checknickname")
     public Boolean checkNickname(@RequestBody String nickname) {
         if (memberService.checkNicknameDuplicate(nickname)) {
             return true;
@@ -93,7 +84,7 @@ public class MemberController {
     }
 
     // 비밀번호 수정
-    @PutMapping("/password")
+    @PutMapping("/member/password")
     public ResponseEntity<String> updatePassword(@Valid @RequestBody MemberRequest.Password passwordRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) { // 에러 출력
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -119,7 +110,7 @@ public class MemberController {
     }
 
     // 닉네임 변경
-    @PutMapping("/nickname")
+    @PutMapping("/member/nickname")
     public ResponseEntity<String> updateNickname(@Valid @RequestBody MemberRequest.Nickname nicknameRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) { // 에러 출력
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -150,7 +141,7 @@ public class MemberController {
     }
 
     // 주소지 입력 -> 실명, 폰번호, 주소
-    @PutMapping("/address")
+    @PutMapping("/member/address")
     public ResponseEntity<String> updateAddress(@Valid @RequestBody MemberRequest.Address addressRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) { // 에러 출력
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -174,7 +165,7 @@ public class MemberController {
 
 
     // 생일, 성별 변경
-    @PutMapping("/other")
+    @PutMapping("/member/other")
     public ResponseEntity<String> updateBirthGender(@Valid @RequestBody MemberRequest.BirthGender birthGenderRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) { // 에러 출력
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -197,17 +188,17 @@ public class MemberController {
 
 
     // 프로필 이미지 설정
-    @PutMapping("/image")
-    public ResponseEntity<String> updateProfileImage(@RequestParam("image") MultipartFile image) {
-        try {
-            //String imageUrl = memberService.uploadImageToStorage(image);
-            //memberService.updateProfileImage(memberId, imageUrl);
-            return ResponseEntity.ok("프로필 이미지가 수정되었습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("프로필 이미지 업데이트에 실패하였습니다.");
-        }
-    }
+//    @PutMapping("/member/image")
+//    public ResponseEntity<String> updateProfileImage(@RequestParam("image") MultipartFile image) {
+//        try {
+//            //String imageUrl = memberService.uploadImageToStorage(image);
+//            //memberService.updateProfileImage(memberId, imageUrl);
+//            return ResponseEntity.ok("프로필 이미지가 수정되었습니다.");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().body("프로필 이미지 업데이트에 실패하였습니다.");
+//        }
+//    }
     @GetMapping("/test")
     public ResponseEntity<?> test() {
 
