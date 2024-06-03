@@ -22,20 +22,19 @@ public class ArticleCommentDto {
     @NotBlank(message = "content 비워둘수없음 ")
     private String content;
     private int parentId;
+    private int ref;
 
 
     //  패런트 아이디가 없으면 null 있으면 0 부모글 pk값 가져와서부모글
     public static ArticleCommentDto createArticleCommentDto(ArticleComment articleComment) {
-        int parentId = 0; //기본값은 null
-        if (articleComment.getParentId() !=0) {
-            parentId = articleComment.getParentId();//부모 댓글이 있는 경우 부모 댓글의 articleCommentId 가져오기
-        }
+
         return new ArticleCommentDto(
                 articleComment.getArticleCommentId(), //댓글 엔티티의 id
                 articleComment.getArticle().getArticleId(),//댓글 엔티티가 속한 부모 게시글의 id
                 articleComment.getCreatedWho(),//댓글 엔티티의 createdWho
                 articleComment.getContent(), //댓글 엔티티의 content
-                parentId //부모 댓글 ID설정
+                articleComment.getParentId(), //부모 댓글 ID설정
+                articleComment.getRef()
         );
     }
 

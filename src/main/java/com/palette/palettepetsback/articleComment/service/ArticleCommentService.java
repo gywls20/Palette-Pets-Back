@@ -38,15 +38,15 @@ public class ArticleCommentService {
     //댓글 조회
     @Transactional
     public List<ArticleCommentDto>comments(Article article){
-        return articleCommentRepository.findByArticle(article)//댓글 엔티티 목록 조회
+        return articleCommentRepository.findByArticleOrderByParentIdAscRefAsc(article)//댓글 엔티티 목록 조회
                 .stream() //댓글 엔티티 목록을 스트림으로 변환
                 .map(ArticleCommentDto::createArticleCommentDto)//엔티티를 DTO로 매핑
                 .collect(Collectors.toList()); //스트림을 리스트로 변환
     }
     //댓글 작성
     @Transactional
-    public ArticleCommentDto create(Long articleId,ArticleCommentDto dto){
-        Article article = articleRepository.findById(articleId)
+    public ArticleCommentDto create(ArticleCommentDto dto){
+        Article article = articleRepository.findById(dto.getArticleId())
                 .orElseThrow(()->new IllegalArgumentException("댓글 생성 실패" + "대상 게시글이 없습니다."));
 
         //부모 댓글이 있는 경우
@@ -58,7 +58,9 @@ public class ArticleCommentService {
 
         ArticleComment articleComment = ArticleComment.createComment(dto,article,parentComment);
         ArticleComment created =articleCommentRepository.save(articleComment);
+//        created.setRef(created.getArticleCommentId().intValue());
         return ArticleCommentDto.createArticleCommentDto(created);
+
 
     }
 

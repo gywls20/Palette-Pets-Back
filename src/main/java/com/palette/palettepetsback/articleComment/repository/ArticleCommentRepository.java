@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ArticleCommentRepository extends JpaRepository<ArticleComment,Long> {
     // select * from article_comment where article_id = Article.article_id
-    List<ArticleComment> findByArticle(Article articleId);
+    List<ArticleComment> findByArticleOrderByParentIdAscRefAsc(Article articleId);
 
 }
 

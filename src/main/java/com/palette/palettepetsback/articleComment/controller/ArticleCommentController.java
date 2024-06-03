@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.palette.palettepetsback.Article.QArticle.article;
+//import static com.palette.palettepetsback.Article.QArticle.article;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,9 +39,9 @@ public class ArticleCommentController {
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
     }
     //POST
-    @PostMapping("/Post/comments/{articleId}")
-    public ResponseEntity<ArticleCommentDto>create(@Valid  @PathVariable Long articleId, @RequestBody ArticleCommentDto dto) {
-        ArticleCommentDto createdDto = articleCommentService.create(articleId,dto);
+    @PostMapping("/Post/comments")
+    public ResponseEntity<ArticleCommentDto>create(@Valid @RequestBody ArticleCommentDto dto) {
+        ArticleCommentDto createdDto = articleCommentService.create(dto);
         return ResponseEntity.status(HttpStatus.OK).body(createdDto);
     }
 

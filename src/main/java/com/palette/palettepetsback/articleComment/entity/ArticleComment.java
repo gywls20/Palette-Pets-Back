@@ -4,10 +4,7 @@ import com.palette.palettepetsback.Article.Article;
 
 import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
 import java.time.LocalDateTime;
@@ -35,6 +32,7 @@ public class ArticleComment {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @Column(name = "ref")
     private int ref;
     @Column(name = "parent_id")
     private int parentId;
@@ -54,36 +52,20 @@ public class ArticleComment {
         if (articleCommentDto.getArticleId() != article.getArticleId())
             throw new IllegalArgumentException("댓글 생성 실패 게시글의 id가 잘못됐습니다");
 
-        // 부모 댓글이 있는 경우
-        if (parentComment != null) {
-            // 자식 댓글의 ref 값 계산
-            int childRef = parentComment.getRef() * 10 + 1;
 
-            // 자식 댓글 생성
-            return ArticleComment.builder()
-                    .article(article)
-                    .createdWho(articleCommentDto.getCreatedWho())
-                    .content(articleCommentDto.getContent())
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .ref(childRef)
-                    .parentId(parentComment.getArticleCommentId().intValue())
-                    .build();
-        }
-        // 부모 댓글이 없는 경우
-        else {
-            // 최상위 댓글 생성
-            return ArticleComment.builder()
-                    .article(article)
-                    .createdWho(articleCommentDto.getCreatedWho())
-                    .content(articleCommentDto.getContent())
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .ref(1)
-                    .parentId(0) //parentId가 0이면 부모가 없는 최상위 댓글임
-                    .build();
-        }
+
+        return ArticleComment.builder()
+                .article(article)
+                .createdWho(articleCommentDto.getCreatedWho())
+                .content(articleCommentDto.getContent())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .ref(articleCommentDto.getRef())
+                .parentId(articleCommentDto.getParentId())
+                .build();
+
     }
+
 
 
 }
