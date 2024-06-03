@@ -19,32 +19,6 @@ public class RedisController {
     private final redisRepository redisRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @PostMapping("/save")
-    public void save() {
-        Test test = new Test("555", "changeTest22", LocalDateTime.now());
-        redisRepository.save("2", test);
-    }
-
-    @GetMapping("/find")
-    public Test find() {
-        return redisRepository.findById("2");
-    }
-    @GetMapping("/findAll")
-    public void findAll() {
-        redisRepository.findAll();
-    }
-
-    @PostMapping("/delete")
-    public void delete() {
-        redisRepository.delete("1");
-    }
-
-    @PostMapping("/setWithExpiration")
-    public void setWithExpiration() {
-        Test test = new Test("1", "test",LocalDateTime.now());
-        redisRepository.setWithExpiration("1", test, 10L, TimeUnit.SECONDS);
-    }
-
     @GetMapping("/refresh/list")
     public List<RefreshToken> refreshList() {
         Iterable<RefreshToken> all = refreshTokenRepository.findAll();
