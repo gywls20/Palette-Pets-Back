@@ -1,6 +1,7 @@
 package com.palette.palettepetsback.config.jwt.filter;
 
 import com.palette.palettepetsback.config.jwt.JWTUtil;
+import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -19,8 +20,7 @@ import java.io.IOException;
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
-    // todo 리프레시 토큰 저장소 적용 필요
-//    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * 굳이 doFilter 두번 감싸는 이유 -> HttpServletRequest 얘 써야하는데 GenericFilterBean 구현하면 ServletRequest를 파라미터로 써야해서
@@ -64,10 +64,10 @@ public class CustomLogoutFilter extends GenericFilterBean {
             response.getWriter().print("refresh token is null");
             return;
         }
-        // 만료 체크 -> 이미 로그아웃 됨 todo 어떤 응답 코드로 보낼지 나중에 정하기
+        // 만료 체크 -> 이미 로그아웃 필요 에러 반환 (REFRESH_TOKEN_EXPIRED_ERROR)
         if (jwtUtil.isExpired(refresh)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("refresh token is expired");
+            response.getWriter().print("REFRESH_TOKEN_EXPIRED_ERROR");
             return;
         }
         // 받은 토큰이 refresh 인지 확인
@@ -80,7 +80,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
         /**
          * 로그아웃 로직 수행
          */
-        // RTR 저장소 토큰 제거 todo 나중에 추가
+        // RTR 저장소 토큰 제거 todo test 필요
+        refreshTokenRepository.deleteByRefreshToken(refresh);
 
         // refresh 쿠키 제거
         Cookie cookie = new Cookie("refresh", null);

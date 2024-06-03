@@ -37,7 +37,7 @@ public class ArticleComment {
     private LocalDateTime updatedAt;
     private int ref;
     @Column(name = "parent_id")
-    private Long parentId;
+    private int parentId;
     @Column(name = "content", nullable = false)
     private String content;
     @Column(name = "is_deleted", nullable = false)
@@ -67,7 +67,7 @@ public class ArticleComment {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .ref(childRef)
-                    .parentId((parentComment.getArticleCommentId()))
+                    .parentId(parentComment.getArticleCommentId().intValue())
                     .build();
         }
         // 부모 댓글이 없는 경우
@@ -80,7 +80,7 @@ public class ArticleComment {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .ref(1)
-                    .parentId(0L) //parentId가 0이면 부모가 없는 최상위 댓글임
+                    .parentId(0) //parentId가 0이면 부모가 없는 최상위 댓글임
                     .build();
         }
     }
