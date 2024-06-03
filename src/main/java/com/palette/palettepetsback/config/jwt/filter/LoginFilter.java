@@ -6,9 +6,11 @@ import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
 import com.palette.palettepetsback.config.jwt.redis.entity.RefreshToken;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.member.dto.LoginRequest;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -51,13 +54,23 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         } else {
 
+            LoginRequest loginRequest = new LoginRequest();
+
             // JSON 으로 요청 : request -> username, password 추출
             try {
 
-                LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
+                ObjectMapper objectMapper = new ObjectMapper();
+                ServletInputStream inputStream = request.getInputStream();
+                String loginBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+                loginRequest = objectMapper.readValue(loginBody, com.palette.palettepetsback.member.dto.LoginRequest.class);
+
+                String username = loginRequest.getEmail();
+                String password = loginRequest.getPassword();
+
+//                LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
                 // 인증 토큰 생성
                 UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+                        new UsernamePasswordAuthenticationToken(username, password);
                 // 검증 정보 -> 검증 매니저에게 전달
                 return authenticationManager.authenticate(authenticationToken);
 
@@ -91,16 +104,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료 (1일~한달)
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
-        RefreshToken refreshToken = RefreshToken.builder()
-                .refreshToken(refresh)
-                .email(member.getEmail())
-                .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000).getTime())
-                .build();
-        RefreshToken saved = refreshTokenRepository.save(refreshToken);
-        log.info("refresh token 저장소 저장 = {}", saved);
-        if (saved.getRefreshToken() == null) {
-            throw new RuntimeException("redis 리프레시 토큰 저장소 저장 실패");
-        }
+//        RefreshToken refreshToken = RefreshToken.builder()
+//                .refreshToken(refresh)
+//                .email(member.getEmail())
+//                .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000).getTime())
+//                .build();
+//        RefreshToken saved = refreshTokenRepository.save(refreshToken);
+//        log.info("refresh token 저장소 저장 = {}", saved);
+//        if (saved.getRefreshToken() == null) {
+//            throw new RuntimeException("redis 리프레시 토큰 저장소 저장 실패");
+//        }
 
         // response 설정
         // access 토큰 -> Authorization 헤더에 넣어서 반환
@@ -134,12 +147,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     // JSON 요청 로그인 정보 DTO
-    @Getter
-    @Setter
-    static class LoginRequest {
-        private String username;
-        private String password;
-    }
+//    @Getter
+//    @Setter
+//    static class LoginRequest {
+//        private String username;
+//        private String password;
+//    }
 
     // 로그인 성공 JSON 반환값
     @Getter
