@@ -12,7 +12,7 @@ import lombok.Setter;
 public class LoginRequest {
     @Pattern(regexp="^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])+[.][a-zA-Z]{2,3}$", message="이메일 형식이 맞지 않습니다.")
     @NotBlank(message = "이메일을 입력해 주세요.")
-    private String email;
+    private String username;
     @NotBlank(message = "비밀번호를 입력해 주세요.")
     private String password;
 }

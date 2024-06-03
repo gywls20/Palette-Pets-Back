@@ -1,26 +1,16 @@
 package com.palette.palettepetsback.member.service;
 
-import com.palette.palettepetsback.config.exceptions.NoMemberExistException;
 import com.palette.palettepetsback.member.dto.JoinRequest;
-import com.palette.palettepetsback.member.dto.LoginRequest;
 import com.palette.palettepetsback.member.dto.MemberRequest;
-import com.palette.palettepetsback.member.dto.Role;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
-import com.palette.palettepetsback.member.repository.MemberRepositoryCustomImpl;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Service
