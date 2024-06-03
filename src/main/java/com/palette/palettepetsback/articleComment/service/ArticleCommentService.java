@@ -38,7 +38,7 @@ public class ArticleCommentService {
     //댓글 조회
     @Transactional
     public List<ArticleCommentDto>comments(Article article){
-        return articleCommentRepository.findByArticle(article)//댓글 엔티티 목록 조회
+        return articleCommentRepository.findByArticleOrderByParentIdAscRefAsc(article)//댓글 엔티티 목록 조회
                 .stream() //댓글 엔티티 목록을 스트림으로 변환
                 .map(ArticleCommentDto::createArticleCommentDto)//엔티티를 DTO로 매핑
                 .collect(Collectors.toList()); //스트림을 리스트로 변환

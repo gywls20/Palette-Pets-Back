@@ -5,9 +5,11 @@ import com.palette.palettepetsback.config.jwt.filter.CustomLogoutFilter;
 import com.palette.palettepetsback.config.jwt.filter.JWTFilter;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
+import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
 import com.palette.palettepetsback.config.oauth2.CustomSuccessHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAccessDeniedHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAuthenticationEntryPoint;
+import com.palette.palettepetsback.member.dto.Role;
 import com.palette.palettepetsback.member.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -39,6 +42,7 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -64,36 +68,39 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/member/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.POST, "/join").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
-                                .requestMatchers("/logout", "/", "/members/**").permitAll()
+                                .requestMatchers("/logout", "/").permitAll()
                                 .anyRequest().permitAll()
 //                        .anyRequest().authenticated()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper),
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),
+                                jwtUtil, objectMapper, refreshTokenRepository),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 //        // 세션 매니저 설정 - STATELESS (JWT 사용을 위한 무상태 설정)
         http
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 //        // 시큐리티 에러 핸들링 (401 , 403) todo 커스텀 401, 403 에러 핸들러 작성
-//        http
-//                .exceptionHandling(ex ->
-//                        ex
-//                                .authenticationEntryPoint(authenticationEntryPoint())
-//                                .accessDeniedHandler(accessDeniedHandler())
-//                );
+        http
+                .exceptionHandling(ex ->
+                        ex
+                                .authenticationEntryPoint(authenticationEntryPoint())
+                                .accessDeniedHandler(accessDeniedHandler())
+                );
         http
                 .oauth2Login((oauth2) -> oauth2
 //                    .loginPage("/login")
                     .userInfoEndpoint((userInfoEndpointConfig) ->
                             userInfoEndpointConfig
                                     .userService(customOAuth2UserService))
-                                .successHandler(customSuccessHandler)
+                                    .successHandler(customSuccessHandler)
                 );
 
         return http.build();
@@ -102,18 +109,18 @@ public class SecurityConfig {
     // password encoder : Bcrypt 타입 사용
     @Bean
     public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword);
-            }
-        };
+        return new BCryptPasswordEncoder();
+//        return new PasswordEncoder() {
+//            @Override
+//            public String encode(CharSequence rawPassword) {
+//                return rawPassword.toString();
+//            }
+//
+//            @Override
+//            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+//                return rawPassword.toString().equals(encodedPassword);
+//            }
+//        };
     }
 
     // 인증 매니저 -> 로그인 필터 사용

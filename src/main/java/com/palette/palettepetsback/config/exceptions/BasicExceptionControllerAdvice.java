@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.config.exceptions;
 
+import com.palette.palettepetsback.config.exceptions.exception.BasicLoginIOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -17,5 +18,12 @@ public class BasicExceptionControllerAdvice {
     public ResponseEntity<?> handleNoMemberExistException(NoMemberExistException e) {
         log.error("NoMemberExistException = {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    // 로그인 IO 에러 응답
+    @ExceptionHandler({ BasicLoginIOException.class })
+    public ResponseEntity<?> basicLoginIOException(BasicLoginIOException e) {
+        log.error("BasicLoginIOException = {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE); // 406 error
     }
 }

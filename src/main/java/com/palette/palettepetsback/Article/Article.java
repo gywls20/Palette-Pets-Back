@@ -44,6 +44,7 @@ public class Article {
 
     @Column(name = "count_views")
     private Integer countViews;
+
     @Column(name = "count_review")
     private Integer countReview;
 
