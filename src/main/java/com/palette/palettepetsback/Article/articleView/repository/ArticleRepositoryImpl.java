@@ -7,6 +7,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
@@ -14,13 +15,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
-    @Autowired
-    public ArticleRepositoryImpl(EntityManager entityManager) {
-        this.queryFactory = new JPAQueryFactory(entityManager);
-    }
 
     @Override
     public Page<Article> findDsl(PageableDTO pd) {
@@ -29,7 +27,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
         int page = pd.getPage();
         int size = 10;
         String sort = pd.getSort();
-        boolean dir = pd.isDir();
+//        boolean dir = pd.isDir();
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -45,24 +43,24 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
                 .limit(pageable.getPageSize());
 
 
-        switch (sort) {
-            case "articleId" -> {
-                if (dir) {
-                    content.orderBy(article.articleId.asc());
-                } else content.orderBy(article.articleId.desc());
-            }
-            case "createdAt" -> {
-                if (dir) {
-                    content.orderBy(article.createdAt.asc());
-                } else content.orderBy(article.createdAt.desc());
-            }
-            case "countLoves" -> {
-                if (dir) {
-                    content.orderBy(article.countLoves.asc());
-                } else content.orderBy(article.countLoves.desc());
-            }
-            default -> content.orderBy(article.articleId.asc());
-        }
+//        switch (sort) {
+//            case "articleId" -> {
+//                if (dir) {
+//                    content.orderBy(article.articleId.asc());
+//                } else content.orderBy(article.articleId.desc());
+//            }
+//            case "createdAt" -> {
+//                if (dir) {
+//                    content.orderBy(article.createdAt.asc());
+//                } else content.orderBy(article.createdAt.desc());
+//            }
+//            case "countLoves" -> {
+//                if (dir) {
+//                    content.orderBy(article.countLoves.asc());
+//                } else content.orderBy(article.countLoves.desc());
+//            }
+//            default -> content.orderBy(article.articleId.asc());
+//        }
 
         List<Article> articles = content.fetch();
 

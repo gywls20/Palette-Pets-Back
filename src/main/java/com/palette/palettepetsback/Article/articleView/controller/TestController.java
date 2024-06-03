@@ -61,6 +61,8 @@ public class TestController {
     @GetMapping("/test/querydsl/search")
     public ResponseEntity<?> searchDSL(@ModelAttribute SearchDSLDTO request){
         String[] searchList = request.getSearch().split(",");
+
+
         PathBuilder<?> entityPath = new PathBuilder<>(Article.class, "article");
         Order order = request.isAsc() ? Order.ASC : Order.DESC;
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
