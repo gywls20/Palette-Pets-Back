@@ -9,6 +9,8 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: validate
 
   # REDIS
   data:

@@ -48,12 +48,12 @@ public class ArticleCommentController {
 
 
    //PATCH
-    @PatchMapping("/Patch/comments/{articleCommentId}")
-    public ResponseEntity<ArticleCommentDto>update(@PathVariable Long articleCommentId,
-                                                   @RequestBody ArticleCommentDto dto){
-        ArticleCommentDto updatedDto = articleCommentService.update(articleCommentId,dto);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedDto);
-    }
+//    @PatchMapping("/Patch/comments/{articleCommentId}")
+//    public ResponseEntity<ArticleCommentDto>update(@PathVariable Long articleCommentId,
+//                                                   @RequestBody ArticleCommentDto dto){
+//        ArticleCommentDto updatedDto = articleCommentService.update(articleCommentId,dto);
+//        return ResponseEntity.status(HttpStatus.OK).body(updatedDto);
+//    }
 
    //DELETE
     @DeleteMapping("/Delete/comments/{articleCommentId}")

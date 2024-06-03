@@ -1,5 +1,7 @@
 package com.palette.palettepetsback.pet.controller;
 
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.pet.dto.request.ImgPetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetUpdateDto;
@@ -46,9 +48,22 @@ public class PetController {
 
     // 펫 이미지 등록
     @PostMapping("/img")
-    public boolean registerPetImg(@RequestBody ImgPetRegistryDto dto) {
+    public boolean registerPetImg(@Validated @RequestPart() ImgPetRegistryDto dto,
+                                  @RequestPart("files") MultipartFile[] files) {
         // todo S3 저장 메서드 + 펫 이미지 리스트 저장
-        return petService.registerImgPet(dto) != null;
+        int i = 0;
+        for (MultipartFile file : files) {
+            i++;
+            log.info("{}th file={}", i, file);
+            String imgUrl = petService.fileUpload(file, "pet/img");
+            dto.setImgUrl(imgUrl);
+            Long saved = petService.registerImgPet(dto);
+            if (saved == null) {
+                log.info("펫 이미지 리스트 저장 중 에러 발생");
+                return false;
+            }
+        }
+        return true;
     }
 
     // 펫 수정 - 펫 + 펫 이미지 추가
@@ -87,5 +102,13 @@ public class PetController {
         log.info("dto ={}", dto);
         log.info("s3Result ={}", s3Result);
         return true;
+    }
+
+    // 잠깐 getMemberInfo() 호출 테스트 -> 로그인하고 테스트 or 로그인 안하고 테스트 해보기
+    @GetMapping("/test/memberInfo")
+    public AuthInfoDto test2() {
+        AuthInfoDto memberInfo = JWTUtil.getMemberInfo();
+        log.info("memberInfo={}", memberInfo);
+        return memberInfo;
     }
 }
