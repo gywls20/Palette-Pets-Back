@@ -20,7 +20,6 @@ import java.io.IOException;
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
-    // todo 리프레시 토큰 저장소 적용 필요
     private final RefreshTokenRepository refreshTokenRepository;
 
     /**
@@ -65,10 +64,10 @@ public class CustomLogoutFilter extends GenericFilterBean {
             response.getWriter().print("refresh token is null");
             return;
         }
-        // 만료 체크 -> 이미 로그아웃 됨 todo 어떤 응답 코드로 보낼지 나중에 정하기
+        // 만료 체크 -> 이미 로그아웃 필요 에러 반환 (REFRESH_TOKEN_EXPIRED_ERROR)
         if (jwtUtil.isExpired(refresh)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("refresh token is expired");
+            response.getWriter().print("REFRESH_TOKEN_EXPIRED_ERROR");
             return;
         }
         // 받은 토큰이 refresh 인지 확인

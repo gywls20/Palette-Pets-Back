@@ -1,6 +1,7 @@
 package com.palette.palettepetsback.config.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palette.palettepetsback.config.exceptions.exception.BasicLoginIOException;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
 import com.palette.palettepetsback.config.jwt.redis.entity.RefreshToken;
@@ -62,8 +63,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
             } catch (IOException e) {
                 log.info("[LoginFilter] - 검증 중 IO 에러 발생, ", e);
-                // todo 검증 요청 중 발생한 커스텀 예외 생성 필요
-                throw new RuntimeException(e.getMessage());
+                throw new BasicLoginIOException(e.getMessage());
             }
         }
     }
