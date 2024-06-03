@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.palette.palettepetsback.Article.QArticle.article;
+//import static com.palette.palettepetsback.Article.QArticle.article;
 
 @RestController
 @RequiredArgsConstructor
