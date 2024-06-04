@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    //로그인 페이지
+    //로그인 페이지 - 사용하지 않습니다. -> loginFilter로 가세요
 //    @GetMapping("/login")
 //    public String loginPage() {
 //
@@ -50,10 +49,6 @@ public class MemberController {
 
     @PostMapping("/join")
     public ResponseEntity<String> signup (@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
-
-        log.info("joinRequest.getEmail() = ",joinRequest.getEmail());
-        log.info("joinRequest.getPassword() = ",joinRequest.getPassword());
-        log.info("joinRequest.getNickName() = ",joinRequest.getNickName());
 
         if (bindingResult.hasErrors()) { //에러출력
             List<FieldError> list = bindingResult.getFieldErrors();
