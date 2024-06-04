@@ -34,9 +34,16 @@ public class PetService {
     private final ImgPetRepository imgPetRepository;
     private final NCPObjectStorageService objectStorageService;
 
-    // 파일 저장 테스트
+    // 파일 저장
+    @Transactional
     public String fileUpload(MultipartFile file, String dirPath) {
         return objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, dirPath, file);
+    }
+
+    // S3 파일
+    @Transactional
+    public String fileDelete(String fileName) {
+        return objectStorageService.deleteFile(Singleton.S3_BUCKET_NAME, fileName);
     }
 
     // 펫 등록
@@ -67,8 +74,6 @@ public class PetService {
         );
 
         log.info("saved = {}", saved);
-
-        // todo 펫 이미지 등록
 
         return saved.getId();
     }
@@ -106,12 +111,20 @@ public class PetService {
     // 펫 등록 정보 삭제 -> 물리적 삭제
     @Transactional
     public void deletePet(Long petId) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NoSuchPetException("pet not found"));
+        // s3 저장된 이미지 삭제
+        String fileDeleted = fileDelete(pet.getPetImage());
+        log.info("NCP Object Storage file deleted = {}", "pet/" + fileDeleted);
         petRepository.deleteById(petId); // JPA cascade 로 imgPet 에 연관된 이미지도 삭제
     }
 
     // 펫 등록 정보 -> 펫 이미지 삭제
     @Transactional
     public void deleteImgPet(Long imgId) {
+        ImgPet imgPet = imgPetRepository.findById(imgId).orElseThrow(() -> new NoSuchPetException("반려동물 이미지가 존재하지 않습니다"));
+        // s3 저장된 이미지 삭제
+        String fileDeleted = fileDelete("pet/img/" + imgPet.getImgUrl());
+        log.info("NCP Object Storage file deleted = {}", fileDeleted);
         imgPetRepository.deleteById(imgId);
     }
 
@@ -188,5 +201,13 @@ public class PetService {
         });
 
         return petResponseDtoList;
+    }
+
+    public List<ImgPetResponseDto> findAllPetImgById(Long petId) {
+
+        List<ImgPet> petImgList = imgPetRepository.findAllByPetId(petId);
+        return petImgList.stream()
+                .map(ImgPetResponseDto::toDto)
+                .toList();
     }
 }

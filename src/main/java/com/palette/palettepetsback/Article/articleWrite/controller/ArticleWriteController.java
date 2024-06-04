@@ -7,12 +7,17 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +48,10 @@ public class ArticleWriteController {
     //게시글 등록
     @PostMapping(path="/Post/article")
     public ResponseEntity<Article> create(@Valid @RequestBody ArticleWriteDto dto){
+
+        CustomUserDetails principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member member = principal.getMember();
+
         Article created = articleWriteService.create(dto);
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
