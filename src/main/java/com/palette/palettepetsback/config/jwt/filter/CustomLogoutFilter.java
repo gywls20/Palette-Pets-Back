@@ -80,7 +80,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         /**
          * 로그아웃 로직 수행
          */
-        // RTR 저장소 토큰 제거 todo test 필요
+        // todo RTR 저장소 토큰 제거
         refreshTokenRepository.deleteByRefreshToken(refresh);
 
         // refresh 쿠키 제거

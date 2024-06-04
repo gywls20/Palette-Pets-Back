@@ -1,10 +1,14 @@
 package com.palette.palettepetsback.config.jwt;
 
+import com.palette.palettepetsback.config.exceptions.exception.NotAuthenticatedException;
+import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -67,6 +71,26 @@ public class JWTUtil {
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public static AuthInfoDto getMemberInfo() {
+
+        // principal 정보 가져오기
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // jwt 인증을 거친 요청인지 검증
+        if (principal.equals("anonymousUser")) {
+            log.info("현재 익명 인증 객체 = {}", principal);
+            throw new NotAuthenticatedException("스프링 시큐리티 세션에서 가져올 정보가 존재하지 않음");
+        }
+        // userDetails 캐스팅 수행하여 member 정보 획득
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member member = userDetails.getMember();
+
+        return AuthInfoDto.builder()
+                .memberId(member.getMemberId())
+                .email(member.getEmail())
+                .role(member.getRole())
+                .build();
     }
 
     /**

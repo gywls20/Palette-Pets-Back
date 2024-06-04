@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Table(name = "img_pet")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ImgPet {
 

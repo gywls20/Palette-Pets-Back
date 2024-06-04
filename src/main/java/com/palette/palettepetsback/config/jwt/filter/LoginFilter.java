@@ -64,7 +64,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 String loginBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
                 loginRequest = objectMapper.readValue(loginBody, com.palette.palettepetsback.member.dto.LoginRequest.class);
 
-                String username = loginRequest.getEmail();
+                String username = loginRequest.getUsername();
                 String password = loginRequest.getPassword();
 
 //                LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
@@ -104,16 +104,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료 (1일~한달)
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
-//        RefreshToken refreshToken = RefreshToken.builder()
-//                .refreshToken(refresh)
-//                .email(member.getEmail())
-//                .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000).getTime())
-//                .build();
-//        RefreshToken saved = refreshTokenRepository.save(refreshToken);
-//        log.info("refresh token 저장소 저장 = {}", saved);
-//        if (saved.getRefreshToken() == null) {
-//            throw new RuntimeException("redis 리프레시 토큰 저장소 저장 실패");
-//        }
+        RefreshToken refreshToken = RefreshToken.builder()
+                .refreshToken(refresh)
+                .email(member.getEmail())
+                .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000).getTime())
+                .build();
+        RefreshToken saved = refreshTokenRepository.save(refreshToken);
+        log.info("refresh token 저장소 저장 = {}", saved);
+        if (saved.getRefreshToken() == null) {
+            throw new RuntimeException("redis 리프레시 토큰 저장소 저장 실패");
+        }
 
         // response 설정
         // access 토큰 -> Authorization 헤더에 넣어서 반환
