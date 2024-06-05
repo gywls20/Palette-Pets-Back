@@ -72,6 +72,7 @@ public class ArticleWriteController {
         return articleWriteService.createImgArticle(dto)!=null;
     }
 
+
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정
     @PatchMapping("/Patch/{id}")

@@ -48,7 +48,7 @@ public class ArticleComment {
 
 
 
-    public static ArticleComment createComment(ArticleCommentDto articleCommentDto, Article article, ArticleComment parentComment) {
+    public static ArticleComment createComment(ArticleCommentDto articleCommentDto, Article article ,Long count) {
         if (articleCommentDto.getArticleId() != article.getArticleId())
             throw new IllegalArgumentException("댓글 생성 실패 게시글의 id가 잘못됐습니다");
 
@@ -61,7 +61,7 @@ public class ArticleComment {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .ref(articleCommentDto.getRef())
-                .parentId(articleCommentDto.getParentId())
+                .parentId(Math.toIntExact(count))
                 .build();
 
     }

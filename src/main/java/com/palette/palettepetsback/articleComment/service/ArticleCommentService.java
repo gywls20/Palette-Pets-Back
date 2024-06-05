@@ -9,6 +9,8 @@ import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentDto;
 import com.palette.palettepetsback.articleComment.entity.ArticleComment;
 import com.palette.palettepetsback.articleComment.repository.ArticleCommentRepository;
 
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
@@ -46,17 +48,44 @@ public class ArticleCommentService {
     //댓글 작성
     @Transactional
     public ArticleCommentDto create(ArticleCommentDto dto){
+
+        // 프론트에서 보내주는 DTO 값
+        // articleId
+        // ref
+        // content
+        // parentId
+        // parentId 가 0이면 generate로 생성 되는 articleCommentId 값을 그대로 parentId에 적용
+        // parentId 가 0이 아니면 그 parentId를 그대로 적용
+
         Article article = articleRepository.findById(dto.getArticleId())
                 .orElseThrow(()->new IllegalArgumentException("댓글 생성 실패" + "대상 게시글이 없습니다."));
 
-        //부모 댓글이 있는 경우
-        ArticleComment parentComment = null;
-        if(dto.getParentId()!=0){
-            parentComment = articleCommentRepository.findById((long) dto.getParentId())
-                    .orElseThrow(()->new IllegalArgumentException("부모 댓글을 찾을 수 없습니다."));
+        // JWT 토큰을 가지고 Member Id -> dto set
+        AuthInfoDto memberInfo = JWTUtil.getMemberInfo();
+//        log.info(String.valueOf(memberInfo.getMemberId()));
+        if(memberInfo == null) {
+            return null;
         }
 
-        ArticleComment articleComment = ArticleComment.createComment(dto,article,parentComment);
+        dto.setCreatedWho(memberInfo.getMemberId());
+
+        //  parentId 계산
+        //  parentId가 있는 경우
+        Long parentId;
+        ArticleComment parentComment = null;
+
+        //부모 댓글이 있는 경우
+        if(dto.getParentId() !=0 ){
+            parentComment = articleCommentRepository.findById((long) dto.getParentId())
+                    .orElseThrow(()->new IllegalArgumentException("부모 댓글을 찾을 수 없습니다."));
+            parentId = parentComment.getArticleCommentId();
+        }
+        else{
+            parentId = articleCommentRepository.countBy()+1;
+        }
+
+
+        ArticleComment articleComment = ArticleComment.createComment(dto,article,parentId);
         ArticleComment created =articleCommentRepository.save(articleComment);
 //        created.setRef(created.getArticleCommentId().intValue());
         return ArticleCommentDto.createArticleCommentDto(created);
