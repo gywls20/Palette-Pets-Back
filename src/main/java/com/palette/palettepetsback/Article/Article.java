@@ -19,6 +19,7 @@ public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="article_id")
+
     private Long articleId;
 
     @Column(name="created_who")
@@ -89,9 +90,7 @@ public class Article {
         }
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
-    }
+
 
     public void setState(String modified) {
         this.state= State.valueOf(modified);

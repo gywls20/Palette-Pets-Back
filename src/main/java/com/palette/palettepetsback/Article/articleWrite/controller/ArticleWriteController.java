@@ -38,8 +38,16 @@ public class ArticleWriteController {
         log.info("index");
         return articleWriteService.index();
     }
+    //게시글 목록 조회
+//    @GetMapping("/article/all")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Response findAllArticles(@RequestParam(defaultValue = "0") final Integer page) {
+//        return Response.success(articleWriteService.findAllArticles(page));
+//    }
+
+
     //게시글 단건 조회
-    @GetMapping("/Get/{articleId}")
+    @GetMapping("/articles/{articleId}")
     @ResponseStatus(HttpStatus.OK)
     public Response findArticle(@PathVariable final Long articleId){
         return Response.success(articleWriteService.findArticle(articleId));

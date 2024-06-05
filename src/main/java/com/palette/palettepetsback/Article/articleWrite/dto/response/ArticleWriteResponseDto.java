@@ -32,9 +32,9 @@ public class ArticleWriteResponseDto {
         return new ArticleWriteResponseDto(
                 article.getArticleId(),
                 created_who,
-                article.getArticleTags(),
                 article.getTitle(),
                 article.getContent(),
+                article.getArticleTags(),
                 article.getCountLoves(),
                 article.getCountReport(),
                 article.getCountReview(),
