@@ -32,10 +32,11 @@ public class ArticleComment {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ref")
-    private int ref;
+    private int ref; // 댓글들의 그룹번호 부모댓글과 자식댓글은 모두 똑같은 ref를 가진다
     @Column(name = "parent_id")
-    private int parentId;
+    private int parentId; // 부모 댓글
     @Column(name = "content", nullable = false)
     private String content;
     @Column(name = "is_deleted", nullable = false)
@@ -48,7 +49,7 @@ public class ArticleComment {
 
 
 
-    public static ArticleComment createComment(ArticleCommentDto articleCommentDto, Article article, ArticleComment parentComment) {
+    public static ArticleComment createComment(ArticleCommentDto articleCommentDto, Article article ,Long count) {
         if (articleCommentDto.getArticleId() != article.getArticleId())
             throw new IllegalArgumentException("댓글 생성 실패 게시글의 id가 잘못됐습니다");
 
@@ -61,7 +62,7 @@ public class ArticleComment {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .ref(articleCommentDto.getRef())
-                .parentId(articleCommentDto.getParentId())
+                .parentId(Math.toIntExact(count))
                 .build();
 
     }

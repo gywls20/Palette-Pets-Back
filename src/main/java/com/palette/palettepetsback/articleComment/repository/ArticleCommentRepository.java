@@ -11,5 +11,7 @@ public interface ArticleCommentRepository extends JpaRepository<ArticleComment,L
     // select * from article_comment where article_id = Article.article_id
     List<ArticleComment> findByArticleOrderByParentIdAscRefAsc(Article articleId);
 
+    @Query("SELECT MAX(e.articleCommentId) FROM ArticleComment e")
+    Long findMaxId();
 }
 

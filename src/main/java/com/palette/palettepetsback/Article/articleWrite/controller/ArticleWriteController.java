@@ -14,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -55,18 +56,36 @@ public class ArticleWriteController {
 
     //게시글 등록
     @PostMapping(path="/Post/article")
-    public ResponseEntity<Article> create(@Valid @RequestBody ArticleWriteDto dto){
+    public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
+                                          @RequestPart("files") List<MultipartFile> files){
+        //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
+
+        //object storage upload
+        for(MultipartFile file: files){
+
+            String fileName =  articleWriteService.uploadArticleImage("article/img",file);
+
+            //글 이미지 정보 DB 등록 -> img_article table
+            ArticleImageDto imageDto = new ArticleImageDto();
+            imageDto.setArticleId(created.getArticleId());
+            imageDto.setImgUrl(fileName);
+            articleWriteService.createImgArticle(imageDto);
+
+        }
+
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+
 
     //게시글 이미지 등록
     @PostMapping("/Post/img")
     public boolean createArticleImg(@RequestBody ArticleImageDto dto){
         return articleWriteService.createImgArticle(dto)!=null;
     }
+
 
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정
