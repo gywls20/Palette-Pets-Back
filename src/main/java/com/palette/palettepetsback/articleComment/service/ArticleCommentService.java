@@ -81,7 +81,7 @@ public class ArticleCommentService {
             parentId = parentComment.getArticleCommentId();
         }
         else{
-            parentId = articleCommentRepository.countBy()+1;
+            parentId = articleCommentRepository.findMaxId()+1;
         }
 
 
