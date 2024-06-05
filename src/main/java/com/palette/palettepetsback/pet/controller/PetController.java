@@ -5,6 +5,7 @@ import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.pet.dto.request.ImgPetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetUpdateDto;
+import com.palette.palettepetsback.pet.dto.response.ImgPetResponseDto;
 import com.palette.palettepetsback.pet.dto.response.PetResponseDto;
 import com.palette.palettepetsback.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,12 @@ public class PetController {
     @GetMapping("/{petId}")
     public PetResponseDto getPetByPetId(@PathVariable("petId") Long petId) {
         return petService.findByPetId(petId);
+    }
+
+    // 펫 이미지 리스트 가져오기
+    @GetMapping("/img/list/{petId}")
+    public List<ImgPetResponseDto> getPetImgListByMemberId(@PathVariable("petId") Long petId) {
+        return petService.findAllPetImgById(petId);
     }
 
     // 펫 등록
@@ -66,12 +73,11 @@ public class PetController {
         return true;
     }
 
-    // 펫 수정 - 펫 + 펫 이미지 추가
+    // 펫 수정 - 펫 정보만
     @PutMapping("/{petId}")
     public boolean updatePet(@PathVariable("petId") Long petId,
                              @Validated @RequestPart("dto") PetUpdateDto dto,
                              @RequestPart(value = "file", required = false) MultipartFile file) {
-        // todo S3 저장 메서드 test 필요
         if (file != null) {
             String petImage = petService.fileUpload(file, "pet");
             dto.setPetImage(petImage);
@@ -90,6 +96,7 @@ public class PetController {
     // 펫 이미지 삭제
     @DeleteMapping("/img/{imgId}")
     public boolean deletePetImg(@PathVariable("imgId") Long imgId) {
+        // todo S3 삭제 메서드 test 필요
         petService.deleteImgPet(imgId);
         return true;
     }

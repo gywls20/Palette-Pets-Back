@@ -1,6 +1,5 @@
 package com.palette.palettepetsback.Article.articleWrite.controller;
 
-import com.amazonaws.Response;
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
@@ -8,19 +7,14 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
-import com.palette.palettepetsback.config.SingleTon.Singleton;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -45,26 +39,11 @@ public class ArticleWriteController {
         return articleWriteService.index();
     }
 
+
     //게시글 등록
     @PostMapping(path="/Post/article")
-    public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
-                                                 @RequestPart("files") List<MultipartFile> files){
-        //글 정보 DB 등록 -> article table
+    public ResponseEntity<Article> create(@Valid @RequestBody ArticleWriteDto dto){
         Article created = articleWriteService.create(dto);
-
-        //object storage upload
-        for(MultipartFile file: files){
-
-            String fileName =  articleWriteService.uploadArticleImage("article/img",file);
-
-            //글 이미지 정보 DB 등록 -> img_article table
-            ArticleImageDto imageDto = new ArticleImageDto();
-            imageDto.setArticleId(created.getArticleId());
-            imageDto.setImgUrl(fileName);
-            articleWriteService.createImgArticle(imageDto);
-
-        }
-
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -75,15 +54,6 @@ public class ArticleWriteController {
     public boolean createArticleImg(@RequestBody ArticleImageDto dto){
         return articleWriteService.createImgArticle(dto)!=null;
     }
-
-    //글 하나만 가져오기 만들기 ** * * ** *  * * 받아오는거 article정보하고 aritlce Img정보까지 다 받아오기
-//    @GetMapping("/")
-//    @ResponseStatus(HttpStatus.OK)
-//    public Response findAllBoards(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
-//        return Response.success(articleWriteService.findAllArticles(pageable));
-//    }
-
-
 
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정
