@@ -8,6 +8,9 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
+import com.palette.palettepetsback.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -51,9 +54,12 @@ public class ArticleWriteController {
     //게시글 단건 조회
     @GetMapping("/articles/{articleId}")
     @ResponseStatus(HttpStatus.OK)
-    public Response findArticle(@PathVariable final Long articleId){
+    public Response findArticle(@PathVariable final Long articleId
+                                ,@JwtAuth final AuthInfoDto authInfoDto){
+        log.info("authInfo = {}", authInfoDto);
         return Response.success(articleWriteService.findArticle(articleId));
     }
+
 
     //게시글 등록
     @PostMapping(path="/Post/article")
@@ -86,6 +92,18 @@ public class ArticleWriteController {
     public boolean createArticleImg(@RequestBody ArticleImageDto dto){
         return articleWriteService.createImgArticle(dto)!=null;
     }
+
+
+    //게시글 수정 -> 변경
+//    @PutMapping("/articles/{articleId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Response editArticle(@PathVariable final Long articleId,
+//                                @Valid @ModelAttribute final ArticleUpdateRequest req,
+//                                @JwtAuth final AuthInfoDto authInfoDto){
+//        return null;
+//    }
+
+
 
 
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
