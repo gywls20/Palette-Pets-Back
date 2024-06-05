@@ -33,8 +33,8 @@ public class Article {
     @Column(name = "title", nullable = false)
     private String title;
 
-//    @Column(name = "article_tags")
-//    private String articleTags;
+    @Column(name = "article_tags")
+    private String articleTags;
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private Article.State state;

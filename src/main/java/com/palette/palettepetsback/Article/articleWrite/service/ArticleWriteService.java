@@ -4,8 +4,11 @@ import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.ArticleImage;
 import com.palette.palettepetsback.Article.articleView.DTO.reponsse.ArticleResponseDTO;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
+import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleSimpleDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
 
+import com.palette.palettepetsback.Article.articleWrite.dto.request.PageInfoDto;
+import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleFindAllWithPagingResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleWriteResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ImgArticleRepository;
@@ -18,11 +21,17 @@ import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Slf4j
@@ -30,6 +39,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArticleWriteService {
 
+    private static final int PAGE_SIZE = 10;
+    private static final String SORTED_BY_ID="id";
     private final ArticleWriteRepository articleWriteRepository;
     private final NCPObjectStorageService objectStorageService;
     private final ImgArticleRepository imgArticleRepository;
@@ -140,6 +151,7 @@ public class ArticleWriteService {
     }
 
     //게시글 단건 조회
+    @Transactional(readOnly = true)
     public ArticleWriteResponseDto findArticle(Long articleId) {
         Article article = articleWriteRepository.findById(articleId)
                 .orElseThrow(ArticleNotFoundException::new);
@@ -147,6 +159,27 @@ public class ArticleWriteService {
         Member member = article.getMember();
         return ArticleWriteResponseDto.toDto(article,member.getMemberNickname());
     }
+
+    //게시글 전체 조회
+//    @Transactional(readOnly = true)
+//    public ArticleFindAllWithPagingResponseDto findAllArticles(Integer page) {
+//        Page<Article> articles = makePageArticles(page);
+//        return responsePagingArticles(articles);
+//    }
+//
+//    private ArticleFindAllWithPagingResponseDto responsePagingArticles(final Page<Article> articles) {
+//        List<ArticleSimpleDto> articleSimpleDtoList = articles.stream()
+//                .map(ArticleSimpleDto::toDto)
+//                .collect(Collectors.toList());
+//
+//        return ArticleFindAllWithPagingResponseDto.toDto(articleSimpleDtoList, new PageInfoDto(articles));
+//    }
+//
+//    private Page<Article> makePageArticles(final Integer page) {
+//        PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, Sort.by(articleId).descending());
+//        return articleWriteRepository.findAll(pageRequest);
+//    }
+
 }
 
 
