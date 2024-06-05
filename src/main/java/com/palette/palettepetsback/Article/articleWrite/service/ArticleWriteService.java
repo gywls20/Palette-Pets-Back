@@ -2,16 +2,20 @@ package com.palette.palettepetsback.Article.articleWrite.service;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.ArticleImage;
+import com.palette.palettepetsback.Article.articleView.DTO.reponsse.ArticleResponseDTO;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
 
+import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleWriteResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ImgArticleRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleLikeRepository;
+import com.palette.palettepetsback.Article.exception.type.ArticleNotFoundException;
 import com.palette.palettepetsback.config.SingleTon.Singleton;
 import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
+import com.palette.palettepetsback.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,13 +65,13 @@ public class ArticleWriteService {
     @Transactional
     public Article create(ArticleWriteDto dto) {
 
-        AuthInfoDto memberInfo = JWTUtil.getMemberInfo();
+        AuthInfoDto memberInfo = JWTUtil.getMemberInfo(); //토큰을 가져와서 멤버아이디 찾아내기
 //        log.info(String.valueOf(memberInfo.getMemberId()));
         if(memberInfo == null) {
             return null;
         }
 
-        dto.setCreatedWho(memberInfo.getMemberId());
+        dto.setCreatedWho(memberInfo.getMemberId());//dto를 받아와서 멤버아이디가 없으니까  위에꺼를 가져와서 넣기
 
         Article articleWrite = Article.builder()
                 .createdWho(dto.getCreatedWho())
@@ -135,10 +139,14 @@ public class ArticleWriteService {
         }
     }
 
+    //게시글 단건 조회
+    public ArticleWriteResponseDto findArticle(Long articleId) {
+        Article article = articleWriteRepository.findById(articleId)
+                .orElseThrow(ArticleNotFoundException::new);
 
-
-
-
+        Member member = article.getMember();
+        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname());
+    }
 }
 
 

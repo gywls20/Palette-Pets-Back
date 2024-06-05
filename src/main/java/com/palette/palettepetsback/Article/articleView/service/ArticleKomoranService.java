@@ -48,9 +48,9 @@ public class ArticleKomoranService {
             where.or(article.articleTags.like("%"+search+"%"));
         }
 
-        //정렬 조건
+        //정렬 조건i
         PathBuilder<?> entityPath = new PathBuilder<>(Article.class, "article");
-        Order order = pd.getDir() ? Order.ASC : Order.DESC;
+        Order order = pd.getDir() ? Order.DESC : Order.ASC;
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
         orderSpecifiers.add(new OrderSpecifier(order, entityPath.get(pd.getSort())));
 
