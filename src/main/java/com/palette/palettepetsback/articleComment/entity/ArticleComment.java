@@ -32,7 +32,7 @@ public class ArticleComment {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Column(name = "ref")
     private int ref; // 댓글들의 그룹번호 부모댓글과 자식댓글은 모두 똑같은 ref를 가진다
     @Column(name = "parent_id")

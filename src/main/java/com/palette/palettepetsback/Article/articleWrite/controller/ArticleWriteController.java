@@ -34,11 +34,12 @@ public class ArticleWriteController {
 //    } // 이거 대신에 @RequiredArgsConstructor 이거를 붙이면 된다
 
     //GET
-    @GetMapping("/Get/article")
-    public List<Article> index(){
-        log.info("index");
-        return articleWriteService.index();
-    }
+//    @GetMapping("/Get/article")
+//    public List<Article> index(){
+//        log.info("index");
+//        return articleWriteService.index();
+//    }
+//
     //게시글 목록 조회
 //    @GetMapping("/article/all")
 //    @ResponseStatus(HttpStatus.OK)
