@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.Article.articleWrite.controller;
 
+import com.amazonaws.Response;
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
@@ -12,11 +13,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -73,6 +77,11 @@ public class ArticleWriteController {
     }
 
     //글 하나만 가져오기 만들기 ** * * ** *  * * 받아오는거 article정보하고 aritlce Img정보까지 다 받아오기
+//    @GetMapping("/")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Response findAllBoards(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+//        return Response.success(articleWriteService.findAllArticles(pageable));
+//    }
 
 
 
