@@ -6,11 +6,11 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
+import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,12 @@ public class ArticleWriteController {
         log.info("index");
         return articleWriteService.index();
     }
-
+    //게시글 단건 조회
+    @GetMapping("/Get/{articleId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Response findArticle(@PathVariable final Long articleId){
+        return Response.success(articleWriteService.findArticle(articleId));
+    }
 
     //게시글 등록
     @PostMapping(path="/Post/article")
