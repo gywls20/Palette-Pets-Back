@@ -1,7 +1,7 @@
 package com.palette.palettepetsback.articleComment.service;
 
 import com.palette.palettepetsback.Article.Article;
-import com.palette.palettepetsback.Article.QArticle;
+import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleView.repository.ArticleRepository;
 import com.palette.palettepetsback.Article.articleView.service.ArticleService;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
