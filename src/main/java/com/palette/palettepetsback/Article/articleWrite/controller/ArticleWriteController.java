@@ -7,6 +7,7 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.config.SingleTon.Singleton;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -39,11 +41,26 @@ public class ArticleWriteController {
         return articleWriteService.index();
     }
 
-
     //게시글 등록
     @PostMapping(path="/Post/article")
-    public ResponseEntity<Article> create(@Valid @RequestBody ArticleWriteDto dto){
+    public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
+                                                 @RequestPart("files") List<MultipartFile> files){
+        //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
+
+        //object storage upload
+        for(MultipartFile file: files){
+
+            String fileName =  articleWriteService.uploadArticleImage("article/img",file);
+
+            //글 이미지 정보 DB 등록 -> img_article table
+            ArticleImageDto imageDto = new ArticleImageDto();
+            imageDto.setArticleId(created.getArticleId());
+            imageDto.setImgUrl(fileName);
+            articleWriteService.createImgArticle(imageDto);
+
+        }
+
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

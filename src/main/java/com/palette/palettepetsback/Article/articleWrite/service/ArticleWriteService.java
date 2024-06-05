@@ -8,10 +8,15 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ImgArticleRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleLikeRepository;
+import com.palette.palettepetsback.config.SingleTon.Singleton;
+import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,14 +27,21 @@ import java.util.List;
 public class ArticleWriteService {
 
     private final ArticleWriteRepository articleWriteRepository;
-
+    private final NCPObjectStorageService objectStorageService;
     private final ImgArticleRepository imgArticleRepository;
     private final ArticleLikeRepository likeArticleRepository;
 
 
-    //게시글 이미지 등록
+    //게시글 이미지 Object Storage 등록
+    public String uploadArticleImage(String filePath, MultipartFile file){
+        return objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME,filePath,file);
+
+    }
+
+    //게시글 이미지 정보 DB 등록
     @Transactional
     public  Long  createImgArticle(ArticleImageDto dto) {
+
         Article article = articleWriteRepository.findById(dto.getArticleId()).orElseThrow(()->new IllegalArgumentException("article not found"));
 
         ArticleImage saved = imgArticleRepository.save(
@@ -48,8 +60,17 @@ public class ArticleWriteService {
 
     @Transactional
     public Article create(ArticleWriteDto dto) {
+
+        AuthInfoDto memberInfo = JWTUtil.getMemberInfo();
+//        log.info(String.valueOf(memberInfo.getMemberId()));
+        if(memberInfo == null) {
+            return null;
+        }
+
+        dto.setCreatedWho(memberInfo.getMemberId());
+
         Article articleWrite = Article.builder()
-                .createdWho(dto.getArticleId())
+                .createdWho(dto.getCreatedWho())
                 .articleTags(dto.getArticleTags())
                 .title(dto.getTitle())
                 .content(dto.getContent())
