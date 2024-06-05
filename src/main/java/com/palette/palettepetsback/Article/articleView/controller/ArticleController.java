@@ -49,14 +49,9 @@ public class ArticleController {
     //리스트 출력하기(페이징, 정렬)
     @GetMapping("/list")
     public ResponseEntity<List<ArticleResponseDTO>> tagSearch(@ModelAttribute PageableDTO pd) {
-//        Pageable pageable = PageRequest.of(pd.getPage(),
-//                                        10,
-//                                        Sort.by(Sort.Direction.fromString(pd.getDir()), pd.getSort()));
-        System.out.println("오케이");
         List<ArticleResponseDTO> articles = articleService.searchList(pd);
 
         return ResponseEntity.ok().body(articles);
-
     }
     //검색 & 리스트 출력(페이징, 정렬, 문장 분리)
     @GetMapping("/listLabel")
@@ -75,7 +70,10 @@ public class ArticleController {
 
         System.out.println(articles);
         return ResponseEntity.ok().body(articles);
-
+    }
+    @GetMapping("/listCount")
+    public ResponseEntity<Integer> count(@RequestParam String where) {
+        return ResponseEntity.ok().body(articleService.count(where));
     }
 
 }
