@@ -114,8 +114,6 @@ public class ArticleWriteController {
         articleWriteService.deleteImgArticle(imgIds);
         return true;
     }
-
-
 }
 
 
