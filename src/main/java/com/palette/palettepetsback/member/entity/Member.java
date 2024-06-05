@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Entity
 @Builder
+@Table(name = "member")
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Member {
