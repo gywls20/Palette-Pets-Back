@@ -72,6 +72,10 @@ public class ArticleWriteController {
         return articleWriteService.createImgArticle(dto)!=null;
     }
 
+    //글 하나만 가져오기 만들기 ** * * ** *  * * 받아오는거 article정보하고 aritlce Img정보까지 다 받아오기
+
+
+
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정
     @PatchMapping("/Patch/{id}")

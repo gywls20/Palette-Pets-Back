@@ -61,13 +61,13 @@ public class ArticleWriteService {
     @Transactional
     public Article create(ArticleWriteDto dto) {
 
-        AuthInfoDto memberInfo = JWTUtil.getMemberInfo();
+        AuthInfoDto memberInfo = JWTUtil.getMemberInfo(); //토큰을 가져와서 멤버아이디 찾아내기
 //        log.info(String.valueOf(memberInfo.getMemberId()));
         if(memberInfo == null) {
             return null;
         }
 
-        dto.setCreatedWho(memberInfo.getMemberId());
+        dto.setCreatedWho(memberInfo.getMemberId());//dto를 받아와서 멤버아이디가 없으니까  위에꺼를 가져와서 넣기
 
         Article articleWrite = Article.builder()
                 .createdWho(dto.getCreatedWho())
