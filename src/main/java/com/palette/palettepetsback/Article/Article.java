@@ -33,9 +33,8 @@ public class Article {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "article_tags")
-    private String articleTags;
-
+//    @Column(name = "article_tags")
+//    private String articleTags;
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private Article.State state;
@@ -54,6 +53,16 @@ public class Article {
 
     @Column(name="is_deleted", nullable = false)
     private boolean isDeleted;
+
+    //추가 Entity
+    @Column(name="board_name")
+    @Enumerated(EnumType.STRING)
+    private Article.ComminityBoard boardName;
+
+    @Column(name="article_head")
+    private String articleHead;
+
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("memberId")
@@ -97,8 +106,13 @@ public class Article {
         this.state= State.valueOf(modified);
     }
 
+    public void setBoardName(String modified) {
+        this.boardName= ComminityBoard.valueOf(modified);
+    }
 
-
+    public enum ComminityBoard{
+        FREEBOARD,INFORMATION,SHOW,QNA
+    }
     public enum State{
         ACTIVE,MODIFIED,DELETED
     }
@@ -109,8 +123,6 @@ public class Article {
             this.title = article.title;
         if(article.content != null)
             this.content = article.content;
-        if(article.articleTags !=null)
-            this.articleTags=article.articleTags;
 
     }
 }
