@@ -57,7 +57,7 @@ public class LikeController {
 
     private ArticleLikeResponseDto mapToDto(ArticleLike articleLike) {
         return ArticleLikeResponseDto.builder()
-
+                .id((long) articleLike.getId().hashCode())
                 .articleId(articleLike.getArticle().getArticleId())
                 .memberId(articleLike.getMember().getMemberId())
                 .createdAt(articleLike.getCreatedAt())

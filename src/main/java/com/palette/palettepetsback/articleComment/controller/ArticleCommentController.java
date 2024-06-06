@@ -10,6 +10,7 @@ import com.palette.palettepetsback.articleComment.service.ArticleCommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.List;
 
 //import static com.palette.palettepetsback.Article.QArticle.article;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin //리액트에서 넘어올때 포트가 다르면 오류가 생기는걸 해결해줌
@@ -41,10 +43,10 @@ public class ArticleCommentController {
     //POST
     @PostMapping("/Post/comments")
     public ResponseEntity<ArticleCommentDto>create(@Valid @RequestBody ArticleCommentDto dto) {
+
         ArticleCommentDto createdDto = articleCommentService.create(dto);
         return ResponseEntity.status(HttpStatus.OK).body(createdDto);
     }
-
 
 
    //PATCH
