@@ -1,98 +1,121 @@
 package com.palette.palettepetsback.hotSpot.service;
 
+
+import com.palette.palettepetsback.config.exceptions.NoMemberExistException;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotAddRequest;
+import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
+import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotResponse;
+import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
 import com.palette.palettepetsback.hotSpot.entity.HotSpot;
+import com.palette.palettepetsback.hotSpot.entity.ImgHotSpot;
 import com.palette.palettepetsback.hotSpot.repository.HotSpotRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.palette.palettepetsback.member.entity.Member;
+import com.palette.palettepetsback.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class HotSpotService {
+    private final HotSpotRepository hotSpotRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    private HotSpotRepository hotSpotRepository;
+    //hotspot 저장 메서드
+    @Transactional
+    public void HotSpotInsert(HotSpotAddRequest dto) {
 
-    // 게시글 추가
-    public HotSpotResponse addHotSpot(HotSpotAddRequest hotSpotAddRequest) {
-        HotSpot hotSpot = new HotSpot();
-        hotSpot.setName(hotSpotAddRequest.getName());
-        hotSpot.setDescription(hotSpotAddRequest.getDescription());
-        hotSpot.setPlace(hotSpotAddRequest.getPlace());
-        hotSpot.setReason(hotSpotAddRequest.getReason());
-        hotSpot.setPetType(hotSpotAddRequest.getPetType());
+        Member member = memberRepository.findById(dto.getMemberId())
+                .orElseThrow(() -> new NoMemberExistException("존재하지 않는 회원입니다."));
 
-        // 작성자를 현재 사용자로 설정
-        String username = getCurrentUsername();
-        hotSpot.setCreatedBy(username);
+        HotSpot hotSpot = HotSpot.builder()
+                .lng(dto.getLng())
+                .lat(dto.getLat())
+                .simpleContent(dto.getSimpleContent())
+                .address(dto.getAddress())
+                .content(dto.getContent())
+                .placeName(dto.getPlaceName())
+                .member(member)
+                .build();
 
         hotSpotRepository.save(hotSpot);
-        return new HotSpotResponse();
     }
 
-    // 태그 조회
-    public HotSpotResponse getHotSpot(Long id) {
-        Optional<HotSpot> hotSpot = hotSpotRepository.findById(id);
-        if (hotSpot.isPresent()) {
-            return new HotSpotResponse();
+    //hotspot 업데이트 메서드
+    @Transactional
+    public void HotSpotUpdate(HotSpotUpdateRequest dto) {
+
+        HotSpot hotSpot = hotSpotRepository.findById(dto.getHotSpotId())
+                .orElseThrow(() -> new RuntimeException("명소 추천 게시글이 존재하지 않습니다."));
+
+        hotSpot.updateHotSpot(dto);
+    }
+
+    //hotspot 삭제 메서드
+    @Transactional
+    public void HotSpotDelete(Long id){
+        HotSpot hotSpot = hotSpotRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("명소 추천 게시글이 존재하지 않습니다."));
+
+        hotSpot.changeIsDeleted();
+    }
+
+    //hotspot 리스트 쿼리 메서드
+    public List<HotSpotListResponse> getAllHotSpot(){
+        List<HotSpot> hotSpotList = hotSpotRepository.findHotSpotList();
+
+        //controller로 반환할 빈 dto 리스트 생성
+        List<HotSpotListResponse> list = new ArrayList<>();
+
+        for (HotSpot hotSpot : hotSpotList) {
+            HotSpotListResponse dto = hotSpot.toDto();
+            list.add(dto);
         }
-        return null;
+
+        return list;
     }
+    //hotspot 한 건 쿼리 메서드 -> imageHotSpot 값도 같이 필요
+    public HotSpotResponse getHotSpotDetail(Long hotSpotId){
 
-    // 목록 조회
-    public List<HotSpotResponse> getAllHotSpots() {
-        List<HotSpot> hotSpots = hotSpotRepository.findAll();
-        return new ArrayList<>();
-    }
+        HotSpot hotSpot = hotSpotRepository.findById(hotSpotId)
+                .orElseThrow(() -> new RuntimeException("명소 추천 게시글이 존재하지 않습니다."));
 
-    // 게시글 수정
-    public HotSpotResponse updateHotSpot(Long id, HotSpotAddRequest hotSpotUpdateRequest) {
-        Optional<HotSpot> optionalHotSpot = hotSpotRepository.findById(id);
-        if (optionalHotSpot.isPresent()) {
-            HotSpot hotSpot = optionalHotSpot.get();
-            String username = getCurrentUsername();
+        List<ImgHotSpot> imgHotSpots = hotSpot.getImgHotSpots();
 
-            // 작성자 또는 관리자인지 확인
-            if (!hotSpot.getCreatedBy().equals(username) && !isAdmin(username)) {
-                throw new SecurityException("수정 권한이 없습니다.");
-            }
+        List<ImgHotSpotResponse> imgHotSpotDtoList = new ArrayList<>();
 
-            hotSpot.setName(hotSpotUpdateRequest.getName());
-            hotSpot.setDescription(hotSpotUpdateRequest.getDescription());
-            hotSpot.setPlace(hotSpotUpdateRequest.getPlace());
-            hotSpot.setReason(hotSpotUpdateRequest.getReason());
-            hotSpot.setPetType(hotSpotUpdateRequest.getPetType());
+        for (ImgHotSpot imgHotSpot : imgHotSpots) {
+            ImgHotSpotResponse dto = ImgHotSpotResponse.builder()
+                    .imgHotSpotId(imgHotSpot.getId())
+                    .imgUrl(imgHotSpot.getImgUrl())
+                    .build();
 
-            hotSpotRepository.save(hotSpot);
-            return new HotSpotResponse();
+            imgHotSpotDtoList.add(dto);
         }
-        return null;
-    }
 
-    // 게시글 삭제
-    public void deleteHotSpot(Long id) {
-        hotSpotRepository.deleteById(id);
-    }
+        HotSpotResponse result = HotSpotResponse.builder()
+                .hotSpotId(hotSpot.getId())
+                .memberNickname(hotSpot.getMember().getMemberNickname())
+                .createAt(hotSpot.getCreatedAt())
+                .modifiedAt(hotSpot.getModifiedAt())
+                .placeName(hotSpot.getPlaceName())
+                .simpleContent(hotSpot.getSimpleContent())
+                .content(hotSpot.getContent())
+                .address(hotSpot.getAddress())
+                .lat(hotSpot.getLat())
+                .lng(hotSpot.getLng())
+                .countViews(hotSpot.getCountViews())
+                .imgList(imgHotSpotDtoList)
+                .build();
 
-    // 현재 사용자명 가져오기
-    private String getCurrentUsername() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        }
-        return principal.toString();
+        return result;
     }
+    //조회수 기능 추가
 
-    // 관리자 여부 확인
-    private boolean isAdmin(String username) {
-        // 관리자인지 확인하는 로직 구현
-        // 예시: 관리자 사용자명을 "admin"으로 가정
-        return "admin".equals(username);
-    }
 }

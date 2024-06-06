@@ -1,12 +1,15 @@
 package com.palette.palettepetsback.hotSpot.entity;
 
+import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
+import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
 import com.palette.palettepetsback.member.entity.Member;
 import lombok.*;
 
 import jakarta.persistence.*;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,8 +43,11 @@ public class HotSpot {
     private Double lng;
     @Column(name = "count_views") // 조회수
     private Integer countViews;
-    @Column(name = "is_delteed") // 삭제
+    @Column(name = "is_deleted") // 삭제
     private Boolean isDeleted;
+    //imgHotSpot 양방향 연결
+    @OneToMany(mappedBy = "hotSpot", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<ImgHotSpot> imgHotSpots = new ArrayList<>();
 
     // 명소 추천 글 등록 메서드
     @Builder
@@ -57,5 +63,40 @@ public class HotSpot {
         this.lng = lng;
         this.countViews = 0;
         this.isDeleted = false;
+    }
+
+    //update 메서드
+    public void updateHotSpot(HotSpotUpdateRequest dto) {
+        this.modifiedAt = LocalDateTime.now();
+        this.placeName = dto.getPlaceName();
+        this.simpleContent =dto.getSimpleContent();
+        this.content = dto.getContent();
+        this.address = dto.getAddress();
+        this.lat = dto.getLat();
+        this.lng = dto.getLng();
+    }
+
+    //delete 메서드
+    public void changeIsDeleted() {
+        this.isDeleted = !this.isDeleted;
+    }
+
+    //Entity to dto
+    public HotSpotListResponse toDto() {
+
+        return HotSpotListResponse.builder()
+                .hotSpotId(this.id)
+                .memberNickname(getMember().getMemberNickname())
+                .createAt(createdAt)
+                .modifiedAt(modifiedAt)
+                .placeName(placeName)
+                .simpleContent(simpleContent)
+                .content(content)
+                .address(address)
+                .lat(lat)
+                .lng(lng)
+                .countViews(countViews)
+                .build();
+
     }
 }
