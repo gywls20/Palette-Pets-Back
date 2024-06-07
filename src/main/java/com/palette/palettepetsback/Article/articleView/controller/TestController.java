@@ -39,7 +39,7 @@ public class TestController {
                 .content(request.getContent())
                 .title(request.getTitle())
                 .createdWho(1L)
-                .articleTags(request.getTags())
+//                .articleTags(request.getTags())
                 .build());
         return ResponseEntity.ok().body(article);
     }

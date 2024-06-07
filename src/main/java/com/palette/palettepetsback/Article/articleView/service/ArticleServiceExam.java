@@ -45,9 +45,9 @@ public class ArticleServiceExam {
         QArticle qArticle = QArticle.article;
 
         BooleanBuilder builder = new BooleanBuilder();
-        for(String search : searchList){
-            builder.and(qArticle.articleTags.like("%"+search+"%"));
-        }
+//        for(String search : searchList){
+//            builder.and(qArticle.articleTags.like("%"+search+"%"));
+//        }
 
         List<Article> articles = jpaQueryFactory
                 .selectFrom(qArticle)

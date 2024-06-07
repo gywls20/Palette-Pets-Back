@@ -25,7 +25,6 @@ public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="article_id")
-
     private Long articleId;
 
     @Column(name="created_who")
@@ -42,7 +41,6 @@ public class Article {
 
     @Column(name = "article_tags")
     private String articleTags;
-
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private Article.State state;
@@ -61,6 +59,16 @@ public class Article {
 
     @Column(name="is_deleted", nullable = false)
     private boolean isDeleted;
+
+    //추가 Entity
+    @Column(name="board_name")
+    @Enumerated(EnumType.STRING)
+    private Article.ComminityBoard boardName;
+
+    @Column(name="article_head")
+    private String articleHead;
+
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("memberId")
@@ -96,11 +104,14 @@ public class Article {
         }
     }
 
-
+    public boolean isDeleted() {
+        return isDeleted;
+    }
 
     public void setState(String modified) {
         this.state= State.valueOf(modified);
     }
+
 
     public ImageUpdateResult update(ArticleUpdateRequest req) {
         this.title = req.getTitle();
@@ -154,6 +165,15 @@ public class Article {
                 .collect(toList());
     }
 
+
+    public void setBoardName(String modified) {
+        this.boardName= ComminityBoard.valueOf(modified);
+    }
+
+    public enum ComminityBoard{
+        FREEBOARD,INFORMATION,SHOW,QNA
+    }
+
     public enum State{
         ACTIVE,MODIFIED,DELETED
     }
@@ -164,8 +184,6 @@ public class Article {
             this.title = article.title;
         if(article.content != null)
             this.content = article.content;
-        if(article.articleTags !=null)
-            this.articleTags=article.articleTags;
 
     }
 
