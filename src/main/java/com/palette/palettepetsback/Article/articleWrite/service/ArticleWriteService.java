@@ -2,18 +2,14 @@ package com.palette.palettepetsback.Article.articleWrite.service;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.ArticleImage;
-import com.palette.palettepetsback.Article.articleView.DTO.reponsse.ArticleResponseDTO;
-import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
-import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleSimpleDto;
-import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
+import com.palette.palettepetsback.Article.articleWrite.dto.request.*;
 
-import com.palette.palettepetsback.Article.articleWrite.dto.request.PageInfoDto;
-import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleFindAllWithPagingResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleWriteResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ImgArticleRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleLikeRepository;
 import com.palette.palettepetsback.Article.exception.type.ArticleNotFoundException;
+import com.palette.palettepetsback.Article.exception.type.MemberNotEqualsException;
 import com.palette.palettepetsback.config.SingleTon.Singleton;
 import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
@@ -21,17 +17,14 @@ import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toList;
+import static com.palette.palettepetsback.member.entity.QMember.member;
 
 @Service
 @Slf4j
@@ -45,6 +38,9 @@ public class ArticleWriteService {
     private final NCPObjectStorageService objectStorageService;
     private final ImgArticleRepository imgArticleRepository;
     private final ArticleLikeRepository likeArticleRepository;
+    private final FileService fileService;
+
+
 
 
     //게시글 이미지 Object Storage 등록
@@ -158,6 +154,39 @@ public class ArticleWriteService {
 
         Member member = article.getMember();
         return ArticleWriteResponseDto.toDto(article,member.getMemberNickname());
+    }
+
+    @Transactional
+    public ArticleWriteResponseDto editArticle(Long articleId, ArticleUpdateRequest req, Member member) {
+        Article article = articleWriteRepository.findById(articleId)
+                .orElseThrow(ArticleNotFoundException::new);
+
+        validateArticleOwner(member,article);
+
+        Article.ImageUpdateResult result = article.update(req);
+
+        uploadImages(result.getAddedImage(),result.getAddedImageFiles());
+        deleteImages(result.getDeletedImages());
+
+        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname());
+    }
+
+    private void deleteImages(List<ArticleImage> deletedImages) {
+        deletedImages.forEach(deletedImage-> fileService.delete(String.valueOf(deletedImage.getArticle())));
+    }
+
+    private void uploadImages(List<ArticleImage> uploadedImages, List<MultipartFile> fileImages) {
+        IntStream.range(0,uploadedImages.size())
+                .forEach(uploadedImage->fileService.upload(
+                        fileImages.get(uploadedImage),
+                        String.valueOf(uploadedImages.get(uploadedImage).getArticle())
+                ));
+    }
+
+    private void validateArticleOwner(Member member, Article article) {
+        if(!member.equals(article.getMember())){
+            throw new MemberNotEqualsException();
+        }
     }
 
     //게시글 전체 조회

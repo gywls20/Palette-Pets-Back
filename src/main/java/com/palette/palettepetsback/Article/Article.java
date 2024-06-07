@@ -1,13 +1,19 @@
 package com.palette.palettepetsback.Article;
 
+import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleUpdateRequest;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
+import static java.util.stream.Collectors.toList;
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Entity
 @Data
@@ -96,7 +102,57 @@ public class Article {
         this.state= State.valueOf(modified);
     }
 
+    public ImageUpdateResult update(ArticleUpdateRequest req) {
+        this.title = req.getTitle();
+        this.content = req.getContent();
 
+        ImageUpdateResult result = findImageUpdateResult(req.getAddedImages(),req.getDeletedImages());
+        addImages(result.getAddedImage());
+        deleteImages(result.getDeletedImages());
+        return result;
+    }
+
+
+
+    private void addImages(List<ArticleImage> addedImages) {
+        addedImages.forEach(addedImage->{
+            images.add(addedImage);
+            addedImage.initArticle(this);
+        });
+    }
+    private void deleteImages(List<ArticleImage> deletedImages) {
+        deletedImages.forEach(deletedImage->this.images.remove(deletedImage));
+    }
+
+
+    private ImageUpdateResult findImageUpdateResult(List<MultipartFile> addedImageFiles, List<Integer> deletedImageIds) {
+
+        List<ArticleImage>addedImages = convertImageFilesToImages(addedImageFiles);
+        List<ArticleImage> deletedImages = convertImageIdsToImages(deletedImageIds);
+        return new ImageUpdateResult(addedImageFiles,addedImages,deletedImages);
+    }
+
+    private List<ArticleImage> convertImageIdsToImages(List<Integer> imageIds) {
+        return imageIds.stream()
+                .map(this::convertImageIdToImage)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
+    }
+
+    private Optional<ArticleImage> convertImageIdToImage( int id) {
+     return this.images.stream()
+             .filter(articleImage -> articleImage.isSameImageId(id))
+             .findAny();
+
+
+    }
+
+    private List<ArticleImage> convertImageFilesToImages(List<MultipartFile>imageFiles) {
+        return imageFiles.stream()
+                .map(imageFile->ArticleImage.from(imageFile.getOriginalFilename()))
+                .collect(toList());
+    }
 
     public enum State{
         ACTIVE,MODIFIED,DELETED
@@ -110,6 +166,15 @@ public class Article {
             this.content = article.content;
         if(article.articleTags !=null)
             this.articleTags=article.articleTags;
+
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class ImageUpdateResult {
+        private List<MultipartFile> addedImageFiles;
+        private List<ArticleImage>addedImage;
+        private List<ArticleImage>deletedImages;
 
     }
 }
