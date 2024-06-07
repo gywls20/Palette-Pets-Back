@@ -6,19 +6,18 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
+import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
-import com.palette.palettepetsback.config.security.CustomUserDetails;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,31 +37,74 @@ public class ArticleWriteController {
 //    } // 이거 대신에 @RequiredArgsConstructor 이거를 붙이면 된다
 
     //GET
-    @GetMapping("/Get/article")
-    public List<Article> index(){
-        log.info("index");
-        return articleWriteService.index();
+//    @GetMapping("/Get/article")
+//    public List<Article> index(){
+//        log.info("index");
+//        return articleWriteService.index();
+//    }
+//
+    //게시글 목록 조회
+//    @GetMapping("/article/all")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Response findAllArticles(@RequestParam(defaultValue = "0") final Integer page) {
+//        return Response.success(articleWriteService.findAllArticles(page));
+//    }
+
+
+    //게시글 단건 조회
+    @GetMapping("/articles/{articleId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Response findArticle(@PathVariable final Long articleId
+                                ,@JwtAuth final AuthInfoDto authInfoDto){
+        log.info("authInfo = {}", authInfoDto);
+        return Response.success(articleWriteService.findArticle(articleId));
     }
 
 
     //게시글 등록
     @PostMapping(path="/Post/article")
-    public ResponseEntity<Article> create(@Valid @RequestBody ArticleWriteDto dto){
-
-        CustomUserDetails principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = principal.getMember();
-
+    public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
+                                          @RequestPart("files") List<MultipartFile> files){
+        //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
+
+        //object storage upload
+        for(MultipartFile file: files){
+
+            String fileName =  articleWriteService.uploadArticleImage("article/img",file);
+
+            //글 이미지 정보 DB 등록 -> img_article table
+            ArticleImageDto imageDto = new ArticleImageDto();
+            imageDto.setArticleId(created.getArticleId());
+            imageDto.setImgUrl(fileName);
+            articleWriteService.createImgArticle(imageDto);
+
+        }
+
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+
 
     //게시글 이미지 등록
     @PostMapping("/Post/img")
     public boolean createArticleImg(@RequestBody ArticleImageDto dto){
         return articleWriteService.createImgArticle(dto)!=null;
     }
+
+
+    //게시글 수정 -> 변경
+//    @PutMapping("/articles/{articleId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Response editArticle(@PathVariable final Long articleId,
+//                                @Valid @ModelAttribute final ArticleUpdateRequest req,
+//                                @JwtAuth final AuthInfoDto authInfoDto){
+//        return null;
+//    }
+
+
+
 
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정

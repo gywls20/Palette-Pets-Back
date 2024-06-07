@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,13 +18,13 @@ import java.util.stream.Collectors;
 public class ArticleCommentDto {
     private Long articleCommentId;
     private Long articleId;
-    @NotNull(message = "createdWho null이 될수없음")
+//    @NotNull(message = "createdWho null이 될수없음")
     private Long createdWho;
     @NotBlank(message = "content 비워둘수없음 ")
     private String content;
     private int parentId;
     private int ref;
-
+    private LocalDateTime createdAt;
 
     //  패런트 아이디가 없으면 null 있으면 0 부모글 pk값 가져와서부모글
     public static ArticleCommentDto createArticleCommentDto(ArticleComment articleComment) {
@@ -34,7 +35,8 @@ public class ArticleCommentDto {
                 articleComment.getCreatedWho(),//댓글 엔티티의 createdWho
                 articleComment.getContent(), //댓글 엔티티의 content
                 articleComment.getParentId(), //부모 댓글 ID설정
-                articleComment.getRef()
+                articleComment.getRef(),
+                articleComment.getCreatedAt()
         );
     }
 
