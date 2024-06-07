@@ -151,7 +151,8 @@ public class MemberService {
 
         //pw 업데이트
         optionalMember.ifPresent(member -> {
-            member.updatePassword(pw);
+            // 비밀번호 암호화후 저장
+            member.updatePassword(passwordEncoder.encode(pw));
             memberRepository.save(member);
         });
 
