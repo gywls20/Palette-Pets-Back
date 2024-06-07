@@ -63,9 +63,7 @@ public class MemberService {
 
     //회원가입
     public void join(JoinRequest req) {
-        log.info("JoinRequest = ",req.getPassword());
         String encodedPassword = passwordEncoder.encode(req.getPassword());
-        log.info("encodedPassword = ", encodedPassword);
         memberRepository.save(req.toEntity(encodedPassword));
 
     }
