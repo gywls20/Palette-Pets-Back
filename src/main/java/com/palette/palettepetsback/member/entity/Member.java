@@ -95,4 +95,7 @@ public class Member {
         this.memberBirth=memberBirth;
         this.memberGender=memberGender;
     }
+    public void saveProfile(String memberImage){
+        this.memberImage = memberImage;
+    }
 }

@@ -2,15 +2,23 @@ package com.palette.palettepetsback.member.service;
 
 import com.palette.palettepetsback.config.Mail.EmailResponseDTO;
 import com.palette.palettepetsback.config.Mail.RegisterMail;
+import com.palette.palettepetsback.config.SingleTon.Singleton;
+import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
+import com.palette.palettepetsback.config.exceptions.NoSuchPetException;
 import com.palette.palettepetsback.member.dto.JoinRequest;
+import com.palette.palettepetsback.member.dto.MemberImgRequest;
 import com.palette.palettepetsback.member.dto.MemberRequest;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
+import com.palette.palettepetsback.pet.dto.request.ImgPetRegistryDto;
+import com.palette.palettepetsback.pet.entity.ImgPet;
+import com.palette.palettepetsback.pet.entity.Pet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -23,6 +31,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RegisterMail registerMail;
+    private final NCPObjectStorageService objectStorageService;
 
     //일반 로그인
 //    public Member login(String email, String password) {
@@ -110,10 +119,7 @@ public class MemberService {
 
     }
 
-    // 프로필 이미지 설정
-    public void updateProfileImage(String imagePath) {
 
-    }
 
     // 생일, 성별 변경
     public void updateBirthGender(Long memberId, MemberRequest.BirthGender BirthGenderRequest) {
@@ -152,5 +158,20 @@ public class MemberService {
         return responseDTO;
 
     }
+    // 프로필 이미지 설정
+    @Transactional
+    public String updateProfileImage(MultipartFile file, String dirPath) {
+        return objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, dirPath, file);
+    }
+    @Transactional
+    public void profileSave(MemberImgRequest dto) {
+        Optional<Member> optionalMember=memberRepository.findByMemberId(dto.getMemberId());
 
+        optionalMember.ifPresent(member -> {
+            member.saveProfile(dto.getImgUrl());
+
+            memberRepository.save(member);
+        });
+
+    }
 }
