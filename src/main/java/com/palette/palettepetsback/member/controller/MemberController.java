@@ -66,8 +66,9 @@ public class MemberController {
         memberService.join(joinRequest);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
+
     //비밀번호 찾기
-//등록된 이메일로 임시비밀번호를 발송하고 발송된 임시비밀번호로 사용자의 pw를 변경하는 컨트롤러
+    //등록된 이메일로 임시비밀번호를 발송하고 발송된 임시비밀번호로 사용자의 pw를 변경하는 컨트롤러
     @PostMapping("/memberF/findPw")
     public ResponseEntity<String>sendEmail(@RequestBody  MemberRequest.Email Email){
         log.info("멤버 서비스.체크이메일 듀플리케이트 = {}", Email.getEmail());
