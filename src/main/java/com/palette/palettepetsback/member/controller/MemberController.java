@@ -16,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +29,11 @@ public class MemberController {
     private final MemberService memberService;
     private final RegisterMail registerMail;
 
+    private static Long getMemberId(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long memberId = userDetails.getMember().getMemberId();
+        return memberId;
+    }
 
 
     @PostMapping("/join")
@@ -119,7 +123,7 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             Long memberId = getMemberId(authentication);
-            // 서비스 메서드 호출하여 비밀번호 업데이트
+
             memberService.updateNickname(memberId,nicknameRequest);
         } else {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
@@ -128,11 +132,6 @@ public class MemberController {
         return ResponseEntity.ok("닉네임이 수정되었습니다.");
     }
 
-    private static Long getMemberId(Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long memberId = userDetails.getMember().getMemberId();
-        return memberId;
-    }
 
     // 주소지 입력 -> 실명, 폰번호, 주소
     @PutMapping("/member/address")
@@ -147,7 +146,7 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             Long memberId = getMemberId(authentication);
-            // 서비스 메서드 호출하여 비밀번호 업데이트
+
             memberService.updateAddress(memberId, addressRequest);
         } else {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
@@ -171,7 +170,7 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             Long memberId = getMemberId(authentication);
-            // 서비스 메서드 호출하여 비밀번호 업데이트
+
             memberService.updateBirthGender(memberId, birthGenderRequest);
         } else {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");

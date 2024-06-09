@@ -33,25 +33,7 @@ public class MemberService {
     private final RegisterMail registerMail;
     private final NCPObjectStorageService objectStorageService;
 
-    //일반 로그인
-//    public Member login(String email, String password) {
-//
-//        Optional<Member> member = memberRepository.findByEmail(email);
-//
-//        if (member.isEmpty()) {
-//            log.info("그런 사람 없습니다.");
-//            return null;
-//        }else {
-//            Member member1 = member.get();
-//
-//            // passwordEncoder.matches를 사용하여 비밀번호 비교
-//            if(passwordEncoder.matches(password, member1.getPassword())){
-//                return member1;
-//            }
-//        }
-//        log.info("비번 잘못 쳤습니다.");
-//        return null;
-//    }
+
     //이메일 중복확인
     public boolean checkEmailDuplicate(String email) {
         return memberRepository.existsByEmail(email);
@@ -143,9 +125,9 @@ public class MemberService {
         responseDTO.setAddress(userEmail);
         responseDTO.setTitle("냥가왈부 임시비밀번호 안내 메일입니다.");
         responseDTO.setMessage("안녕하세요. 세상 모든 반려인들을 위한 서비스 냥가왈부 입니다. " +
-                "\n 회원님의 비밀번호는 <"+pw+">입니다. " +
+                "\n\n\n 회원님의 비밀번호는 < "+pw+" >입니다. " +
                 "\n 로그인하신 후 꼭 비밀번호를 변경해 주세요. " +
-                "\n 비밀번호 변경은 마이페이지>메뉴>비밀번호 변경 에 있습니다. ");
+                "\n\n 비밀번호 변경은 마이페이지>메뉴>비밀번호 변경 에 있습니다. ");
 
         //pw 업데이트
         optionalMember.ifPresent(member -> {
@@ -173,4 +155,24 @@ public class MemberService {
         });
 
     }
+
+    //일반 로그인 -안씀
+//    public Member login(String email, String password) {
+//
+//        Optional<Member> member = memberRepository.findByEmail(email);
+//
+//        if (member.isEmpty()) {
+//            log.info("그런 사람 없습니다.");
+//            return null;
+//        }else {
+//            Member member1 = member.get();
+//
+//            // passwordEncoder.matches를 사용하여 비밀번호 비교
+//            if(passwordEncoder.matches(password, member1.getPassword())){
+//                return member1;
+//            }
+//        }
+//        log.info("비번 잘못 쳤습니다.");
+//        return null;
+//    }
 }
