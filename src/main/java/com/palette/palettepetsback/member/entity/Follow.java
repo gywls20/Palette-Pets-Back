@@ -13,23 +13,23 @@ import java.time.LocalDateTime;
 public class Follow {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_follow_id")
-    private Long memberFollowId;
+    @Column(name = "follow_id")
+    private Long followId;
 
     @ManyToOne
     @JoinColumn(name = "follower_id")
     private Member followerId;
 
     @ManyToOne
-    @JoinColumn(name = "followee_id")
-    private Member followeeId;
+    @JoinColumn(name = "following_id")
+    private Member followingId;
 
     @CreationTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "time")
     private LocalDateTime time;
 
-    public void saveFollow(Member followerId, Member followeeId){
+    public void saveFollow(Member followerId, Member followingId){
         this.followerId = followerId;
-        this.followeeId = followeeId;
+        this.followingId = followingId;
     }
 }

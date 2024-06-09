@@ -48,7 +48,7 @@ public class Member {
     @OneToMany(mappedBy = "followerId", cascade = CascadeType.ALL)
     private List<Follow> followerList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "followeeId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "followingId", cascade = CascadeType.ALL)
     private List<Follow> followingList = new ArrayList<>();
 
     @Builder

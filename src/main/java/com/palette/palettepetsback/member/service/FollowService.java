@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.member.service;
 
+import com.palette.palettepetsback.member.dto.FollowResponse;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.entity.Follow;
 import com.palette.palettepetsback.member.repository.FollowRepository;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,75 +21,71 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
 
-    public void follow(String nickname, Long followeeId) {
-        Optional<Member> optionalMember = memberRepository.findByMemberNickname(nickname);
-        if (optionalMember.isPresent()) {
-            Member follower = optionalMember.get();
-            Member followee = memberRepository.findById(followeeId).orElseThrow();
+    public void follow(String nickname, Long followingId) {
+        Optional<Member> followerMember = memberRepository.findByMemberNickname(nickname);
+        Optional<Member> followingMember= memberRepository.findByMemberId(followingId);
+        // 자기 자신 follow 안됨
+        if (followerMember == followingMember)
+            throw new IllegalArgumentException("자기 자신을 follow할 수 없습니다.");
+
+        if (followerMember.isPresent()) {
+            Optional<Follow> Checkfollow = followRepository.findByFollowerIdAndFollowingId(followerMember.get(),followingMember.get());
+            if (Checkfollow.isPresent()){
+                throw new IllegalArgumentException("같은 사람을 팔로우 했습니다.");
+            }
+            Member follower = followerMember.get();
+            Member followee = memberRepository.findById(followingId).orElseThrow();
 
             Follow follow = new Follow();
             follow.setFollowerId(follower);
-            follow.setFolloweeId(followee);
+            follow.setFollowingId(followee);
+
             followRepository.save(follow);
         } else {
-
+            throw new IllegalArgumentException("팔로우 하려는 유저는 없는사람입니다.");
         }
     }
 
     public void unfollow(String nickname, Long followeeId) {
         Optional<Member> followerMember = memberRepository.findByMemberNickname(nickname);
-        Optional<Member> followeeMember = memberRepository.findByMemberId(followeeId);
+        Optional<Member> followingMember = memberRepository.findByMemberId(followeeId);
 
-        Follow follow = followRepository.findByFollowerIdAndFolloweeId(followerMember.get(), followeeMember.get());
-        followRepository.delete(follow);
+        Optional<Follow> follow = followRepository.findByFollowerIdAndFollowingId(followerMember.get(), followingMember.get());
+        followRepository.delete(follow.get());
     }
 
-    public List<Member> getFollowers(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+    public List<FollowResponse> getFollowerList(String nickname, Long memberId) {
+        Member ToMember = memberRepository.findByMemberNickname(nickname).orElseThrow();
+        Member FromMember = memberRepository.findById(memberId).orElseThrow();
 
-        System.out.println("member = " + member);
+        List<Follow> list = followRepository.findByFollowerId(ToMember);
+        List<FollowResponse> followerList = new ArrayList<>();
 
-        System.out.println("member.getFollowerList() = " + member.getFollowerList());
-        System.out.println("member.getFollowerList().get(0) = " + member.getFollowerList().get(0));
-        for (Follow follower : member.getFollowerList()) {
-            System.out.println("follower.getMemberFollowId() = " + follower.getMemberFollowId());
-            System.out.println("follower.getFollowerId() = " + follower.getFollowerId());
-            System.out.println("follower.getFolloweeId() = " + follower.getFolloweeId());
-            System.out.println("follower.getTime() = " + follower.getTime());
+        for (Follow f : list) {
+            FollowResponse followResponse =new FollowResponse();
+            followResponse.setNickname(f.getFollowingId().getMemberNickname());
+            followResponse.setProfile(f.getFollowingId().getMemberImage());
+
+            followerList.add(followResponse);
         }
-        return member.getFollowerList().stream()
-                .map(Follow::getFollowerId)
-                .collect(Collectors.toList());
+
+        return followerList;
     }
 
-    public List<Member> getFollowing(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
-        return member.getFollowingList().stream()
-                .map(Follow::getFolloweeId)
-                .collect(Collectors.toList());
+    public List<FollowResponse> getFollowingList(String nickname, Long memberId) {
+        Member ToMember = memberRepository.findByMemberNickname(nickname).orElseThrow();
+        Member FromMember = memberRepository.findById(memberId).orElseThrow();
+
+        List<Follow> list = followRepository.findByFollowingId(FromMember);
+        List<FollowResponse> followingList = new ArrayList<>();
+
+        for (Follow f : list) {
+            FollowResponse followResponse = new FollowResponse();
+            followResponse.setNickname(f.getFollowerId().getMemberNickname());
+            followResponse.setProfile(f.getFollowerId().getMemberImage());
+            followingList.add(followResponse);
+        }
+        return followingList;
     }
-
-
-    //팔로우 하기
-    // 닉네임을 가쟈오면 아이디로 저장 , 내 아이디 저장
-//    public void follow(String followName, Long memberId){
-//        //닉네임으로 아이디 찾기
-//        Optional<Member> optionalMember = memberRepository.findByMemberNickname(followName);
-//        Follow Follow = new Follow();
-//        if(optionalMember.isPresent()){
-//            Follow.saveFollow(memberId, optionalMember.get().getMemberId());
-//        }
-//
-//    }
-
-    //사용자 아이디로 팔로우 팔로워 수 구하기
-    public void getFollow() {
-
-    }
-
-    //피드 저장
-
-    //피드 삭제
-
 
 }
