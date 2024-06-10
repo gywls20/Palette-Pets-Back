@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -31,17 +30,11 @@ public class ArticleLike {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime createdAt;
 
-    public ArticleLike(Member member, Article article) {
-        this.id = new ArticleLikeId(member.getMemberId(), article.getArticleId());
-        this.article = article;
-        this.member = member;
-    }
-
     @PrePersist
-    public void createdAt() {
+    public void prePersist() {
         createdAt = LocalDateTime.now();
     }
 }
