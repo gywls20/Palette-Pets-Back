@@ -22,7 +22,7 @@ public class ArticleCommentDto {
     private Long createdWho;
     @NotBlank(message = "content 비워둘수없음 ")
     private String content;
-    private int parentId;
+    private Long parentId;
     private int ref;
     private LocalDateTime createdAt;
 

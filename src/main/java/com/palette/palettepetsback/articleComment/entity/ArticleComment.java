@@ -36,7 +36,7 @@ public class ArticleComment {
     @Column(name = "ref")
     private int ref; // 댓글들의 그룹번호 부모댓글과 자식댓글은 모두 똑같은 ref를 가진다
     @Column(name = "parent_id")
-    private int parentId; // 부모 댓글
+    private Long parentId; // 부모 댓글
     @Column(name = "content", nullable = false)
     private String content;
     @Column(name = "is_deleted", nullable = false)
@@ -62,7 +62,7 @@ public class ArticleComment {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .ref(articleCommentDto.getRef())
-                .parentId(Math.toIntExact(count))
+                .parentId((long) Math.toIntExact(count))
                 .build();
 
     }
