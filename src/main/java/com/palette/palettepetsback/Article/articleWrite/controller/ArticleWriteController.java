@@ -58,35 +58,43 @@ public class ArticleWriteController {
     @GetMapping("/articles/{articleId}")
     @ResponseStatus(HttpStatus.OK)
     public Response findArticle(@PathVariable final Long articleId
-                                ,@JwtAuth final AuthInfoDto authInfoDto){
-        log.info("authInfo = {}", authInfoDto);
+                                ){
+//        ,@JwtAuth final AuthInfoDto authInfoDto
+//        log.info("authInfo = {}", authInfoDto);
+        //조회수 증가
+        articleWriteService.updateCountViews(articleId);
+
+        //단건 응답
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
 
-    //게시글 등록
+    //게시글 등록 --- 완료
     @PostMapping(path="/Post/article")
     public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
-                                          @RequestPart("files") List<MultipartFile> files){
+                                          @RequestPart(value="files",required = false) List<MultipartFile> files){
+        log.info("dto = {}", dto);
+        log.info("files = {}", files);
+
         //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
 
         //object storage upload
-        for(MultipartFile file: files){
+            if(files != null && !files.isEmpty()){
+                for (MultipartFile file : files) {
 
-            String fileName =  articleWriteService.uploadArticleImage("article/img",file);
-
-            //글 이미지 정보 DB 등록 -> img_article table
-            ArticleImageDto imageDto = new ArticleImageDto();
-            imageDto.setArticleId(created.getArticleId());
-            imageDto.setImgUrl(fileName);
-            articleWriteService.createImgArticle(imageDto);
-
-        }
+                    String fileName = articleWriteService.uploadArticleImage("article/img", file);
+                    //글 이미지 정보 DB 등록 -> img_article table
+                    ArticleImageDto imageDto = new ArticleImageDto();
+                    imageDto.setArticleId(created.getArticleId());
+                    imageDto.setImgUrl(fileName);
+                    articleWriteService.createImgArticle(imageDto);
+                }
+            }
 
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build() ;
     }
 
 
@@ -102,8 +110,8 @@ public class ArticleWriteController {
     @ResponseStatus(HttpStatus.OK)
     public Response editArticle(@PathVariable final Long articleId,
                                 @Valid @RequestBody final ArticleUpdateRequest req,
-                                @JwtAuth final Member member){
-        return Response.success(articleWriteService.editArticle(articleId,req,member));
+                                @JwtAuth final AuthInfoDto authInfoDto){
+        return Response.success(articleWriteService.editArticle(articleId,req,authInfoDto));
     }
 
 
@@ -111,15 +119,15 @@ public class ArticleWriteController {
 
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정
-    @PatchMapping("/Patch/{id}")
-    public ResponseEntity<Article> update( @PathVariable Long id,
-                                                @Valid
-                                              @RequestBody ArticleWriteDto dto){
-        Article updated = articleWriteService.update(id,dto); // 서비스를 통해 게시글 수정
-        return (updated != null)?//수정되면 정상, 안되면 오류 응답
-                ResponseEntity.status(HttpStatus.OK).body(updated):
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
+//    @PatchMapping("/Patch/{id}")
+//    public ResponseEntity<Article> update( @PathVariable Long id,
+//                                                @Valid
+//                                              @RequestBody ArticleWriteDto dto){
+//        Article updated = articleWriteService.update(id,dto); // 서비스를 통해 게시글 수정
+//        return (updated != null)?//수정되면 정상, 안되면 오류 응답
+//                ResponseEntity.status(HttpStatus.OK).body(updated):
+//                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//    }
 
 
     // 삭제할때는 Article.state는 deleted (삭제됨) article.is_deleted는 1로 수정 article_id 만 있으면 됨

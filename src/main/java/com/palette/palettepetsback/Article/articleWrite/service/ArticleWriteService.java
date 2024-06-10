@@ -4,6 +4,8 @@ import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.ArticleImage;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.*;
 
+import com.palette.palettepetsback.Article.articleWrite.dto.request.PageInfoDto;
+import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleFindAllWithPagingResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleWriteResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.ImgArticleRepository;
@@ -15,6 +17,7 @@ import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.member.entity.Member;
+import com.palette.palettepetsback.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.palette.palettepetsback.member.entity.QMember.member;
@@ -39,6 +44,7 @@ public class ArticleWriteService {
     private final ImgArticleRepository imgArticleRepository;
     private final ArticleLikeRepository likeArticleRepository;
     private final FileService fileService;
+    private final MemberRepository memberRepository;
 
 
 
@@ -80,9 +86,16 @@ public class ArticleWriteService {
 
         dto.setCreatedWho(memberInfo.getMemberId());//dto를 받아와서 멤버아이디가 없으니까  위에꺼를 가져와서 넣기
 
+        StringJoiner joiner = new StringJoiner(",");
+        for (String item : dto.getArticleTags()) {
+            joiner.add(item);
+        }
+
         Article articleWrite = Article.builder()
                 .createdWho(dto.getCreatedWho())
-                .articleTags(dto.getArticleTags())
+                .boardName(Article.ComminityBoard.valueOf(dto.getBoardName()))
+                .articleHead(dto.getArticleHead())
+                .articleTags(joiner.toString())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
@@ -99,7 +112,7 @@ public class ArticleWriteService {
                 .createdWho(dto.getCreatedWho())
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .articleTags(dto.getArticleTags()   )
+//                .articleTags(dto.getArticleTags()   )
                 .build();
         log.info("id:{}, articleWrite:{}", id, articleWrite.toString());
 
@@ -157,12 +170,13 @@ public class ArticleWriteService {
     }
 
     @Transactional
-    public ArticleWriteResponseDto editArticle(Long articleId, ArticleUpdateRequest req, Member member) {
+    public ArticleWriteResponseDto editArticle(Long articleId, ArticleUpdateRequest req, AuthInfoDto authInfoDto) {
         Article article = articleWriteRepository.findById(articleId)
                 .orElseThrow(ArticleNotFoundException::new);
 
-        validateArticleOwner(member,article);
+        validateArticleOwner(authInfoDto,article);
 
+        Member member = memberRepository.findById(authInfoDto.getMemberId()).orElseThrow(()->new IllegalArgumentException("멤버를 찾을수없습니다"));
         Article.ImageUpdateResult result = article.update(req);
 
         uploadImages(result.getAddedImage(),result.getAddedImageFiles());
@@ -183,8 +197,8 @@ public class ArticleWriteService {
                 ));
     }
 
-    private void validateArticleOwner(Member member, Article article) {
-        if(!member.equals(article.getMember())){
+    private void validateArticleOwner(AuthInfoDto authInfoDto, Article article) {
+        if(!authInfoDto.getMemberId().equals(article.getMember().getMemberId())){
             throw new MemberNotEqualsException();
         }
     }
@@ -209,6 +223,22 @@ public class ArticleWriteService {
 //        return articleWriteRepository.findAll(pageRequest);
 //    }
 
+    //게시글 조회시 조회수 up
+    @Transactional
+    public void updateCountViews(Long articleId) {
+        Article article = articleWriteRepository.findById(articleId)
+                .orElseThrow(ArticleNotFoundException::new);
+        log.info("articleId:{}", article.getArticleId());
+        articleWriteRepository.updateCountViews(article.getArticleId(), article.getCountViews()+1);
+    }
+    //댓글 등록시 댓글 개수 up
+    @Transactional
+    public void updateCountReviews(Long articleId) {
+        Article article = articleWriteRepository.findById(articleId)
+                .orElseThrow(ArticleNotFoundException::new);
+        log.info("articleId:{}", article.getArticleId());
+        articleWriteRepository.updateCountReviews(article.getArticleId(), article.getCountReview()+1);
+    }
 }
 
 
