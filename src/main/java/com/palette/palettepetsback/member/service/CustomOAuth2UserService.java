@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.member.service;
 
+import com.palette.palettepetsback.config.exceptions.EmailExistsException;
 import com.palette.palettepetsback.member.dto.*;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
@@ -12,8 +13,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-
-import static com.palette.palettepetsback.member.entity.QMember.member;
 
 @Service
 @RequiredArgsConstructor
@@ -57,10 +56,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             Optional<Member> findEmail = memberRepository.findByEmail(email);
             
             //이메일 중복 확인
-            if (findEmail.isPresent()) { //이메일이 이미 존재하는 경우
-                System.out.println("findEmail = " + findEmail);
-                OAuth2Error oAuth2Error = new OAuth2Error("error");
-                throw new OAuth2AuthenticationException(oAuth2Error, oAuth2Error.toString());
+            if (findEmail.isPresent()) {
+                throw new OAuth2AuthenticationException(new OAuth2Error("email_exists", "이미 존재하는 이메일입니다.", "http://localhost:3000/login"));
             }
 
               Member member = Member.builder()

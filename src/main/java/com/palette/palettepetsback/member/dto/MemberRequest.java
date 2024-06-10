@@ -17,6 +17,11 @@ public class MemberRequest {
         private String password;
         @NotBlank(message = "비밀번호 확인을 입력해 주세요.")
         private String checkPassword;
+    }@Getter @Setter
+    @NoArgsConstructor
+    public static class Email{
+        @NotBlank(message = "이메일을 입력해 주세요.")
+        private String email;
     }
     @Getter @Setter
     @NoArgsConstructor
@@ -51,4 +56,6 @@ public class MemberRequest {
         private String gender;
 
     }
+
+
 }

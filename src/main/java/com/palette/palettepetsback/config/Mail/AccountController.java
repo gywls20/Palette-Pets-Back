@@ -21,4 +21,5 @@ public class AccountController {
         }
         return ResponseEntity.ok().body(new EmailResponseDTO(null));
     }
+
 }
