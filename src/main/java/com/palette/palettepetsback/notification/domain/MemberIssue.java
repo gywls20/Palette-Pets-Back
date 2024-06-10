@@ -38,4 +38,8 @@ public class MemberIssue {
         this.issueCode = issueCode;
         this.isRead = false;
     }
+
+    public void changeIsRead() {
+        this.isRead = true;
+    }
 }

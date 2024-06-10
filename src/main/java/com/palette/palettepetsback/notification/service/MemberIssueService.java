@@ -27,7 +27,7 @@ public class MemberIssueService {
     private final EmitterRepository emitterRepository;
     private final MemberRepository memberRepository;
 
-    private static final Long DEFAULT_TIMEOUT = 30 * 1000L;
+    private static final Long DEFAULT_TIMEOUT = 60 * 60 * 60 * 1000L;
 
     public SseEmitter connect(final Long memberId, final String lastEventId) {
 
@@ -49,7 +49,8 @@ public class MemberIssueService {
         });
 
         // 첫 연결 시, 503 Service Unavailable 방지용 더미 이벤트 데이터 전송
-        sendToClient(eventId, emitter, "알림 서버 연결 성공 [memberId = "+ memberId + "]");
+        sendToClient(eventId, emitter, "NOTIFICATION_CONNECT_SUCCESS");
+//        sendToClient(eventId, emitter, "알림 서버 연결 성공 [memberId = "+ memberId + "]");
 
         // 클라이언트가 미수신한 event 목록이 존재할 경우 전송해서 event 유실을 예방
         if (!lastEventId.isEmpty()) {
@@ -105,6 +106,16 @@ public class MemberIssueService {
                     }
                 }
         );
+    }
+
+    @Transactional
+    public void readMemberIssue(Long memberIssueId) {
+
+        MemberIssue memberIssue = memberIssueRepository.findById(memberIssueId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 알림입니다"));
+
+        // 해당 알림을 읽음표시
+        memberIssue.changeIsRead();
     }
 
 
