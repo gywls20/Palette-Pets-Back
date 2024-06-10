@@ -19,6 +19,7 @@ public class ArticleWriteResponseDto {
 
     private Long ArticleId;
     private String created_who;
+    private String memberImage;
     private String title;
     private String content;
     private String articleTags;
@@ -28,10 +29,11 @@ public class ArticleWriteResponseDto {
     private List<ArticleImageDto>images;
     private LocalDateTime createdAt;
 
-    public static ArticleWriteResponseDto toDto (Article article, String created_who){
+    public static ArticleWriteResponseDto toDto (Article article, String created_who,String memberImage){
         return new ArticleWriteResponseDto(
                 article.getArticleId(),
                 created_who,
+                memberImage,
                 article.getTitle(),
                 article.getContent(),
                 article.getArticleTags(),

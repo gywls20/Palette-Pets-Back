@@ -1,33 +1,43 @@
 package com.palette.palettepetsback.articleComment.service;
 
+
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.QArticle;
 import com.palette.palettepetsback.Article.articleView.repository.ArticleRepository;
-import com.palette.palettepetsback.Article.articleView.service.ArticleService;
-import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
-import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentDto;
+import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentAddRequest;
+import com.palette.palettepetsback.articleComment.dto.response.ArticleCommentListResponse;
 import com.palette.palettepetsback.articleComment.entity.ArticleComment;
+import com.palette.palettepetsback.articleComment.entity.QArticleComment;
 import com.palette.palettepetsback.articleComment.repository.ArticleCommentRepository;
 
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
-import io.micrometer.common.util.StringUtils;
+import com.palette.palettepetsback.member.entity.Member;
+import com.palette.palettepetsback.member.repository.MemberRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.palette.palettepetsback.articleComment.dto.response.ArticleCommentListResponse.convertCommentToDto;
 
 @Service
 @Transactional(readOnly = true)// 트랜잭션 걸어서 JPA가 제대로 돌아가게  함 ->  읽기만 가능 수정할거면 메서드에 각각 트랜잭션 걸기
+@Slf4j
 @RequiredArgsConstructor
 public class ArticleCommentService {
     private final ArticleCommentRepository articleCommentRepository;
     private final ArticleRepository articleRepository;
+    private final MemberRepository memberRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
 //    @Transactional(readOnly = true)
 //    public List<ArticleCommentDto> comments(Article article) {
@@ -39,58 +49,52 @@ public class ArticleCommentService {
 
     //댓글 조회
     @Transactional
-    public List<ArticleCommentDto>comments(Article article){
-        return articleCommentRepository.findByArticleOrderByParentIdAscRefAsc(article)//댓글 엔티티 목록 조회
-                .stream() //댓글 엔티티 목록을 스트림으로 변환
-                .map(ArticleCommentDto::createArticleCommentDto)//엔티티를 DTO로 매핑
-                .collect(Collectors.toList()); //스트림을 리스트로 변환
+    public List<ArticleCommentListResponse> comments(Long articleId) {
+
+        QArticleComment qArticleComment = QArticleComment.articleComment;
+
+        List<ArticleComment> articleComments =
+                jpaQueryFactory.selectFrom(qArticleComment)
+                .leftJoin(qArticleComment.parentId)
+                .fetchJoin()
+                .where(qArticleComment.article.articleId.eq(articleId))
+                .orderBy(
+                        qArticleComment.parentId.articleCommentId.asc().nullsFirst(),
+                        qArticleComment.createdAt.asc()
+                ).fetch();
+
+        List<ArticleCommentListResponse> result = new ArrayList<>();
+        Map<Long, ArticleCommentListResponse> map = new HashMap<>();
+        articleComments.stream().forEach(c -> {
+            ArticleCommentListResponse dto = convertCommentToDto(c);
+            map.put(dto.getArticleCommentId(), dto);
+            if(c.getParentId() != null) map.get(c.getParentId().getArticleCommentId()).getChildren().add(dto);
+            else result.add(dto);
+        });
+
+
+        return result;
     }
+
+
     //댓글 작성
     @Transactional
-    public ArticleCommentDto create(ArticleCommentDto dto){
-
-        // 프론트에서 보내주는 DTO 값
-        // articleId
-        // ref
-        // content
-        // parentId
-        // parentId 가 0이면 generate로 생성 되는 articleCommentId 값을 그대로 parentId에 적용
-        // parentId 가 0이 아니면 그 parentId를 그대로 적용
+    public ArticleComment create(ArticleCommentAddRequest dto) {
 
         Article article = articleRepository.findById(dto.getArticleId())
-                .orElseThrow(()->new IllegalArgumentException("댓글 생성 실패" + "대상 게시글이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("댓글 생성 실패" + "대상 게시글이 없습니다."));
 
-        // JWT 토큰을 가지고 Member Id -> dto set
-        AuthInfoDto memberInfo = JWTUtil.getMemberInfo();
-//        log.info(String.valueOf(memberInfo.getMemberId()));
-        if(memberInfo == null) {
-            return null;
-        }
+        Member member = memberRepository.findById(dto.getCreatedWho())
+                .orElseThrow(() -> new RuntimeException("member not found"));
 
-        dto.setCreatedWho(memberInfo.getMemberId());
-
-        //  parentId 계산
-        //  parentId가 있는 경우
-        Long parentId;
         ArticleComment parentComment = null;
 
-        //부모 댓글이 있는 경우
-        if(dto.getParentId() !=0 ){
+        if (dto.getParentId() != 0) {
             parentComment = articleCommentRepository.findById((long) dto.getParentId())
-                    .orElseThrow(()->new IllegalArgumentException("부모 댓글을 찾을 수 없습니다."));
-            parentId = parentComment.getArticleCommentId();
-        }
-        else{
-            parentId = articleCommentRepository.findMaxId()+1;
+                    .orElseThrow(() -> new IllegalArgumentException("댓글 생성 실패" + "부모 댓글이 없습니다."));
         }
 
-
-        ArticleComment articleComment = ArticleComment.createComment(dto,article,parentId);
-        ArticleComment created =articleCommentRepository.save(articleComment);
-//        created.setRef(created.getArticleCommentId().intValue());
-        return ArticleCommentDto.createArticleCommentDto(created);
-
-
+        return articleCommentRepository.save(dto.toEntity(article,member, parentComment));
     }
 
 
@@ -104,38 +108,37 @@ public class ArticleCommentService {
 //}
 
 
-
-
     //부모 댓글의 ref값을 기반으로 자식 댓글의 ref값을 계산
-    private int calculateChildRef(int parentRef) {
-        return parentRef * 10 + 1;
-    }
-
-    //댓글 수정
-    @Transactional
-    public ArticleCommentDto update(Long articleCommentId,ArticleCommentDto dto){
-        //댓글 조회
-        ArticleComment target = articleCommentRepository.findById(articleCommentId)
-                .orElseThrow(()->new IllegalArgumentException("댓글을 찾을수 없습니다"));
-        //댓글 내용 업데이트
-        target.setContent(dto.getContent());
-        //변경 사항저장
-        ArticleComment updatedComment = articleCommentRepository.save(target);
-        //DTO로 변환하여 반환
-        return ArticleCommentDto.createArticleCommentDto(updatedComment);
-    }
-    //댓글 삭제
-    public ArticleComment delete(Long articleCommentId){
-        //대상찾기
-        ArticleComment target = articleCommentRepository.findById(articleCommentId).orElse(null);
-        //잘못된 요청 처리하기
-        if(target == null){
-            return null;
-        }
-        //대상 삭제하기
-        articleCommentRepository.delete(target);
-        return target;
-    }
+//    private int calculateChildRef(int parentRef) {
+//        return parentRef * 10 + 1;
+//    }
+//
+//    //댓글 수정
+//    @Transactional
+//    public ArticleCommentRequestDto update(Long articleCommentId, ArticleCommentRequestDto dto) {
+//        //댓글 조회
+//        ArticleComment target = articleCommentRepository.findById(articleCommentId)
+//                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을수 없습니다"));
+//        //댓글 내용 업데이트
+//        target.setContent(dto.getContent());
+//        //변경 사항저장
+//        ArticleComment updatedComment = articleCommentRepository.save(target);
+//        //DTO로 변환하여 반환
+//        return ArticleCommentRequestDto.createArticleCommentDto(updatedComment);
+//    }
+//
+//    //댓글 삭제
+//    public ArticleComment delete(Long articleCommentId) {
+//        //대상찾기
+//        ArticleComment target = articleCommentRepository.findById(articleCommentId).orElse(null);
+//        //잘못된 요청 처리하기
+//        if (target == null) {
+//            return null;
+//        }
+//        //대상 삭제하기
+//        articleCommentRepository.delete(target);
+//        return target;
+//    }
 
 //        @Transactional
 //        public ArticleCommentDto update(Long articleCommentId,ArticleCommentDto dto){
@@ -162,6 +165,6 @@ public class ArticleCommentService {
 //            articleCommentRepository.delete(target);
 //            return target;
 //        }
-    }
+}
 
 

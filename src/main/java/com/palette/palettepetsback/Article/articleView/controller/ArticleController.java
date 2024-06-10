@@ -46,19 +46,32 @@ public class ArticleController {
         return ResponseEntity.ok().body(articles);
     }
 
-    //리스트 출력하기(페이징, 정렬)
+//    //리스트 출력하기(페이징, 정렬)
+//    @GetMapping("/list")
+//    public ResponseEntity<List<ArticleResponseDTO>> tagSearch(@ModelAttribute PageableDTO pd) {
+//        log.info("pd: {}", pd);
+//        List<ArticleResponseDTO> articles = articleService.searchList(pd);
+//        log.info("articles: {}", articles);
+//        return ResponseEntity.ok().body(articles);
+//    }
+
     @GetMapping("/list")
     public ResponseEntity<List<ArticleResponseDTO>> tagSearch(@ModelAttribute PageableDTO pd) {
+        log.info("pd: {}", pd);
         List<ArticleResponseDTO> articles = articleService.searchList(pd);
-
+        log.info("articles: {}", articles);
         return ResponseEntity.ok().body(articles);
     }
+
+
+
+
+
     //검색 & 리스트 출력(페이징, 정렬, 문장 분리)
     @GetMapping("/listLabel")
     public ResponseEntity<List<ArticleResponseDTO>> labelSearch(@ModelAttribute PageableDTO pd) {
         //Article article = new Article();
         List<ArticleResponseDTO> articles = articleKomoranService.searchLabelList(pd);
-
         return ResponseEntity.ok().body(articles);
 
     }

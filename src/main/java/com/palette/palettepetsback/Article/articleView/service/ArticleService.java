@@ -61,10 +61,10 @@ public class ArticleService {
         String[] searchList = pd.getWhere().split(","); // ',' 단위로 주어진 검색 조건 분리
 
         BooleanBuilder where = new BooleanBuilder(); // 검색 조건을 넣는 객체
-        for(String search: searchList){
-            where.or(qArticle.articleTags.like("%"+search+"%"));
-            // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
-        }
+//        for(String search: searchList){
+//            where.or(qArticle.articleTags.like("%"+search+"%"));
+//            // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
+//        }
 
         List<Article> articles = jpaQueryFactory
                 .selectFrom(qArticle)
@@ -72,12 +72,12 @@ public class ArticleService {
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]))
                 .offset(offset).limit(PAGE_SIZE)
                 .fetch();
-        System.out.println("offset : "+offset);
-        System.out.println("Size : "+articles.size());
+
 
         List<ArticleResponseDTO> articleResponseDTOList = articles.stream()
                 .map(responseDTO -> new ArticleResponseDTO(responseDTO))
                 .collect(Collectors.toList());
+
 
         return articleResponseDTOList;
     }
@@ -90,10 +90,10 @@ public class ArticleService {
         String[] searchList = articleTags.split(","); // ',' 단위로 주어진 검색 조건 분리
 
         BooleanBuilder where = new BooleanBuilder(); // 검색 조건을 넣는 객체
-        for(String search: searchList){
-            where.or(qArticle.articleTags.like("%"+search+"%"));
-            // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
-        }
+//        for(String search: searchList){
+//            where.or(qArticle.articleTags.like("%"+search+"%"));
+//            // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
+//        }
         List<Article> articleList = jpaQueryFactory
                 .selectFrom(qArticle)
                 .where(where)
