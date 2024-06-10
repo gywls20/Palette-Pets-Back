@@ -131,6 +131,7 @@ public class ArticleWriteController {
     //DELETE
     @DeleteMapping("/Delete/{id}")
     public Article delete(@PathVariable Long id){
+
         // 1. 대상 찾기
         Article target = articleWriteRepository.findById(id).orElse(null);
         // 2. 잘못된 요청처리하기
@@ -140,6 +141,7 @@ public class ArticleWriteController {
         //3. 대상 삭제하기 대신  상태변경하기
         target.markAsDeleted();
         articleWriteRepository.save(target); //변경된 상태 저장
+
         return target;
     }
 

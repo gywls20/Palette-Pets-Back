@@ -1,6 +1,7 @@
 package com.palette.palettepetsback.Article.articleView.DTO.reponsse;
 
 import com.palette.palettepetsback.Article.Article;
+import com.palette.palettepetsback.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleResponseDTO {
+
     private Long articleId;
     private LocalDateTime createdAt;
     private Long createdWho;
@@ -23,6 +25,7 @@ public class ArticleResponseDTO {
     private Integer countLoves;
     private Integer countViews;
     private Integer countReview;
+
 
     public ArticleResponseDTO(Article responseDTO) {
 
@@ -37,6 +40,9 @@ public class ArticleResponseDTO {
         this.countLoves = responseDTO.getCountLoves();
         this.countViews = responseDTO.getCountViews();
         this.countReview = responseDTO.getCountReview();
+
     }
+
+
 
 }

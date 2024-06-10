@@ -164,7 +164,7 @@ public class ArticleWriteService {
                 .orElseThrow(ArticleNotFoundException::new);
 
         Member member = article.getMember();
-        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname());
+        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname(),member.getMemberImage());
     }
 
     //게시글 전체 조회
