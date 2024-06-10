@@ -51,7 +51,6 @@ public class ArticleComment {
 
     @Column(name = "content", nullable = false)
     private String content;
-
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
@@ -77,20 +76,6 @@ public class ArticleComment {
         }
     }
 
-//    public static ArticleComment createComment(ArticleCommentDto articleCommentDto, Article article ,Long count) {
-//        if (articleCommentDto.getArticleId() != article.getArticleId())
-//            throw new IllegalArgumentException("댓글 생성 실패 게시글의 id가 잘못됐습니다");
-//        return ArticleComment.builder()
-//                .article(article)
-//                .createdWho(articleCommentDto.getCreatedWho())
-//                .content(articleCommentDto.getContent())
-//                .createdAt(LocalDateTime.now())
-//                .updatedAt(LocalDateTime.now())
-//                .ref(articleCommentDto.getRef())
-//                .parentId(Math.toIntExact(count))
-//                .build();
-//
-//    }
 
 
 }

@@ -2,6 +2,7 @@ package com.palette.palettepetsback.Article.articleWrite.controller;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
+import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleUpdateRequest;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
 
 
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import static com.palette.palettepetsback.member.entity.QMember.member;
 
 @RestController
 @CrossOrigin //리액트에서 넘어올때 포트가 다르면 오류가 생기는걸 해결해줌
@@ -103,28 +106,28 @@ public class ArticleWriteController {
 
 
     //게시글 수정 -> 변경
-//    @PutMapping("/articles/{articleId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public Response editArticle(@PathVariable final Long articleId,
-//                                @Valid @ModelAttribute final ArticleUpdateRequest req,
-//                                @JwtAuth final AuthInfoDto authInfoDto){
-//        return null;
-//    }
+    @PutMapping("/articles/{articleId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Response editArticle(@PathVariable final Long articleId,
+                                @Valid @RequestBody final ArticleUpdateRequest req,
+                                @JwtAuth final AuthInfoDto authInfoDto){
+        return Response.success(articleWriteService.editArticle(articleId,req,authInfoDto));
+    }
 
 
 
 
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정
-    @PatchMapping("/Patch/{id}")
-    public ResponseEntity<Article> update( @PathVariable Long id,
-                                                @Valid
-                                              @RequestBody ArticleWriteDto dto){
-        Article updated = articleWriteService.update(id,dto); // 서비스를 통해 게시글 수정
-        return (updated != null)?//수정되면 정상, 안되면 오류 응답
-                ResponseEntity.status(HttpStatus.OK).body(updated):
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
+//    @PatchMapping("/Patch/{id}")
+//    public ResponseEntity<Article> update( @PathVariable Long id,
+//                                                @Valid
+//                                              @RequestBody ArticleWriteDto dto){
+//        Article updated = articleWriteService.update(id,dto); // 서비스를 통해 게시글 수정
+//        return (updated != null)?//수정되면 정상, 안되면 오류 응답
+//                ResponseEntity.status(HttpStatus.OK).body(updated):
+//                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//    }
 
 
     // 삭제할때는 Article.state는 deleted (삭제됨) article.is_deleted는 1로 수정 article_id 만 있으면 됨
