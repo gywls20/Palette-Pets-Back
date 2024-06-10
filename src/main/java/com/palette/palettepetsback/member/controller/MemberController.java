@@ -1,5 +1,7 @@
 package com.palette.palettepetsback.member.controller;
 
+import com.palette.palettepetsback.config.Mail.EmailResponseDTO;
+import com.palette.palettepetsback.config.Mail.RegisterMail;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.dto.JoinRequest;
 import com.palette.palettepetsback.member.dto.MemberRequest;
@@ -14,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,8 +25,9 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final RegisterMail registerMail;
 
-    //로그인 페이지
+    //로그인 페이지 - 사용하지 않습니다. -> loginFilter로 가세요
 //    @GetMapping("/login")
 //    public String loginPage() {
 //
@@ -51,10 +53,6 @@ public class MemberController {
     @PostMapping("/join")
     public ResponseEntity<String> signup (@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
 
-        log.info("joinRequest.getEmail() = ",joinRequest.getEmail());
-        log.info("joinRequest.getPassword() = ",joinRequest.getPassword());
-        log.info("joinRequest.getNickName() = ",joinRequest.getNickName());
-
         if (bindingResult.hasErrors()) { //에러출력
             List<FieldError> list = bindingResult.getFieldErrors();
             for(FieldError error : list) {
@@ -66,22 +64,37 @@ public class MemberController {
         }
 
         memberService.join(joinRequest);
-        log.info("joinRequest =", joinRequest.getPassword());
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
-    //비밀번호 찾기
 
+    //비밀번호 찾기
+    //등록된 이메일로 임시비밀번호를 발송하고 발송된 임시비밀번호로 사용자의 pw를 변경하는 컨트롤러
+    @PostMapping("/memberF/findPw")
+    public ResponseEntity<String>sendEmail(@RequestBody  MemberRequest.Email Email){
+        log.info("멤버 서비스.체크이메일 듀플리케이트 = {}", Email.getEmail());
+        if (memberService.checkEmailDuplicate(Email.getEmail())) { //이메일 존재
+            EmailResponseDTO.sendPwDto dto = memberService.createMailUpdatePW(Email.getEmail());
+
+            registerMail.mailSend(dto);
+
+            return ResponseEntity.ok("이메일이 전송되었습니다. 메일함에서 확인해 주세요.");
+        } else {
+            return ResponseEntity.badRequest().body("해당하는 이메일이 없습니다. 다시 입력해 주세요.");
+        }
+    }
 
 
     //닉네임 중복확인 버튼
     //중복시 true 반환
-    @PostMapping("/member/checknickname")
-    public Boolean checkNickname(@RequestBody String nickname) {
-        if (memberService.checkNicknameDuplicate(nickname)) {
-            return true;
+    @PostMapping("/memberF/checknickname")
+    public Boolean checkNickname(@RequestBody MemberRequest.Nickname nickname) {
+        log.info("nick={}",nickname.getNickName());
+        if (memberService.checkNicknameDuplicate(nickname.getNickName())) {
+            return true; // 중복되면 true 반환
         }
-        return false;
+        return false; // 중복되지 않으면 false 반환
     }
+
 
     // 비밀번호 수정
     @PutMapping("/member/password")

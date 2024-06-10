@@ -1,12 +1,16 @@
 package com.palette.palettepetsback.config.Mail;
 
+import com.palette.palettepetsback.member.entity.Member;
+import com.palette.palettepetsback.member.repository.MemberRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -18,7 +22,7 @@ public class RegisterMail {
     private String authNum; //랜덤 인증 코드
 
     //랜덤 인증 코드 생성
-    public void createCode() {
+    public String createCode() {
         Random random = new Random();
         StringBuffer key = new StringBuffer();
 
@@ -37,7 +41,7 @@ public class RegisterMail {
                     break;
             }
         }
-        authNum = key.toString();
+        return key.toString();
     }
 
     //메일 양식 작성
@@ -99,5 +103,16 @@ public class RegisterMail {
 //        model.addAttribute("code", code);
         return code;
     }
+
+    public void mailSend(EmailResponseDTO.sendPwDto mailDto){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(mailDto.getAddress());
+        message.setFrom("springtest12345@naver.com");
+        message.setSubject(mailDto.getTitle());
+        message.setText(mailDto.getMessage());
+
+        emailSender.send(message);
+    }
+
 
 }

@@ -6,6 +6,7 @@ import com.palette.palettepetsback.config.jwt.filter.JWTFilter;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.filter.LoginFilter;
 import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
+import com.palette.palettepetsback.config.oauth2.FailureHandler;
 import com.palette.palettepetsback.config.oauth2.CustomSuccessHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAccessDeniedHandler;
 import com.palette.palettepetsback.config.security.handlers.CustomAuthenticationEntryPoint;
@@ -42,6 +43,7 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final FailureHandler failureHandler;
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
@@ -68,6 +70,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/memberF/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/join").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
@@ -96,11 +99,11 @@ public class SecurityConfig {
                 );
         http
                 .oauth2Login((oauth2) -> oauth2
-//                    .loginPage("/login")
                     .userInfoEndpoint((userInfoEndpointConfig) ->
-                            userInfoEndpointConfig
-                                    .userService(customOAuth2UserService))
-                                    .successHandler(customSuccessHandler)
+                        userInfoEndpointConfig
+                            .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler)
+                        .failureHandler(failureHandler)
                 );
 
         return http.build();

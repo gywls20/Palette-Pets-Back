@@ -132,19 +132,31 @@ public class ArticleWriteController {
 
     // 삭제할때는 Article.state는 deleted (삭제됨) article.is_deleted는 1로 수정 article_id 만 있으면 됨
     //DELETE
-    @DeleteMapping("/Delete/{id}")
-    public Article delete(@PathVariable Long id){
-        // 1. 대상 찾기
-        Article target = articleWriteRepository.findById(id).orElse(null);
-        // 2. 잘못된 요청처리하기
-        if(target ==null ) {//이미 삭제된 대상인지 확인
-            return null;
-        }
-        //3. 대상 삭제하기 대신  상태변경하기
-        target.markAsDeleted();
-        articleWriteRepository.save(target); //변경된 상태 저장
-        return target;
+//    @DeleteMapping("/Delete/{id}")
+//    public Article delete(@PathVariable Long id){
+//        // 1. 대상 찾기
+//        Article target = articleWriteRepository.findById(id).orElse(null);
+//        // 2. 잘못된 요청처리하기
+//        if(target ==null ) {//이미 삭제된 대상인지 확인
+//            return null;
+//        }
+//        //3. 대상 삭제하기 대신  상태변경하기
+//        target.markAsDeleted();
+//        articleWriteRepository.save(target); //변경된 상태 저장
+//        return target;
+//    }
+
+    //게시글 삭제 ->
+    @DeleteMapping("/article/{articleId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Response deleteArticle(@PathVariable final Long articleId,
+                                  @JwtAuth final AuthInfoDto authInfoDto){
+        articleWriteService.deleteArticle(articleId,authInfoDto);
+        return Response.success();
     }
+
+
+
 
     //게시글 이미지 삭제
     @DeleteMapping("{id}/img")
