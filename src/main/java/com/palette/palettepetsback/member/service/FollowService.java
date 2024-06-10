@@ -37,8 +37,7 @@ public class FollowService {
             Member followee = memberRepository.findById(followingId).orElseThrow();
 
             Follow follow = new Follow();
-            follow.setFollowerId(follower);
-            follow.setFollowingId(followee);
+            follow.saveFollow(follower,followee);
 
             followRepository.save(follow);
         } else {
@@ -56,7 +55,7 @@ public class FollowService {
 
     public List<FollowResponse> getFollowerList(String nickname, Long memberId) {
         Member ToMember = memberRepository.findByMemberNickname(nickname).orElseThrow();
-        Member FromMember = memberRepository.findById(memberId).orElseThrow();
+        Member FromMember = memberRepository.findById(memberId).orElseThrow(); //나중에 쓸수도 있어서 냅둠.
 
         List<Follow> list = followRepository.findByFollowerId(ToMember);
         List<FollowResponse> followerList = new ArrayList<>();
