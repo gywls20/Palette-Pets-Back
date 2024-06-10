@@ -62,8 +62,6 @@ public class Article {
     @Column(name="article_head")
     private String articleHead;
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("memberId")
     @JoinColumn(name = "created_who", referencedColumnName = "member_id",nullable = false)
@@ -71,7 +69,7 @@ public class Article {
     private Member member;
 
     @OneToMany(mappedBy = "article",cascade=CascadeType.PERSIST,orphanRemoval = true)
-    private List<ArticleImage>images;
+    private List<ArticleImage> images;
 
     @PrePersist //Entity 실행 전 수행하는 마라미터로 default 값을 지정O
     public void prePersist(){
@@ -123,6 +121,7 @@ public class Article {
             this.title = article.title;
         if(article.content != null)
             this.content = article.content;
-
+        if(article.articleTags != null)
+            this.articleTags = article.articleTags;
     }
 }

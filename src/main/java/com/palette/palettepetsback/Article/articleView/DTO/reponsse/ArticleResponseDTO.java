@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @AllArgsConstructor
@@ -17,17 +18,22 @@ public class ArticleResponseDTO {
     private String content;
     private String title;
     private String articleTags;
+    private String articleHead;
+    private String boardName;
     private Integer countLoves;
     private Integer countViews;
     private Integer countReview;
 
     public ArticleResponseDTO(Article responseDTO) {
+
         this.articleId = responseDTO.getArticleId();
         this.createdAt = responseDTO.getCreatedAt();
         this.createdWho = responseDTO.getCreatedWho();
         this.content = responseDTO.getContent();
         this.title = responseDTO.getTitle();
-        this.articleTags = responseDTO.getArticleTags();;
+        this.articleTags = responseDTO.getArticleTags();
+        this.articleHead = responseDTO.getArticleHead();
+        this.boardName = String.valueOf(responseDTO.getBoardName());
         this.countLoves = responseDTO.getCountLoves();
         this.countViews = responseDTO.getCountViews();
         this.countReview = responseDTO.getCountReview();

@@ -55,35 +55,40 @@ public class ArticleWriteController {
     @GetMapping("/articles/{articleId}")
     @ResponseStatus(HttpStatus.OK)
     public Response findArticle(@PathVariable final Long articleId
-                                ,@JwtAuth final AuthInfoDto authInfoDto){
-        log.info("authInfo = {}", authInfoDto);
+                                ){
+//        ,@JwtAuth final AuthInfoDto authInfoDto
+//        log.info("authInfo = {}", authInfoDto);
+
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
 
-    //게시글 등록
+    //게시글 등록 --- 완료
     @PostMapping(path="/Post/article")
     public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
-                                          @RequestPart("files") List<MultipartFile> files){
+                                          @RequestPart(value="files",required = false) List<MultipartFile> files){
+        log.info("dto = {}", dto);
+        log.info("files = {}", files);
+
         //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
 
         //object storage upload
-        for(MultipartFile file: files){
+            if(files != null && !files.isEmpty()){
+                for (MultipartFile file : files) {
 
-            String fileName =  articleWriteService.uploadArticleImage("article/img",file);
-
-            //글 이미지 정보 DB 등록 -> img_article table
-            ArticleImageDto imageDto = new ArticleImageDto();
-            imageDto.setArticleId(created.getArticleId());
-            imageDto.setImgUrl(fileName);
-            articleWriteService.createImgArticle(imageDto);
-
-        }
+                    String fileName = articleWriteService.uploadArticleImage("article/img", file);
+                    //글 이미지 정보 DB 등록 -> img_article table
+                    ArticleImageDto imageDto = new ArticleImageDto();
+                    imageDto.setArticleId(created.getArticleId());
+                    imageDto.setImgUrl(fileName);
+                    articleWriteService.createImgArticle(imageDto);
+                }
+            }
 
         return (created != null)?
                 ResponseEntity.status(HttpStatus.OK).body(created):
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build() ;
     }
 
 

@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -81,12 +82,18 @@ public class ArticleWriteService {
         if(memberInfo == null) {
             return null;
         }
-
         dto.setCreatedWho(memberInfo.getMemberId());//dto를 받아와서 멤버아이디가 없으니까  위에꺼를 가져와서 넣기
+
+        StringJoiner joiner = new StringJoiner(",");
+        for (String item : dto.getArticleTags()) {
+            joiner.add(item);
+        }
 
         Article articleWrite = Article.builder()
                 .createdWho(dto.getCreatedWho())
-                .articleTags(dto.getArticleTags())
+                .boardName(Article.ComminityBoard.valueOf(dto.getBoardName()))
+                .articleHead(dto.getArticleHead())
+                .articleTags(joiner.toString())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
@@ -103,7 +110,7 @@ public class ArticleWriteService {
                 .createdWho(dto.getCreatedWho())
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .articleTags(dto.getArticleTags()   )
+//                .articleTags(dto.getArticleTags()   )
                 .build();
         log.info("id:{}, articleWrite:{}", id, articleWrite.toString());
 
