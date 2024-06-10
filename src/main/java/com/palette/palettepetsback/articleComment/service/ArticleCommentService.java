@@ -2,7 +2,7 @@ package com.palette.palettepetsback.articleComment.service;
 
 
 import com.palette.palettepetsback.Article.Article;
-import com.palette.palettepetsback.Article.QArticle;
+import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleView.repository.ArticleRepository;
 import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentAddRequest;
 import com.palette.palettepetsback.articleComment.dto.response.ArticleCommentListResponse;

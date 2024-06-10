@@ -18,11 +18,9 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pet_id")
     private Long id;
-    // 나중에 member_id 연관관계 맺기
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_who", referencedColumnName = "member_id")
     private Member member;
-
     private String petName;
     private String petImage;
     @Column(name = "pet_category_1")
