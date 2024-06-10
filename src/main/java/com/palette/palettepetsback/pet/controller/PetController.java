@@ -56,7 +56,7 @@ public class PetController {
     // 펫 이미지 등록
     @PostMapping("/img")
     public boolean registerPetImg(@Validated @RequestPart() ImgPetRegistryDto dto,
-                                  @RequestPart("files") MultipartFile[] files) {
+                                  @RequestPart(value = "files", required = false) MultipartFile[] files) {
         // todo S3 저장 메서드 + 펫 이미지 리스트 저장
         int i = 0;
         for (MultipartFile file : files) {
