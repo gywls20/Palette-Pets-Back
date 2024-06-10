@@ -72,8 +72,8 @@ public class ArticleService {
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]))
                 .offset(offset).limit(PAGE_SIZE)
                 .fetch();
-        System.out.println("offset : "+offset);
-        System.out.println("Size : "+articles.size());
+
+
 
         List<ArticleResponseDTO> articleResponseDTOList = articles.stream()
                 .map(responseDTO -> new ArticleResponseDTO(responseDTO))

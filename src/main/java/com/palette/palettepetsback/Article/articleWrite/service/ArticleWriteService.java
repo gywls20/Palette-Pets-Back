@@ -187,6 +187,22 @@ public class ArticleWriteService {
 //        return articleWriteRepository.findAll(pageRequest);
 //    }
 
+    //게시글 조회시 조회수 up
+    @Transactional
+    public void updateCountViews(Long articleId) {
+        Article article = articleWriteRepository.findById(articleId)
+                .orElseThrow(ArticleNotFoundException::new);
+        log.info("articleId:{}", article.getArticleId());
+        articleWriteRepository.updateCountViews(article.getArticleId(), article.getCountViews()+1);
+    }
+    //댓글 등록시 댓글 개수 up
+    @Transactional
+    public void updateCountReviews(Long articleId) {
+        Article article = articleWriteRepository.findById(articleId)
+                .orElseThrow(ArticleNotFoundException::new);
+        log.info("articleId:{}", article.getArticleId());
+        articleWriteRepository.updateCountReviews(article.getArticleId(), article.getCountReview()+1);
+    }
 }
 
 

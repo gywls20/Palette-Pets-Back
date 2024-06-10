@@ -58,7 +58,10 @@ public class ArticleWriteController {
                                 ){
 //        ,@JwtAuth final AuthInfoDto authInfoDto
 //        log.info("authInfo = {}", authInfoDto);
+        //조회수 증가
+        articleWriteService.updateCountViews(articleId);
 
+        //단건 응답
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
