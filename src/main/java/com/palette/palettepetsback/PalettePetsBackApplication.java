@@ -10,7 +10,6 @@ import java.util.UUID;
 public class PalettePetsBackApplication {
 
     public static void main(String[] args) {
-        System.out.println("UUID : "+UUID.randomUUID());
         SpringApplication.run(PalettePetsBackApplication.class, args);
     }
 

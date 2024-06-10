@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.Chat.Service;
 
+import com.palette.palettepetsback.Chat.Entity.ChatRoom;
 import com.palette.palettepetsback.Chat.Repository.ChatRepository;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +14,25 @@ import java.util.Optional;
 public class ChatService {
     private final ChatRepository chatRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public String getChatRoom(Long my_id, Long receiver_id){
-        String room_name = chatRepository.findChatRoomById(my_id, receiver_id).orElseThrow(()->new IllegalArgumentException("속하지 않은 채팅방입니다."));
+        String room_name = chatRepository.findChatRoomById(my_id, receiver_id).orElse(null);
+        if (room_name == null) {
+            System.out.println("room is NULL");
+            return createChatRoom(my_id, receiver_id);
+        }
         return room_name;
     }
 
-//    @Transactional
-//    public String createChatRoom(Long user1, Long user2){
-//        return chatRepository.save(user1, user2);
-//    }
+    @Transactional
+    public String createChatRoom(Long user1, Long user2){
+        ChatRoom chatRoom = chatRepository.save(
+                ChatRoom.builder()
+                        .user1(user1)
+                        .user2(user2)
+                        .build()
+        );
+        System.out.println("chatRoom.getChatRoomId() = " + chatRoom.getChatRoomId());
+        return chatRoom.getChatRoomId().toString();
+    }
 }
