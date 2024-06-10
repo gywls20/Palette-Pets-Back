@@ -21,6 +21,7 @@ public class ArticleImage {
     private Long id;
     @Column(name="img_url")
     private String imgUrl;
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="article_id")
     private Article article;

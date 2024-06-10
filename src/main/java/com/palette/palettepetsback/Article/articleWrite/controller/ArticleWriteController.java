@@ -1,6 +1,7 @@
 package com.palette.palettepetsback.Article.articleWrite.controller;
 
 import com.palette.palettepetsback.Article.Article;
+import com.palette.palettepetsback.Article.articleView.repository.ArticleRepository;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleUpdateRequest;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
@@ -9,6 +10,7 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.Article.exception.type.ArticleNotFoundException;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +35,7 @@ public class ArticleWriteController {
 
     private final ArticleWriteService articleWriteService;
     private final ArticleWriteRepository articleWriteRepository;
+    private final ArticleRepository articleRepository;
 
 //    @Autowired
 //    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
@@ -132,20 +136,14 @@ public class ArticleWriteController {
 
     // 삭제할때는 Article.state는 deleted (삭제됨) article.is_deleted는 1로 수정 article_id 만 있으면 됨
     //DELETE
-    @DeleteMapping("/Delete/{id}")
-    public Article delete(@PathVariable Long id){
 
-        // 1. 대상 찾기
-        Article target = articleWriteRepository.findById(id).orElse(null);
-        // 2. 잘못된 요청처리하기
-        if(target ==null ) {//이미 삭제된 대상인지 확인
-            return null;
-        }
-        //3. 대상 삭제하기 대신  상태변경하기
-        target.markAsDeleted();
-        articleWriteRepository.save(target); //변경된 상태 저장
+    @DeleteMapping("/Delete/{articleId}")
+    public ResponseEntity<String> delete(@PathVariable Long articleId){
 
-        return target;
+        articleWriteService.delete(articleId);
+
+        return  ResponseEntity.status(HttpStatus.OK).body("게시글이 삭제되었습니다.");
+
     }
 
     //게시글 이미지 삭제

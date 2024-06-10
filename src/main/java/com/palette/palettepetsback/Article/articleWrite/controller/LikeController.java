@@ -32,6 +32,8 @@ public class LikeController {
         articleLikeService.likeArticle(dto.getArticleId(),dto.getMemberId());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    //좋아요 클릭시 countLove + 1
+
     //좋아요 취소
     @DeleteMapping("/like/{articleId}/{memberId}")
     public ResponseEntity<Void>unlikeArticle(@PathVariable Long articleId,@PathVariable Long memberId){
