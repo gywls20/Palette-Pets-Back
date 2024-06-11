@@ -52,6 +52,7 @@ public class ArticleCommentService {
     public List<ArticleCommentListResponse> comments(Long articleId) {
 
         QArticleComment qArticleComment = QArticleComment.articleComment;
+
         List<ArticleComment> articleComments =
                 jpaQueryFactory.selectFrom(qArticleComment)
                 .leftJoin(qArticleComment.parentId)

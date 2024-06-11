@@ -2,6 +2,7 @@ package com.palette.palettepetsback.articleComment.controller;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleView.service.ArticleService;
+import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
 import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentAddRequest;
 import com.palette.palettepetsback.articleComment.dto.response.ArticleCommentListResponse;
 import com.palette.palettepetsback.articleComment.entity.ArticleComment;
@@ -30,7 +31,7 @@ public class ArticleCommentController {
     private final ArticleCommentService articleCommentService;
     private final ArticleService articleService;
     private final ArticleCommentRepository articleCommentRepository;
-
+    private final ArticleWriteService articleWriteService;
 
     //Get
     @GetMapping("/Get/comments/{articleId}")
@@ -57,6 +58,8 @@ public class ArticleCommentController {
         log.info("member : " + memberInfo.getMemberId());
        ArticleComment comment = articleCommentService.create(dto);
         log.info("dto = {}",dto);
+
+        articleWriteService.updateCountReviews(dto.getArticleId());
        return ResponseEntity.ok("작성하신 댓글이 등록되었습니다.");
     }
 

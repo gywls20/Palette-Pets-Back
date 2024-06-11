@@ -12,5 +12,4 @@ public class PalettePetsBackApplication {
     public static void main(String[] args) {
         SpringApplication.run(PalettePetsBackApplication.class, args);
     }
-
 }

@@ -1,13 +1,16 @@
 package com.palette.palettepetsback.Article.articleWrite.controller;
 
 import com.palette.palettepetsback.Article.Article;
+import com.palette.palettepetsback.Article.articleView.repository.ArticleRepository;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
+import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleUpdateRequest;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
 
 
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.Article.exception.type.ArticleNotFoundException;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
@@ -16,10 +19,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import static com.palette.palettepetsback.member.entity.QMember.member;
 
 @RestController
 @CrossOrigin //리액트에서 넘어올때 포트가 다르면 오류가 생기는걸 해결해줌
@@ -29,6 +35,7 @@ public class ArticleWriteController {
 
     private final ArticleWriteService articleWriteService;
     private final ArticleWriteRepository articleWriteRepository;
+    private final ArticleRepository articleRepository;
 
 //    @Autowired
 //    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
@@ -58,7 +65,10 @@ public class ArticleWriteController {
                                 ){
 //        ,@JwtAuth final AuthInfoDto authInfoDto
 //        log.info("authInfo = {}", authInfoDto);
+        //조회수 증가
+        articleWriteService.updateCountViews(articleId);
 
+        //단건 응답
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
@@ -100,44 +110,40 @@ public class ArticleWriteController {
 
 
     //게시글 수정 -> 변경
-//    @PutMapping("/articles/{articleId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public Response editArticle(@PathVariable final Long articleId,
-//                                @Valid @ModelAttribute final ArticleUpdateRequest req,
-//                                @JwtAuth final AuthInfoDto authInfoDto){
-//        return null;
-//    }
+    @PutMapping("/articles/{articleId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Response editArticle(@PathVariable final Long articleId,
+                                @Valid @RequestBody final ArticleUpdateRequest req,
+                                @JwtAuth final AuthInfoDto authInfoDto){
+        return Response.success(articleWriteService.editArticle(articleId,req,authInfoDto));
+    }
 
 
 
 
     //업데이트 할때는 Article.state는 modified(수정됨)article_id,title ,content,created_at 4개가 들어가서 수정
     //게시글 수정
-    @PatchMapping("/Patch/{id}")
-    public ResponseEntity<Article> update( @PathVariable Long id,
-                                                @Valid
-                                              @RequestBody ArticleWriteDto dto){
-        Article updated = articleWriteService.update(id,dto); // 서비스를 통해 게시글 수정
-        return (updated != null)?//수정되면 정상, 안되면 오류 응답
-                ResponseEntity.status(HttpStatus.OK).body(updated):
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
+//    @PatchMapping("/Patch/{id}")
+//    public ResponseEntity<Article> update( @PathVariable Long id,
+//                                                @Valid
+//                                              @RequestBody ArticleWriteDto dto){
+//        Article updated = articleWriteService.update(id,dto); // 서비스를 통해 게시글 수정
+//        return (updated != null)?//수정되면 정상, 안되면 오류 응답
+//                ResponseEntity.status(HttpStatus.OK).body(updated):
+//                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//    }
 
 
     // 삭제할때는 Article.state는 deleted (삭제됨) article.is_deleted는 1로 수정 article_id 만 있으면 됨
     //DELETE
-    @DeleteMapping("/Delete/{id}")
-    public Article delete(@PathVariable Long id){
-        // 1. 대상 찾기
-        Article target = articleWriteRepository.findById(id).orElse(null);
-        // 2. 잘못된 요청처리하기
-        if(target ==null ) {//이미 삭제된 대상인지 확인
-            return null;
-        }
-        //3. 대상 삭제하기 대신  상태변경하기
-        target.markAsDeleted();
-        articleWriteRepository.save(target); //변경된 상태 저장
-        return target;
+
+    @DeleteMapping("/Delete/{articleId}")
+    public ResponseEntity<String> delete(@PathVariable Long articleId){
+
+        articleWriteService.delete(articleId);
+
+        return  ResponseEntity.status(HttpStatus.OK).body("게시글이 삭제되었습니다.");
+
     }
 
     //게시글 이미지 삭제
