@@ -61,6 +61,16 @@ public class ArticleService {
         String[] searchList = pd.getWhere().split(","); // ',' 단위로 주어진 검색 조건 분리
 
         BooleanBuilder where = new BooleanBuilder(); // 검색 조건을 넣는 객체
+
+        where.and(qArticle.isDeleted.eq(false)); // 삭제되지 않은 게시글만 조회 필수 (isDeleted = false)
+
+        if (pd.getWhere() == null || !pd.getWhere().isEmpty()) { //boardName 별로 출력
+            where.and(qArticle.boardName.eq(Article.ComminityBoard.valueOf(pd.getWhere())));
+        }
+
+
+
+
 //        for(String search: searchList){
 //            where.or(qArticle.articleTags.like("%"+search+"%"));
 //            // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
@@ -72,7 +82,7 @@ public class ArticleService {
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]))
                 .offset(offset).limit(PAGE_SIZE)
                 .fetch();
-
+        log.info("articles: {}", articles);
 
         List<ArticleResponseDTO> articleResponseDTOList = articles.stream()
                 .map(responseDTO -> new ArticleResponseDTO(responseDTO))

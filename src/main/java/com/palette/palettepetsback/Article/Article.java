@@ -64,7 +64,7 @@ public class Article {
     //추가 Entity
     @Column(name="board_name")
     @Enumerated(EnumType.STRING)
-    private Article.ComminityBoard boardName;
+    private ComminityBoard boardName;
 
     @Column(name="article_head")
     private String articleHead;
