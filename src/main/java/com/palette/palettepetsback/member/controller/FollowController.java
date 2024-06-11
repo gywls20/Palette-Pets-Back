@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class FollowContoller {
+public class FollowController {
     private final FollowService followService;
 
 

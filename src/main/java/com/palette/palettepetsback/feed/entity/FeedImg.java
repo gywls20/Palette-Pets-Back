@@ -1,7 +1,9 @@
 package com.palette.palettepetsback.feed.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "feed_img")
 public class FeedImg {
