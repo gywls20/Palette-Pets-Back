@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.Article;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleUpdateRequest;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.persistence.*;

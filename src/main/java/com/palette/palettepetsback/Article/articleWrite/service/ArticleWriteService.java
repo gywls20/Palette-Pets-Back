@@ -138,16 +138,17 @@ public class ArticleWriteService {
     }
 
     //DELETE
-    public Article delete(Long id) {
-        // 1. 대상 찾기
-        Article target = articleWriteRepository.findById(id).orElse(null);
+    @Transactional
+    public void delete(Long id) {
+//        // 1. 대상 찾기
+        Article target = articleWriteRepository.findById(id)
+                .orElseThrow(()->new IllegalArgumentException("article not found"));
         // 2. 잘못된 요청 처리하기
         if(target == null){
-            return null;
+            throw new ArticleNotFoundException();
         }
-        // 3. 대상 삭제하기
-        articleWriteRepository.delete(target);
-        return target; //DB에서 삭제한 대상을 컨트롤러에 반환
+        //3. 대상 삭제하기 대신  상태변경하기
+        target.markAsDeleted();
     }
 
     // 게시글 이미지 삭제
@@ -166,7 +167,7 @@ public class ArticleWriteService {
                 .orElseThrow(ArticleNotFoundException::new);
 
         Member member = article.getMember();
-        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname());
+        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname(),member.getMemberImage());
     }
 
     @Transactional
@@ -182,7 +183,7 @@ public class ArticleWriteService {
         uploadImages(result.getAddedImage(),result.getAddedImageFiles());
         deleteImages(result.getDeletedImages());
 
-        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname());
+        return ArticleWriteResponseDto.toDto(article,member.getMemberNickname(),member.getMemberImage());
     }
 
     private void deleteImages(List<ArticleImage> deletedImages) {
@@ -240,14 +241,14 @@ public class ArticleWriteService {
         articleWriteRepository.updateCountReviews(article.getArticleId(), article.getCountReview()+1);
     }
 
-    @Transactional
-    public void deleteArticle(Long articleId, AuthInfoDto authInfoDto) {
-        Article article = articleWriteRepository.findById(articleId)
-                .orElseThrow(ArticleNotFoundException::new);
-
-        validateArticleOwner(authInfoDto,article);
-        articleWriteRepository.delete(article);
-    }
+//    @Transactional
+//    public void deleteArticle(Long articleId, AuthInfoDto authInfoDto) {
+//        Article article = articleWriteRepository.findById(articleId)
+//                .orElseThrow(ArticleNotFoundException::new);
+//
+//        validateArticleOwner(authInfoDto,article);
+//        articleWriteRepository.delete(article);
+//    }
 }
 
 

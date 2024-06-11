@@ -4,6 +4,8 @@ package com.palette.palettepetsback.articleComment.service;
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleView.repository.ArticleRepository;
+import com.palette.palettepetsback.Article.exception.type.AuthInfoDtoNotEqualsException;
+import com.palette.palettepetsback.Article.exception.type.CommentNotFoundException;
 import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentAddRequest;
 import com.palette.palettepetsback.articleComment.dto.response.ArticleCommentListResponse;
 import com.palette.palettepetsback.articleComment.entity.ArticleComment;
@@ -52,6 +54,7 @@ public class ArticleCommentService {
     public List<ArticleCommentListResponse> comments(Long articleId) {
 
         QArticleComment qArticleComment = QArticleComment.articleComment;
+
         List<ArticleComment> articleComments =
                 jpaQueryFactory.selectFrom(qArticleComment)
                 .leftJoin(qArticleComment.parentId)
@@ -94,6 +97,22 @@ public class ArticleCommentService {
         }
 
         return articleCommentRepository.save(dto.toEntity(article,member, parentComment));
+    }
+
+    //댓글 삭제
+    @Transactional
+    public void deleteComment(Long id, Member member) {
+        ArticleComment articleComment = articleCommentRepository.findById(id)
+                .orElseThrow(CommentNotFoundException::new);
+
+        validateDeleteComment(articleComment,member);
+        articleCommentRepository.delete(articleComment);
+    }
+
+    private void validateDeleteComment(ArticleComment articleComment, Member member) {
+        if(!articleComment.isOwnComment(member)){
+            throw new AuthInfoDtoNotEqualsException();
+        }
     }
 
 

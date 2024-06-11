@@ -2,6 +2,7 @@ package com.palette.palettepetsback.articleComment.entity;
 
 import com.palette.palettepetsback.Article.Article;
 
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,6 +37,8 @@ public class ArticleComment {
     @JoinColumn(name = "created_who", referencedColumnName = "member_id",nullable = false)
     @OnDelete(action= OnDeleteAction.CASCADE)
     private Member member;
+
+
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -77,5 +80,7 @@ public class ArticleComment {
     }
 
 
-
+    public boolean isOwnComment(Member member) {
+        return this.member.equals(member);
+    }
 }

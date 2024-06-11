@@ -2,6 +2,7 @@ package com.palette.palettepetsback.articleComment.controller;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleView.service.ArticleService;
+import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
 import com.palette.palettepetsback.articleComment.dto.request.ArticleCommentAddRequest;
 import com.palette.palettepetsback.articleComment.dto.response.ArticleCommentListResponse;
@@ -11,6 +12,8 @@ import com.palette.palettepetsback.articleComment.service.ArticleCommentService;
 
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
+import com.palette.palettepetsback.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +66,17 @@ public class ArticleCommentController {
        return ResponseEntity.ok("작성하신 댓글이 등록되었습니다.");
     }
 
+
+
+
+    //댓글 삭제
+    @DeleteMapping("/comments/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Response delete (@PathVariable final Long id,
+                            @JwtAuth Member member){
+        articleCommentService.deleteComment(id,member);
+        return Response.success();
+    }
 
    //PATCH
 //    @PatchMapping("/Patch/comments/{articleCommentId}")

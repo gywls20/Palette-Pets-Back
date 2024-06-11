@@ -74,10 +74,10 @@ public class ArticleService {
                 .fetch();
 
 
-
         List<ArticleResponseDTO> articleResponseDTOList = articles.stream()
                 .map(responseDTO -> new ArticleResponseDTO(responseDTO))
                 .collect(Collectors.toList());
+
 
         return articleResponseDTOList;
     }
