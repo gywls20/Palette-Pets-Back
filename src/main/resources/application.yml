@@ -32,7 +32,6 @@ spring:
     url: jdbc:mysql://db-n0ucm-kr.vpc-pub-cdb.ntruss.com:3306/PalettePets?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
     username: member
     password: 1q2w3e4r!
-<<<<<<< HEAD
 
   servlet:
     multipart:
@@ -40,8 +39,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 50MB
 
-=======
->>>>>>> a41f43f80db1e68ae808d1313010d35a5293c3cd
   #OAuth2
   profiles:
     include: oauth
