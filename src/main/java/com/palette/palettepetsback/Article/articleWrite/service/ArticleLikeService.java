@@ -41,6 +41,7 @@ public class ArticleLikeService {
                 .member(member)
                 .createdAt(LocalDateTime.now())
                 .build();
+
         articleLikeRepository.save(articleLike);
     }
 
@@ -59,6 +60,7 @@ public class ArticleLikeService {
                 .orElseThrow(()->new IllegalArgumentException("Article not found"));
         return articleLikeRepository.findByArticle(article);
     }
+
     public long getArticleLikeCount(Long articleId){
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(()->new IllegalArgumentException("Article not found"));

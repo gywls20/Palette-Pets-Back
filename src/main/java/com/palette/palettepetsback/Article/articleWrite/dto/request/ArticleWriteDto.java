@@ -5,13 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.List;
+
 @Data
 @ToString
 @AllArgsConstructor
 public class ArticleWriteDto {
 
-    private Long articleId;
-    private String articleTags;
+//    private Long articleId;
+    private String boardName;
+    private String articleHead;
+    private List<String> articleTags;
     @Size(min =2,max = 20)
     private String title;
     @Size(min=10,max=1000)
