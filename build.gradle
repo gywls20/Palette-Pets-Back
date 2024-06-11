@@ -74,7 +74,10 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    //
+
+    //명소추천
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.1'
+    implementation 'org.hibernate.validator:hibernate-validator:7.0.1.Final'
 }
 
 tasks.named('test') {
