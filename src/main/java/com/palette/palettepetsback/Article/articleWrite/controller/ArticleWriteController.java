@@ -73,6 +73,15 @@ public class ArticleWriteController {
     }
 
 
+    //신고수 증가
+    @PostMapping("/{articleId}/report")
+    @ResponseStatus(HttpStatus.OK)
+    public Response reportArticle(@PathVariable Long articleId){
+        articleWriteService.incrementReportCount(articleId);
+        return Response.success("Report count increased");
+    }
+
+
     //게시글 등록 --- 완료
     @PostMapping(path="/Post/article")
     public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
@@ -164,6 +173,9 @@ public class ArticleWriteController {
         articleWriteService.deleteImgArticle(imgIds);
         return true;
     }
+
+
+
 }
 
 
