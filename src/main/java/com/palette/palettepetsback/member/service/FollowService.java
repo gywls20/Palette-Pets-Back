@@ -55,7 +55,7 @@ public class FollowService {
 
     public List<FollowResponse> getFollowerList(String nickname, Long memberId) {
         Member ToMember = memberRepository.findByMemberNickname(nickname).orElseThrow();
-        Member FromMember = memberRepository.findById(memberId).orElseThrow(); //나중에 쓸수도 있어서 냅둠.
+        //Member FromMember = memberRepository.findById(memberId).orElseThrow(); //나중에 쓸수도 있어서 냅둠.
 
         List<Follow> list = followRepository.findByFollowerId(ToMember);
         List<FollowResponse> followerList = new ArrayList<>();
@@ -73,9 +73,9 @@ public class FollowService {
 
     public List<FollowResponse> getFollowingList(String nickname, Long memberId) {
         Member ToMember = memberRepository.findByMemberNickname(nickname).orElseThrow();
-        Member FromMember = memberRepository.findById(memberId).orElseThrow();
+        //Member FromMember = memberRepository.findById(memberId).orElseThrow();
 
-        List<Follow> list = followRepository.findByFollowingId(FromMember);
+        List<Follow> list = followRepository.findByFollowingId(ToMember);
         List<FollowResponse> followingList = new ArrayList<>();
 
         for (Follow f : list) {

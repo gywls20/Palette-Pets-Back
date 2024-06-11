@@ -3,7 +3,6 @@ package com.palette.palettepetsback.member.controller;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.dto.FollowResponse;
 import com.palette.palettepetsback.member.service.FollowService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -68,10 +67,12 @@ public class FollowContoller {
 
     @GetMapping("member/following/{nickname}")
     public ResponseEntity<List<FollowResponse>> getFolloweings(@PathVariable("nickname") String nickname) {
+        System.out.println("nickname = " + nickname);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             Long memberId = getMemberId(authentication);
             List<FollowResponse> followerList = followService.getFollowingList(nickname, memberId);
+            System.out.println("followerList = " + followerList);
             return ResponseEntity.ok(followerList);
         } else {
             return ResponseEntity.badRequest().body(null);
