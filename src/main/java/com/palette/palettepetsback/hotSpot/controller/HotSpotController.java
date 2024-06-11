@@ -1,5 +1,9 @@
 package com.palette.palettepetsback.hotSpot.controller;
 
+import com.palette.palettepetsback.config.aop.notification.NeedNotification;
+import com.palette.palettepetsback.config.aop.notification.NotificationThreadLocal;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotAddRequest;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
@@ -27,8 +31,10 @@ public class HotSpotController {
 
     // 게시글 추가 (파일 포함)
     @PostMapping
+    @NeedNotification
     public ResponseEntity<Void> addHotSpot(@Valid @RequestPart("request") HotSpotAddRequest request,
-                                           @RequestPart(value = "files", required = false) MultipartFile[] files) {
+                                           @RequestPart(value = "files", required = false) MultipartFile[] files,
+                                           @JwtAuth AuthInfoDto authInfoDto) {
         Long hotSpotId = hotSpotService.HotSpotInsert(request);
         // ImgHotSpot 에 이미지 저장
         for (MultipartFile file : files) {
@@ -37,6 +43,10 @@ public class HotSpotController {
                 throw new RuntimeException("이미지 저장 중 오류가 났습니다");
             }
         }
+        NotificationThreadLocal.setNotificationInfo(authInfoDto.getMemberId(), 
+                "명소 추천 글을 작성 성공했습니다", 
+                111);
+
         return ResponseEntity.ok().build();
     }
 
