@@ -5,10 +5,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    // 아이디로 찾기
-    Optional<Member> findByMemberId(String memberId);
-    // 아이디 중복 여부
-    Boolean existsByMemberId(String memberId);
+    // 이메일 찾기
+    Optional<Member> findByEmail(String email);
+    Optional<Member> findByMemberId(Long memberId);
+    // 이메일 중복 여부
+    boolean existsByEmail(String email);
+    //닉네임 중복 확인
+    boolean existsByMemberNickname(String memberNickname);
+
+    Member findByPassword(String password);
+
+    Optional<Member> findByMemberNickname(String NickName);
 }
