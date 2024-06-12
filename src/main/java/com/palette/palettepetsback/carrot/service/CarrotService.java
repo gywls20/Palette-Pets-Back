@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -143,8 +144,34 @@ public class CarrotService {
         return carrotResponseDTOList;
     }
 
+    //전체 리스트 출력
     @Transactional
-    public List<Carrot> test() {
-        return carrotRepository.findAll();
+    public List<CarrotResponseDTO> test() {
+
+        List<Carrot> carrot=carrotRepository.findAll();
+
+        List<CarrotResponseDTO> carrotResponseDTOList=new ArrayList<>();
+        for (Carrot c : carrot) {
+            String member = c.getMember().getMemberNickname();
+            CarrotResponseDTO carrotResponseDTO=new CarrotResponseDTO();
+            carrotResponseDTO.setCarrotId(c.getCarrotId());
+            carrotResponseDTO.setMemberId(member);
+            carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
+            carrotResponseDTO.setCarrotContent(c.getCarrotContent());
+            carrotResponseDTO.setCarrot_price(c.getCarrot_price());
+            carrotResponseDTO.setCarrot_createdAt(c.getCarrot_createdAt());
+            carrotResponseDTO.setCarrotTag(c.getCarrotTag());
+            carrotResponseDTO.setCarrotLike(c.getCarrotLike());
+            carrotResponseDTO.setCarrotView(c.getCarrotView());
+
+            carrotResponseDTOList.add(carrotResponseDTO);
+        }
+
+        return carrotResponseDTOList;
+    }
+
+    @Transactional
+    public int updateView(Long carrotId) {
+        return carrotRepository.updateView(carrotId);
     }
 }

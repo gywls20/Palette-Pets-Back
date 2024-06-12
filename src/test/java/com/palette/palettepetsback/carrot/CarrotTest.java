@@ -27,17 +27,17 @@ public class CarrotTest {
 
     @Test
     void save() {
-        Optional<Member> member = memberRepository.findById(Long.valueOf(27));
+        Optional<Member> member = memberRepository.findById(Long.valueOf(24));
 
         Carrot save = Carrot.builder()
                 .member(member.get())
-                .carrotTitle("망고 산책 시켜주실 분 구해요")
-                .carrotContent("망고는 안물고 착한 강아지예요")
+                .carrotTitle("쵸파 미니 팬미팅 합니다")
+                .carrotContent("말티즈계의 최고 얼짱 쵸파를 보러오세요")
                 .carrotTag("산책")
-                .carrot_price(500000)
+                .carrot_price(0)
                 .build();
         Carrot carrotDTO = carrotRepository.save(save);
-        Assertions.assertEquals(carrotDTO.getCarrotId(), 2);
+        Assertions.assertEquals(carrotDTO.getCarrotId(), 3);
     }
 
     @Test

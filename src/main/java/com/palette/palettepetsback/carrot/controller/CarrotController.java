@@ -36,7 +36,7 @@ public class CarrotController {
 
     //글 & 이미지 등록
     @PostMapping("/post")
-    public ResponseEntity<?> create(@RequestBody CarrotRequestDTO dto,
+    public ResponseEntity<?> create(@RequestPart(name = "request") CarrotRequestDTO dto,
                          @RequestPart(required = false, name = "files") MultipartFile[] files,
                          @JwtAuth AuthInfoDto authInfoDto) {
         //security 부터 memberId 값 받아오기
@@ -62,7 +62,10 @@ public class CarrotController {
         //이미지 수정
         if(file != null) {
             String carrotImg = carrotService.fileUpload(file, "carrot");
-            dto.setCarrotImg(carrotImg);
+
+            CarrotImage carrotImage = new CarrotImage();
+            carrotImage.setCarrotImageUrl(carrotImg);
+            //dto.setCarrotImg(carrotImg);
         }
         //글 수정
         Carrot update = carrotService.update(id, dto);
@@ -83,8 +86,8 @@ public class CarrotController {
 
     //리스트
     @GetMapping("/test")
-    public List<Carrot> test() {
-        List<Carrot> carrotList = carrotService.test();
+    public List<CarrotResponseDTO> test() {
+        List<CarrotResponseDTO> carrotList = carrotService.test();
         //System.out.println(carrotList);
         log.info("carrot {}", carrotList);
 
@@ -95,7 +98,16 @@ public class CarrotController {
     @GetMapping("/list")
     public ResponseEntity<List<CarrotResponseDTO>> List(@ModelAttribute PageableDTO pd) {
         List<CarrotResponseDTO> carrots = carrotService.getList(pd);
+        log.info("carrot = {}", carrots);
         return ResponseEntity.ok().body(carrots);
+    }
+
+    //조회수 증가
+    @GetMapping("/test/{carrotId}")
+    public boolean view(@PathVariable Long carrotId) {
+        carrotService.updateView(carrotId);
+
+        return true;
     }
 
 }
