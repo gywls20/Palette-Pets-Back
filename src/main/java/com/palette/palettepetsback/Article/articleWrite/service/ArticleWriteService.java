@@ -240,6 +240,25 @@ public class ArticleWriteService {
         log.info("articleId:{}", article.getArticleId());
         articleWriteRepository.updateCountReviews(article.getArticleId(), article.getCountReview()+1);
     }
+
+
+    // 신고
+    @Transactional
+    public void incrementReportCount(Long articleId) {
+        Article article = articleWriteRepository.findById(articleId)
+                .orElseThrow(ArticleNotFoundException::new);
+        log.info("articleId:{}", article.getArticleId());
+        articleWriteRepository.incrementReportCount(article.getArticleId(),article.getCountReport()+1);
+    }
+
+//    @Transactional
+//    public void deleteArticle(Long articleId, AuthInfoDto authInfoDto) {
+//        Article article = articleWriteRepository.findById(articleId)
+//                .orElseThrow(ArticleNotFoundException::new);
+//
+//        validateArticleOwner(authInfoDto,article);
+//        articleWriteRepository.delete(article);
+//    }
 }
 
 

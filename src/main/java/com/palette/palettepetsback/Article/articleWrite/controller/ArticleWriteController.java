@@ -73,6 +73,15 @@ public class ArticleWriteController {
     }
 
 
+    //신고수 증가
+    @PostMapping("/{articleId}/report")
+    @ResponseStatus(HttpStatus.OK)
+    public Response reportArticle(@PathVariable Long articleId){
+        articleWriteService.incrementReportCount(articleId);
+        return Response.success("Report count increased");
+    }
+
+
     //게시글 등록 --- 완료
     @PostMapping(path="/Post/article")
     public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
@@ -146,12 +155,27 @@ public class ArticleWriteController {
 
     }
 
+    //게시글 삭제 ->
+//    @DeleteMapping("/article/{articleId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Response deleteArticle(@PathVariable final Long articleId,
+//                                  @JwtAuth final AuthInfoDto authInfoDto){
+//        articleWriteService.deleteArticle(articleId,authInfoDto);
+//        return Response.success();
+//    }
+
+
+
+
     //게시글 이미지 삭제
     @DeleteMapping("{id}/img")
     public boolean deleteArticleImg(@PathVariable ("id")Long id,@RequestBody List<Long>imgIds ){
         articleWriteService.deleteImgArticle(imgIds);
         return true;
     }
+
+
+
 }
 
 
