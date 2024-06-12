@@ -36,7 +36,7 @@ public class CarrotController {
 
     //글 & 이미지 등록
     @PostMapping("/post")
-    public ResponseEntity<?> create(@RequestPart(name = "request") CarrotRequestDTO dto,
+    public ResponseEntity<?> create(@RequestBody CarrotRequestDTO dto,
                          @RequestPart(required = false, name = "files") MultipartFile[] files,
                          @JwtAuth AuthInfoDto authInfoDto) {
         //security 부터 memberId 값 받아오기
@@ -108,6 +108,30 @@ public class CarrotController {
         carrotService.updateView(carrotId);
 
         return true;
+    }
+
+    //좋아요 클릭
+    // 상세 페이지에서만 누를 수 있습니다.
+    @PostMapping("/like/{id}")
+    public ResponseEntity<?> like(@PathVariable(name = "id") Long id,
+                                  @JwtAuth AuthInfoDto authInfoDto) {
+        Long memberId= authInfoDto.getMemberId();
+
+        return ResponseEntity.ok(carrotService.like(id,memberId));
+    }
+
+    //멤버별 좋아요 누른 당근 리스트
+    @GetMapping("/like")
+    public List<CarrotResponseDTO> getLike(@JwtAuth AuthInfoDto authInfoDto) {
+        Long memberId= authInfoDto.getMemberId();
+        return carrotService.getLike(memberId);
+    }
+
+    //검색 기능
+    @GetMapping("/search")
+    public List<CarrotResponseDTO> searchCarrots(@RequestParam String keyword) {
+
+        return carrotService.searchCarrots(keyword);
     }
 
 }

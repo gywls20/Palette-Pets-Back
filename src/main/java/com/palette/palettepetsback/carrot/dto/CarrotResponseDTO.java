@@ -23,6 +23,9 @@ public class CarrotResponseDTO {
     private Integer carrotLike;
     private Integer carrotView;
 
+    private String img;
+
+
     public CarrotResponseDTO(Carrot responseDTO) {
         this.carrotId = responseDTO.getCarrotId();
         this.carrotTitle = responseDTO.getCarrotTitle();

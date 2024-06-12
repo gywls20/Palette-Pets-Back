@@ -17,7 +17,7 @@ public class CarrotLike {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member memberId;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrot_id")
@@ -25,4 +25,9 @@ public class CarrotLike {
 
     @CreationTimestamp
     private LocalDateTime time;
+
+    public void save(Member member, Carrot carrot) {
+        this.carrotId=carrot;
+        this.member=member;
+    }
 }
