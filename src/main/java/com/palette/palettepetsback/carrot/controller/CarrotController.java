@@ -102,12 +102,13 @@ public class CarrotController {
         return ResponseEntity.ok().body(carrots);
     }
 
-    //조회수 증가
-    @GetMapping("/test/{carrotId}")
-    public boolean view(@PathVariable Long carrotId) {
-        carrotService.updateView(carrotId);
+    //상세 보기 & 조회수 증가
+    @GetMapping("/list/{id}")
+    public ResponseEntity<CarrotResponseDTO> view(@PathVariable Long id) {
+        CarrotResponseDTO carrot = carrotService.listDetail(id);
+        carrotService.updateView(id);
 
-        return true;
+        return ResponseEntity.ok().body(carrot);
     }
 
     //좋아요 클릭

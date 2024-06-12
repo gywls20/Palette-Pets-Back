@@ -149,9 +149,9 @@ public class CarrotService {
     @Transactional
     public List<CarrotResponseDTO> test() {
 
-        List<Carrot> carrot=carrotRepository.findAll();
+        List<Carrot> carrot = carrotRepository.findAll();
 
-        List<CarrotResponseDTO> carrotResponseDTOList=new ArrayList<>();
+        List<CarrotResponseDTO> carrotResponseDTOList = new ArrayList<>();
         for (Carrot c : carrot) {
             String member = c.getMember().getMemberNickname();
             CarrotResponseDTO carrotResponseDTO=new CarrotResponseDTO();
@@ -171,9 +171,29 @@ public class CarrotService {
         return carrotResponseDTOList;
     }
 
+    //조회수 증가
     @Transactional
-    public int updateView(Long carrotId) {
-        return carrotRepository.updateView(carrotId);
+    public int updateView(Long id) {
+        return carrotRepository.updateView(id);
+    }
+
+    //상세 출력
+    @Transactional
+    public CarrotResponseDTO listDetail(Long id) {
+        Optional<Carrot> carrotId = carrotRepository.findById(id);
+        Carrot carrot = carrotId.get();
+
+        return CarrotResponseDTO.builder()
+                .carrotId(carrot.getCarrotId())
+                .memberId(carrot.getMember().getMemberName())
+                .carrotTitle(carrot.getCarrotTitle())
+                .carrotContent(carrot.getCarrotContent())
+                .carrot_price(carrot.getCarrot_price())
+                .carrot_createdAt(carrot.getCarrot_createdAt())
+                .carrotTag(carrot.getCarrotTag())
+                .carrotLike(carrot.getCarrotLike())
+                .carrotView(carrot.getCarrotView())
+                .build();
     }
 
 

@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface CarrotRepository extends JpaRepository<Carrot, Long> {
     @Modifying
-    @Query("update Carrot c set c.carrotView = c.carrotView + 1 where c.carrotId = :carrotId")
-    int updateView(Long carrotId);
+    @Query("update Carrot c set c.carrotView = c.carrotView + 1 where c.carrotId = :id")
+    int updateView(Long id);
 
     List<Carrot> findByMember (Member member);
 
