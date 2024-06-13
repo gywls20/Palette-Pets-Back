@@ -55,7 +55,7 @@ public class ArticleCommentController {
 
         AuthInfoDto memberInfo = JWTUtil.getMemberInfo(); //토큰을 가져와서 멤버아이디 찾아내기
         if(memberInfo == null) {
-            return null;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
         dto.setCreatedWho(memberInfo.getMemberId());//dto를 받아와서 멤버아이디가 없으니까  위에꺼를 가져와서 넣기
         log.info("member : " + memberInfo.getMemberId());

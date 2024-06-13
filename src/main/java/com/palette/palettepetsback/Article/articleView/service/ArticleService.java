@@ -65,12 +65,14 @@ public class ArticleService {
 
         where.and(qArticle.isDeleted.eq(false)); // 삭제되지 않은 게시글만 조회 필수 (isDeleted = false)
 
-        // where.or(qArticle.boardName.eq(Article.ComminityBoard.valueOf(pd.getWhere()))); //게시판 조회 ENUM 제거?
-
+        if(pd.getBoardName() != null && !pd.getBoardName().equals("")) {
+            where.and(qArticle.boardName.eq(Article.ComminityBoard.valueOf(pd.getBoardName()))); //게시판 조회 ENUM 제거?
+        }
 //        for(String search : searchList) {
 //            where.or(qArticle.articleTags.like("%" + search + "%"));
         // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
 //        }
+
         for (int i = 0; i < searchList.length; i++) {
             if (i == 0) {
                 where.and(qArticle.articleTags.like("%" + searchList[i] + "%"));

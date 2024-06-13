@@ -11,6 +11,7 @@ public class PageableDTO {
 
     private int page;
     private String where;
+    private String boardName;
     private String sort;
     private Boolean dir;
 
