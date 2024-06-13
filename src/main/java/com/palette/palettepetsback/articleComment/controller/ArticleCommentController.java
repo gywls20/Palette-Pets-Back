@@ -67,10 +67,8 @@ public class ArticleCommentController {
     }
 
 
-
-
     //댓글 삭제
-    @DeleteMapping("/comments/{id}")
+    @DeleteMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Response delete (@PathVariable final Long id,
                             @JwtAuth Member member){
@@ -85,7 +83,6 @@ public class ArticleCommentController {
 //        ArticleCommentDto updatedDto = articleCommentService.update(articleCommentId,dto);
 //        return ResponseEntity.status(HttpStatus.OK).body(updatedDto);
 //    }
-
 
    //DELETE
 //    @DeleteMapping("/Delete/comments/{articleCommentId}")
