@@ -11,6 +11,7 @@ import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
 import com.palette.palettepetsback.hotSpot.entity.HotSpot;
 import com.palette.palettepetsback.hotSpot.entity.ImgHotSpot;
 import com.palette.palettepetsback.hotSpot.repository.HotSpotRepository;
+import com.palette.palettepetsback.hotSpot.repository.HotSpotStarPointRepository;
 import com.palette.palettepetsback.hotSpot.repository.ImgHotSpotRepository;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
@@ -32,6 +33,7 @@ public class HotSpotService {
     private final MemberRepository memberRepository;
     private final NCPObjectStorageService objectStorageService;
     private final ImgHotSpotRepository imgHotSpotRepository;
+    private final HotSpotStarPointRepository hotSpotStarPointRepository;
 
     //hotspot 저장 메서드
     @Transactional
@@ -96,12 +98,20 @@ public class HotSpotService {
         List<HotSpotListResponse> list = new ArrayList<>();
 
         for (HotSpot hotSpot : hotSpotList) {
-            HotSpotListResponse dto = hotSpot.toDto();
+
+
+            Integer rating = getHotSpotAverageStarPoint(hotSpot);
+            // 첫번째 사진을 대표 사진으로 가져오기
+            ImgHotSpot imgHotSpot = hotSpot.getImgHotSpots().get(0);
+            String imgUrl = imgHotSpot.getImgUrl();
+            HotSpotListResponse dto = hotSpot.toDto(rating,imgUrl);
+
             list.add(dto);
         }
 
         return list;
     }
+
     //hotspot 한 건 쿼리 메서드 -> imageHotSpot 값도 같이 필요
     public HotSpotResponse getHotSpotDetail(Long hotSpotId){
 
@@ -216,6 +226,9 @@ public class HotSpotService {
             imgHotSpotDtoList.add(response);
         }
 
+        // 별점 계산해서 각각 게시물 하나에 별점 결과값 넣어주기 = (총 별점 / 평가자수)
+        Integer rating = getHotSpotAverageStarPoint(hotSpot);
+
         // 엔티티 -> DTO
         return HotSpotResponse.builder()
                 .hotSpotId(hotSpot.getId())
@@ -229,7 +242,13 @@ public class HotSpotService {
                 .lat(hotSpot.getLat())
                 .lng(hotSpot.getLng())
                 .countViews(hotSpot.getCountViews())
+                .rating(rating)
                 .imgList(imgHotSpotDtoList)
                 .build();
+    }
+
+    private Integer getHotSpotAverageStarPoint(HotSpot hotSpot) {
+        // 별점 계산해서 각각 게시물 하나에 별점 결과값 넣어주기 = (총 별점 / 평가자수)
+        return hotSpotStarPointRepository.calculateStarPoint(hotSpot.getId());
     }
 }
