@@ -1,4 +1,4 @@
-package com.palette.palettepetsback.Article.articleView.DTO.reponsse;
+package com.palette.palettepetsback.Article.articleView.DTO.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class PopularArticleDTO {
     private Long articleId;
     private String title;
-    private Long userId;
-    private String name;
+    private Long memberId;
+    private String memberNickname;
+    private Integer countLoves;
 }

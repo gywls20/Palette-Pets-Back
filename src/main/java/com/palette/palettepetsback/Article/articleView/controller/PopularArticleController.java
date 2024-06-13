@@ -1,6 +1,7 @@
 package com.palette.palettepetsback.Article.articleView.controller;
 
-import com.palette.palettepetsback.Article.articleView.DTO.reponsse.PopularArticleDTO;
+import com.palette.palettepetsback.Article.Article;
+import com.palette.palettepetsback.Article.articleView.DTO.response.PopularArticleDTO;
 import com.palette.palettepetsback.Article.articleView.service.PopularArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
