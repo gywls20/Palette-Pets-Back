@@ -12,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
@@ -46,6 +44,15 @@ public class MemberIssueController {
         List<MemberIssueResponse> result = memberIssueService.getAllUnreadMemberIssue(authInfoDto.getMemberId());
 
         return ResponseEntity.ok(result);
+    }
+
+    // 일반 알림 읽음 표시하기
+    @PutMapping("/api/issues/{memberIssueId}")
+    public ResponseEntity<Boolean> readIssue(@PathVariable("memberIssueId") final Long memberIssueId,
+                                             @JwtAuth final AuthInfoDto authInfo) {
+        memberIssueService.readMemberIssue(memberIssueId);
+        log.info("{}번 알림 : 회원 알림 읽음 표시", memberIssueId);
+        return ResponseEntity.ok(true);
     }
 
     @GetMapping("/sse/test1")
