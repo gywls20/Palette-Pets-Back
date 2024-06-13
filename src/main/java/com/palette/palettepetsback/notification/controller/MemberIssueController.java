@@ -39,8 +39,6 @@ public class MemberIssueController {
     @GetMapping("/api/issues")
     public ResponseEntity<List<MemberIssueResponse>> getUnreadIssues(@JwtAuth final AuthInfoDto authInfoDto) {
 
-        log.info("authInfoDto: {}", authInfoDto);
-
         List<MemberIssueResponse> result = memberIssueService.getAllUnreadMemberIssue(authInfoDto.getMemberId());
 
         return ResponseEntity.ok(result);
@@ -50,7 +48,7 @@ public class MemberIssueController {
     @PutMapping("/api/issues/{memberIssueId}")
     public ResponseEntity<Boolean> readIssue(@PathVariable("memberIssueId") final Long memberIssueId,
                                              @JwtAuth final AuthInfoDto authInfo) {
-        memberIssueService.readMemberIssue(memberIssueId);
+        memberIssueService.readMemberIssue(memberIssueId, authInfo.getMemberId());
         log.info("{}번 알림 : 회원 알림 읽음 표시", memberIssueId);
         return ResponseEntity.ok(true);
     }
