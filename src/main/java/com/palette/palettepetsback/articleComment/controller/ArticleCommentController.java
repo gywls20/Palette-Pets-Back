@@ -55,7 +55,7 @@ public class ArticleCommentController {
 
         AuthInfoDto memberInfo = JWTUtil.getMemberInfo(); //토큰을 가져와서 멤버아이디 찾아내기
         if(memberInfo == null) {
-            return null;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
         dto.setCreatedWho(memberInfo.getMemberId());//dto를 받아와서 멤버아이디가 없으니까  위에꺼를 가져와서 넣기
         log.info("member : " + memberInfo.getMemberId());
@@ -67,8 +67,18 @@ public class ArticleCommentController {
     }
 
 
+    //PATCH
+   @PatchMapping("/Patch/comments/{articleCommentId}")
+    public ResponseEntity<ArticleComment>update(@PathVariable Long articleCommentId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ArticleComment());
+    }
+
+
+
+
     //댓글 삭제
-    @DeleteMapping("")
+    @DeleteMapping("/comments/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Response delete (@PathVariable final Long id,
                             @JwtAuth Member member){
@@ -76,13 +86,7 @@ public class ArticleCommentController {
         return Response.success();
     }
 
-   //PATCH
-//    @PatchMapping("/Patch/comments/{articleCommentId}")
-//    public ResponseEntity<ArticleCommentDto>update(@PathVariable Long articleCommentId,
-//                                                   @RequestBody ArticleCommentDto dto){
-//        ArticleCommentDto updatedDto = articleCommentService.update(articleCommentId,dto);
-//        return ResponseEntity.status(HttpStatus.OK).body(updatedDto);
-//    }
+
 
    //DELETE
 //    @DeleteMapping("/Delete/comments/{articleCommentId}")

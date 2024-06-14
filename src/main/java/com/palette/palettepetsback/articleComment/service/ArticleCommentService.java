@@ -16,6 +16,7 @@ import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -55,11 +56,16 @@ public class ArticleCommentService {
 
         QArticleComment qArticleComment = QArticleComment.articleComment;
 
+
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(qArticleComment.article.isDeleted.eq(false));
+        where.and(qArticleComment.article.articleId.eq(articleId));
+
         List<ArticleComment> articleComments =
                 jpaQueryFactory.selectFrom(qArticleComment)
                 .leftJoin(qArticleComment.parentId)
                 .fetchJoin()
-                .where(qArticleComment.article.articleId.eq(articleId))
+                .where(where)
                 .orderBy(
                         qArticleComment.parentId.articleCommentId.asc().nullsFirst(),
                         qArticleComment.createdAt.asc()
