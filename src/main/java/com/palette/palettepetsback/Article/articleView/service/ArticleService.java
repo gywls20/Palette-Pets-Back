@@ -44,8 +44,8 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ArticleResponseDTO> searchList(PageableDTO pd){
-        int offset = (pd.getPage()-1) * PAGE_SIZE;
+    public List<ArticleResponseDTO> searchList(PageableDTO pd) {
+        int offset = (pd.getPage() - 1) * PAGE_SIZE;
         QArticle qArticle = QArticle.article;
 
         PathBuilder<?> entityPath = new PathBuilder<>(Article.class, "article"); // 나는 Article Entity를 조회할거야
@@ -54,30 +54,35 @@ public class ArticleService {
         orderSpecifiers.add(new OrderSpecifier(order, entityPath.get(pd.getSort()))); // 정렬 조건 넣기
 
         String[] searchList = pd.getWhere().split(","); // ',' 단위로 주어진 검색 조건 분리
+        log.info("searchList: {}", searchList);
 
         BooleanBuilder where = new BooleanBuilder(); // 검색 조건을 넣는 객체
 
         where.and(qArticle.isDeleted.eq(false)); // 삭제되지 않은 게시글만 조회 필수 (isDeleted = false)
 
-        if (pd.getWhere() == null || !pd.getWhere().isEmpty()) { //boardName 별로 출력
-            where.and(qArticle.boardName.eq(Article.ComminityBoard.valueOf(pd.getWhere())));
+        if(pd.getBoardName() != null && !pd.getBoardName().equals("")) {
+            where.and(qArticle.boardName.eq(Article.ComminityBoard.valueOf(pd.getBoardName()))); //게시판 조회 ENUM 제거?
         }
-
-
-
-
-//        for(String search: searchList){
-//            where.or(qArticle.articleTags.like("%"+search+"%"));
-//            // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
+//        for(String search : searchList) {
+//            where.or(qArticle.articleTags.like("%" + search + "%"));
+        // where articleTage like concat("%"+"고양이"+"%") or articleTage like concat("%"+"강아지"+"%")
 //        }
 
+        for (int i = 0; i < searchList.length; i++) {
+            if (i == 0) {
+                where.and(qArticle.articleTags.like("%" + searchList[i] + "%"));
+            }
+            else {
+                where.or(qArticle.articleTags.like("%" + searchList[i] + "%"));
+            }
+        }
+        
         List<Article> articles = jpaQueryFactory
                 .selectFrom(qArticle)
                 .where(where)
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]))
                 .offset(offset).limit(PAGE_SIZE)
                 .fetch();
-        log.info("articles: {}", articles);
 
         List<ArticleResponseDTO> articleResponseDTOList = articles.stream()
                 .map(responseDTO -> new ArticleResponseDTO(responseDTO))
@@ -86,6 +91,7 @@ public class ArticleService {
 
         return articleResponseDTOList;
     }
+
     @Transactional(readOnly = true)
     public List<ArticleResponseDTO> searchTest(String articleTags) {
         QArticle qArticle = QArticle.article;
@@ -108,6 +114,7 @@ public class ArticleService {
                 .collect(Collectors.toList());
         return articleResponseDTOList;
     }
+
     @Transactional(readOnly = true)
     public Integer count(String where) {
         System.out.println(articleRepository.countByArticleTagsContaining(where).orElse(0));
