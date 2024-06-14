@@ -125,11 +125,6 @@ public class ArticleWriteController {
                                 @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                 @JwtAuth final AuthInfoDto authInfoDto){
 
-//        log.info("articleId = {}", articleId);
-//        log.info("req = {}", req);
-//        log.info("files = {}", files);
-//        log.info("authInfoDto = {}", authInfoDto);
-
         articleWriteService.editArticle(articleId,req,authInfoDto,files);
 
         return Response.success("aaaaa");
