@@ -22,6 +22,7 @@ public class LikeArticleRedis {
     Long articleId;
 
 }
-// 글 도배 방지 Redis 2분
+
+// 글 도배 방지 Redis 1분 (60초)
 // 글 좋아요 24시간
 // 글 신고 24시간

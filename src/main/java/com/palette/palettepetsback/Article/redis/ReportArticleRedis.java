@@ -17,10 +17,8 @@ public class ReportArticleRedis {
 
     @Id
     String reportId;
-
     @Indexed
     Long memberId;
-
     Long articleId;
 
 }

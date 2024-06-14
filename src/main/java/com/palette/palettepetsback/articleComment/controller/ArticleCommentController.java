@@ -67,6 +67,14 @@ public class ArticleCommentController {
     }
 
 
+    //PATCH
+   @PatchMapping("/Patch/comments/{articleCommentId}")
+    public ResponseEntity<ArticleComment>update(@PathVariable Long articleCommentId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ArticleComment());
+    }
+
+
 
 
     //댓글 삭제
@@ -78,13 +86,6 @@ public class ArticleCommentController {
         return Response.success();
     }
 
-   //PATCH
-//    @PatchMapping("/Patch/comments/{articleCommentId}")
-//    public ResponseEntity<ArticleCommentDto>update(@PathVariable Long articleCommentId,
-//                                                   @RequestBody ArticleCommentDto dto){
-//        ArticleCommentDto updatedDto = articleCommentService.update(articleCommentId,dto);
-//        return ResponseEntity.status(HttpStatus.OK).body(updatedDto);
-//    }
 
 
    //DELETE
