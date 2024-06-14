@@ -1,3 +1,5 @@
+
+
 spring:
   application:
     name: PalettePetsBack
@@ -79,5 +81,7 @@ logging:
 jwt:
   secret: sasfjkvnweor1230gfdj560912-49gflkdgj340459bjvb;l4lfo40-go5i6-sl4
 
+server:
+  port: 80
 
 
