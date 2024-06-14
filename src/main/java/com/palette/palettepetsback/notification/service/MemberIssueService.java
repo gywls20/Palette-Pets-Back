@@ -9,6 +9,8 @@ import com.palette.palettepetsback.notification.repository.EmitterRepository;
 import com.palette.palettepetsback.notification.repository.MemberIssueRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +78,6 @@ public class MemberIssueService {
     }
 
     /**
-     *
      * todo : 이거 누르면 링크 가도록 하고싶은데, 그냥 갈 링크들은 정해져있으니 그냥 DB에 갈 링크를 저장해서 링크 바로가게 하면 되는 지 고민해보기.
      *
      * @param memberId
@@ -84,6 +85,7 @@ public class MemberIssueService {
      * @param issueCode
      */
     // 다른 서비스 클래스에서 이벤트가 발생했을 때, 알림을 보내는 메서드
+    @CacheEvict(value = "memberIssue", key = "#memberId", cacheManager = "cacheManager")
     @Async
     @Transactional
     public void sendNotification(final Long memberId, final String issueContent, final Integer issueCode) {
@@ -105,7 +107,7 @@ public class MemberIssueService {
         sseEmitters.forEach(
                 (key, emitter) -> {
                     try {
-                       // 데이터 전송
+                        // 데이터 전송
                         sendToClient(eventId, emitter, memberIssue.getIssueContent());
                         log.info("send emitter to client successfully. notification = {}", memberIssue);
                     } catch (Exception e) {
@@ -118,8 +120,9 @@ public class MemberIssueService {
     }
 
     // 회원 이슈 읽음 표시
+    @CacheEvict(value = "memberIssue", key = "#memberId", cacheManager = "cacheManager")
     @Transactional
-    public void readMemberIssue(Long memberIssueId) {
+    public void readMemberIssue(Long memberIssueId, final Long memberId) {
 
         MemberIssue memberIssue = memberIssueRepository.findById(memberIssueId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 알림입니다"));
@@ -129,7 +132,8 @@ public class MemberIssueService {
     }
 
     // 회원 안 읽은 알림들 불러오기
-    public List<MemberIssueResponse> getAllUnreadMemberIssue(Long memberId) {
+    @Cacheable(value = "memberIssue", key = "#memberId", cacheManager = "cacheManager")
+    public List<MemberIssueResponse> getAllUnreadMemberIssue(final Long memberId) {
         return memberIssueRepository.findAllByMemberId(memberId);
     }
 

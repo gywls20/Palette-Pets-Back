@@ -2,6 +2,11 @@ spring:
   application:
     name: PalettePetsBack
 
+  # spring cache => redis
+  cache:
+    type: redis
+
+
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
