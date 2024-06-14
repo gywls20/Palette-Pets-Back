@@ -6,6 +6,7 @@ import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
+import com.palette.palettepetsback.notification.dto.response.MemberIssueResponse;
 import com.palette.palettepetsback.notification.service.MemberIssueService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.Random;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,13 +28,24 @@ public class MemberIssueController {
     private final MemberIssueService memberIssueService;
     private final MemberRepository memberRepository;
 
+    // SSE 연결 요청 엔드포인트
     @GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> connect(
             @RequestHeader(value = "Last_Event_ID", required = false, defaultValue = "") final String lastEventId,
             @JwtAuth final AuthInfoDto authInfoDto
             ) {
-
         return ResponseEntity.ok(memberIssueService.connect(authInfoDto.getMemberId(), lastEventId));
+    }
+
+    // 일반 알림 조회 list
+    @GetMapping("/api/issues")
+    public ResponseEntity<List<MemberIssueResponse>> getUnreadIssues(@JwtAuth final AuthInfoDto authInfoDto) {
+
+        log.info("authInfoDto: {}", authInfoDto);
+
+        List<MemberIssueResponse> result = memberIssueService.getAllUnreadMemberIssue(authInfoDto.getMemberId());
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/sse/test1")
