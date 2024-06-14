@@ -39,10 +39,6 @@ public class LikeController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        log.info("articleId: "+dto.getArticleId());
-        log.info("authInfoDto: "+authInfoDto.getMemberId());
-
-
         return ResponseEntity.ok(articleLikeService.likeArticle(dto.getArticleId(),authInfoDto.getMemberId()));
     }
 

@@ -167,6 +167,8 @@ public class ArticleWriteService {
                 .orElseThrow(ArticleNotFoundException::new);
 
         Member member = article.getMember();
+
+
         return ArticleWriteResponseDto.toDto(article,member.getMemberNickname(),member.getMemberImage());
     }
 

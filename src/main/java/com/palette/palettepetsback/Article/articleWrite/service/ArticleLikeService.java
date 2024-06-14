@@ -7,6 +7,7 @@ import com.palette.palettepetsback.Article.articleView.repository.ArticleReposit
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleLikeRequestDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleLikeResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleLikeRepository;
+import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.repository.LikeArticleRedisRepository;
 import com.palette.palettepetsback.Article.redis.LikeArticleRedis;
 import com.palette.palettepetsback.member.entity.Member;
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class ArticleLikeService {
     private final ArticleLikeRepository articleLikeRepository;
     private final ArticleRepository articleRepository;
+    private final ArticleWriteRepository articleWriteRepository;
     private final MemberRepository memberRepository;
 
     // Redis
@@ -47,7 +49,7 @@ public class ArticleLikeService {
             return "이미 좋아요를 눌렀습니다.";
         }
 
-        article.increaseLikeCount();
+        articleWriteRepository.incrementLoveCount(articleId,article.getCountLoves()+1);
 
         ArticleLikeId articleLikeId = new ArticleLikeId(articleId, memberId);
 
