@@ -42,6 +42,7 @@ public class ArticleWriteResponseDto {
                 article.getCountReview(),
                 article.getImages().stream().map(ArticleImageDto::toDto).collect(toList()),
                 article.getCreatedAt()
+
         );
     }
 }

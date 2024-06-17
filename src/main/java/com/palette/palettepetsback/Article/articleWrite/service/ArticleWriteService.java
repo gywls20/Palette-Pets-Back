@@ -167,6 +167,8 @@ public class ArticleWriteService {
                 .orElseThrow(ArticleNotFoundException::new);
 
         Member member = article.getMember();
+
+
         return ArticleWriteResponseDto.toDto(article,member.getMemberNickname(),member.getMemberImage());
     }
 
@@ -206,9 +208,9 @@ public class ArticleWriteService {
         // 로직 순서
         // 1. 이미지를 업로드
         // 2. 업로드, 삭제 데이터베이스 업데이트
-        // 3. 이미지 삭제로직이 실패 하면 업로드한 이미지 롤백
-        // 4. 이미지 삭제
-        // 5. 트랜잭션은 자동으로 롤백 한다.
+        // 3. 이미지 삭제로직이 실패 하면 1 에서 업로드한 이미지 롤백 - 실패시 트랜잭션은 자동 롤백
+        // 4. 수정 전 남아있는 이미지 삭제
+        // 5. 로깅
 
         // 기존 이미지 url
         List<String> imgUrls = article.getImages().stream()
@@ -245,7 +247,7 @@ public class ArticleWriteService {
         }
         catch(Exception e){
             //3. 실패시 추가 한 이미지 롤백
-            uploadedImageUrls.forEach(imageKey -> objectStorageService.deleteFile(Singleton.S3_BUCKET_NAME, "article/img/"+imageKey));
+            uploadedImageUrls.forEach(imageKey -> objectStorageService.deleteFile(Singleton.S3_BUCKET_NAME, "article/img/" + imageKey));
             throw e;
         }
 
