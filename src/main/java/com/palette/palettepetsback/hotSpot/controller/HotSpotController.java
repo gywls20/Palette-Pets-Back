@@ -33,7 +33,7 @@ public class HotSpotController {
     // 게시글 추가 (파일 포함)
     @PostMapping
     @NeedNotification
-    public ResponseEntity<Void> addHotSpot(@Valid @RequestPart("request") HotSpotAddRequest request,
+    public ResponseEntity<Boolean> addHotSpot(@Valid @RequestPart("request") HotSpotAddRequest request,
                                            @RequestPart(value = "files", required = false) MultipartFile[] files,
                                            @JwtAuth AuthInfoDto authInfoDto) {
         request.setMemberId(authInfoDto.getMemberId());
@@ -49,7 +49,7 @@ public class HotSpotController {
                 "명소 추천 글을 작성 성공했습니다", 
                 111);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(true);
     }
 
     // 게시글 업데이트
