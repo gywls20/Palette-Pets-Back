@@ -10,6 +10,7 @@ import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
 import com.palette.palettepetsback.hotSpot.service.HotSpotService;
+import com.palette.palettepetsback.member.dto.Role;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ public class HotSpotController {
     public ResponseEntity<Void> addHotSpot(@Valid @RequestPart("request") HotSpotAddRequest request,
                                            @RequestPart(value = "files", required = false) MultipartFile[] files,
                                            @JwtAuth AuthInfoDto authInfoDto) {
+        request.setMemberId(authInfoDto.getMemberId());
         Long hotSpotId = hotSpotService.HotSpotInsert(request);
         // ImgHotSpot 에 이미지 저장
         for (MultipartFile file : files) {
@@ -83,4 +85,16 @@ public class HotSpotController {
     public List<ImgHotSpotResponse> getHotSpotImg(@PathVariable("id") Long id) {
         return hotSpotService.getAllImgHotSpotByHotSpotId(id);
     }
+
+    // 매니저인지 확인 요청
+    @GetMapping("/checkManager")
+    public Boolean checkManager(@JwtAuth AuthInfoDto authInfoDto) {
+        Role role = authInfoDto.getRole();
+        if (role.equals(Role.ADMIN)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
