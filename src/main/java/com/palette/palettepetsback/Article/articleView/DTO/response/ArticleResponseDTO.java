@@ -1,8 +1,7 @@
-package com.palette.palettepetsback.Article.articleView.DTO.reponsse;
+package com.palette.palettepetsback.Article.articleView.DTO.response;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
-import com.palette.palettepetsback.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

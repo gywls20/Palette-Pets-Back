@@ -3,16 +3,13 @@ package com.palette.palettepetsback.Article.articleView.service;
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.QArticle;
 import com.palette.palettepetsback.Article.articleView.DTO.PageableDTO;
-import com.palette.palettepetsback.Article.articleView.DTO.reponsse.ArticleResponseDTO;
+import com.palette.palettepetsback.Article.articleView.DTO.response.ArticleResponseDTO;
 import com.palette.palettepetsback.Article.articleView.repository.ArticleRepository;
-import com.palette.palettepetsback.Article.articleView.repository.ArticleRepositoryCustom;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.querydsl.jpa.JPAExpressions.selectFrom;
 
 @RequiredArgsConstructor
 @Service
