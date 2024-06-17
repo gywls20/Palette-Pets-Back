@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @ToString
 public class ArticleWriteRedis {
     @Id
-  String writeId;
+    String writeId;
 
     @Indexed
     Long memberId;
