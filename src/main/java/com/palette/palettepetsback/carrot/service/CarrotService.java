@@ -129,6 +129,10 @@ public class CarrotService {
 
         BooleanBuilder where = new BooleanBuilder();
 
+        if(pd.getWhere() != null && !pd.getWhere().isEmpty()) {
+            where.and(qCarrot.carrotTag.contains(pd.getWhere()));
+        }
+
         List<Carrot> carrots = jpaQueryFactory
                 .selectFrom(qCarrot)
                 .where(where)
@@ -138,9 +142,32 @@ public class CarrotService {
         System.out.println("offset : " + offset);
         System.out.println("Size : "+ carrots.size());
 
-        List<CarrotResponseDTO> carrotResponseDTOList = carrots.stream()
-                .map(responseDTO -> new CarrotResponseDTO(responseDTO))
-                .collect(Collectors.toList());
+        List<CarrotResponseDTO> carrotResponseDTOList=new ArrayList<>();
+        for (Carrot c : carrots) {
+            List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(c);
+
+            String member = c.getMember().getMemberNickname();
+            CarrotResponseDTO carrotResponseDTO = new CarrotResponseDTO();
+            carrotResponseDTO.setCarrotId(c.getCarrotId());
+            carrotResponseDTO.setMemberId(member);
+            carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
+            carrotResponseDTO.setCarrotContent(c.getCarrotContent());
+            carrotResponseDTO.setCarrot_price(c.getCarrot_price());
+            carrotResponseDTO.setCarrot_createdAt(c.getCarrot_createdAt());
+            carrotResponseDTO.setCarrotTag(c.getCarrotTag());
+            carrotResponseDTO.setCarrotLike(c.getCarrotLike());
+            carrotResponseDTO.setCarrotView(c.getCarrotView());
+
+            if(!carrotImage.isEmpty()){
+                carrotResponseDTO.setImg(carrotImage.get(0).getCarrotImageUrl());
+            }
+
+            carrotResponseDTOList.add(carrotResponseDTO);
+        }
+
+//        List<CarrotResponseDTO> carrotResponseDTOList = carrots.stream()
+//                .map(responseDTO -> new CarrotResponseDTO(responseDTO))
+//                .collect(Collectors.toList());
 
         return carrotResponseDTOList;
     }

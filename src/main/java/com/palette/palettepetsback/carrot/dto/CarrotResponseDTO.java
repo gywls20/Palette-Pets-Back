@@ -20,7 +20,6 @@ public class CarrotResponseDTO {
     private String carrotTag;
     private Integer carrotLike;
     private Integer carrotView;
-
     private String img;
 
 
