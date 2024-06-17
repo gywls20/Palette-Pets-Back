@@ -1,13 +1,13 @@
 package com.palette.palettepetsback.Article.redis.service;
 
 import com.palette.palettepetsback.Article.redis.ArticleWriteRedis;
-import com.palette.palettepetsback.Article.redis.LikeArticleRedis;
 import com.palette.palettepetsback.Article.redis.ReportArticleRedis;
 import com.palette.palettepetsback.Article.redis.repository.ArticleWriteRedisRepository;
-import com.palette.palettepetsback.Article.redis.repository.ArticleLikeRedisRepository;
 import com.palette.palettepetsback.Article.redis.repository.ArticleReportRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class ArticleRedisService {
 
     private final ArticleWriteRedisRepository articleWriteRedisRepository;
-    private final ArticleLikeRedisRepository articleLikeRedisRepository;
     private final ArticleReportRedisRepository articleReportRedisRepository;
 
     /**
@@ -28,13 +27,14 @@ public class ArticleRedisService {
     }
 
     /**
-     * 글 신고 정보를 저장
-     * @param likeArticleRedis 저장할 정보
-     * @return 저장된 정보
+     * 글 도배 방지 정보 조회
+     * @param writeId 조회할 ID
+     * @return 조회된 정보
      */
-    public LikeArticleRedis saveLikeArticle(LikeArticleRedis likeArticleRedis){
-        return articleLikeRedisRepository.save(likeArticleRedis);
+    public Optional<ArticleWriteRedis> findArticleWriteById(String writeId){
+        return articleWriteRedisRepository.findByWriteId(writeId);
     }
+
 
     /**
      *  글 신고 정보를 저장
@@ -43,5 +43,14 @@ public class ArticleRedisService {
      */
     public ReportArticleRedis saveReportArticle(ReportArticleRedis reportArticleRedis){
         return articleReportRedisRepository.save(reportArticleRedis);
+    }
+
+    /**
+     * 글 신고 정보 조회
+     * @param reportId 조회할 ID
+     * @return 조회된 정보
+     */
+    public Optional<ReportArticleRedis> findReportArticleById(String reportId){
+        return articleReportRedisRepository.findByReportId(reportId);
     }
 }
