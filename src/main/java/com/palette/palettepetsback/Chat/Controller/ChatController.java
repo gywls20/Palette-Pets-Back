@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.Chat.Controller;
 
+import com.palette.palettepetsback.Chat.Controller.DTO.ChatResponse;
 import com.palette.palettepetsback.Chat.Service.ChatService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
@@ -16,9 +17,14 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping("/api/chat")
-    public ResponseEntity<String> getChatRoom(@JwtAuth final AuthInfoDto authInfoDto,
-                                             @RequestParam("id") Long id){
+    public ResponseEntity<ChatResponse> getChatRoom(@JwtAuth final AuthInfoDto authInfoDto,
+                                                    @RequestParam("id") Long id){
         System.out.println("/api/chat :: authInfoDto.getMemberId() = " + authInfoDto.getMemberId());
-        return ResponseEntity.ok().body(chatService.getChatRoom(authInfoDto.getMemberId(), id));
+        return ResponseEntity.ok().body(new ChatResponse(
+                chatService.getChatRoom(authInfoDto.getMemberId(), id),
+                authInfoDto.getMemberId()
+        ));
     }
+
+
 }
