@@ -48,7 +48,6 @@ public class MemberController {
         if (memberService.checkEmailDuplicate(joinRequest.getEmail())) {
             return ResponseEntity.badRequest().body("이미 존재하는 이메일입니다.");
         }
-
         memberService.join(joinRequest);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }

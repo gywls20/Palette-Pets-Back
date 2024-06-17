@@ -2,7 +2,6 @@ package com.palette.palettepetsback.Article.articleWrite.service;
 
 import com.palette.palettepetsback.Article.Article;
 import com.palette.palettepetsback.Article.ArticleImage;
-import com.palette.palettepetsback.Article.articleView.DTO.reponsse.ArticleResponseDTO;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.*;
 
 import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleUpdateResponseDto;
@@ -327,19 +326,6 @@ public class ArticleWriteService {
         log.info("articleId:{}", article.getArticleId());
         articleWriteRepository.incrementReportCount(article.getArticleId(),article.getCountReport()+1);
     }
-
-
-
-
-
-//    @Transactional
-//    public void deleteArticle(Long articleId, AuthInfoDto authInfoDto) {
-//        Article article = articleWriteRepository.findById(articleId)
-//                .orElseThrow(ArticleNotFoundException::new);
-//
-//        validateArticleOwner(authInfoDto,article);
-//        articleWriteRepository.delete(article);
-//    }
 }
 
 

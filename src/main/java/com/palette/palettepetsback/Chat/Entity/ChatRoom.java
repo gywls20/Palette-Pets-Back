@@ -1,13 +1,11 @@
 package com.palette.palettepetsback.Chat.Entity;
 
-import com.palette.palettepetsback.Article.Article;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Table(name = "chat_room")
