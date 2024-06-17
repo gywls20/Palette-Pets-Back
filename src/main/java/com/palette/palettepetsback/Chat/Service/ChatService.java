@@ -2,12 +2,10 @@ package com.palette.palettepetsback.Chat.Service;
 
 import com.palette.palettepetsback.Chat.Entity.ChatRoom;
 import com.palette.palettepetsback.Chat.Repository.ChatRepository;
-import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,6 @@ public class ChatService {
                         .user2(user2)
                         .build()
         );
-        System.out.println("chatRoom.getChatRoomId() = " + chatRoom.getChatRoomId());
         return chatRoom.getChatRoomId().toString();
     }
 }
