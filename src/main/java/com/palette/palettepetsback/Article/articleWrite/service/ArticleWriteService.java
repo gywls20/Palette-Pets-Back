@@ -44,8 +44,7 @@ public class ArticleWriteService {
     private final FileService fileService;
     private final MemberRepository memberRepository;
 
-    // Redis
-    private final ReportArticleRedisRepository reportArticleRedisRepository;
+
 
 
 
@@ -319,41 +318,6 @@ public class ArticleWriteService {
         articleWriteRepository.updateCountReviews(article.getArticleId(), article.getCountReview()+1);
     }
 
-
-    //신고 전 확인
-    public Boolean isTodayReport(Long articleId, Long memberId) {
-
-        Optional<List<ReportArticleRedis>> reportArticleRedis = reportArticleRedisRepository.findAllByMemberId(memberId);
-
-        if(reportArticleRedis.isPresent()){
-            log.info("reportArticleRedis:{}", reportArticleRedis.get());
-            for(ReportArticleRedis report : reportArticleRedis.get()){
-               if(report.getArticleId().equals(articleId)){
-                   log.info("report:{}", report.getArticleId());
-                   log.info("articleId:{}", articleId);
-                   return true;
-               }
-            }
-        }
-        return false;
-    }
-
-    // 신고 Redis 저장
-    public Boolean resistReport(Long articleId, Long memberId) {
-
-        try{
-            reportArticleRedisRepository.save(ReportArticleRedis.builder()
-                    .reportId(UUID.randomUUID().toString())
-                    .memberId(memberId)
-                    .articleId(articleId)
-                    .build());
-            return true;
-        }
-        catch (Exception e){
-            log.info("신고 - Redis 저장 실패");
-            return false;
-        }
-    }
 
     // 신고 RDBMS countReport+1
     @Transactional
