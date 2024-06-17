@@ -70,13 +70,18 @@ public class HotSpotService {
         // 연관 이미지 모두삭제
         List<ImgHotSpot> imgHotSpots = hotSpot.getImgHotSpots();
         for (ImgHotSpot imgHotSpot : imgHotSpots) {
+            log.info("imgHotSpot Id : {}", imgHotSpot.getId());
+            log.info("imgHotSpot url : {}", imgHotSpot.getImgUrl());
             deleteHotSpotImage(imgHotSpot.getId());
         }
+
         if (files.length > 0) {
             // 새 거 넣기
             for (MultipartFile file : files) {
                 addHotSpotImage(hotSpot.getId(), file);
             }
+        } else {
+            log.info("수정해서 대신 넣을 file 이 없음");
         }
 
     }
@@ -151,7 +156,9 @@ public class HotSpotService {
 
     // 이미지 등록 메서드
     @Transactional
+//    public Long addHotSpotImage(HotSpot hotSpot, MultipartFile img) {
     public Long addHotSpotImage(Long hotSpotId, MultipartFile img) {
+
         HotSpot hotSpot = hotSpotRepository.findById(hotSpotId)
                 .orElseThrow(() -> new RuntimeException("명소 추천 게시글이 존재하지 않습니다."));
 

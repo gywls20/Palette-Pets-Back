@@ -9,6 +9,7 @@ import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
+import com.palette.palettepetsback.hotSpot.entity.HotSpot;
 import com.palette.palettepetsback.hotSpot.service.HotSpotService;
 import com.palette.palettepetsback.member.dto.Role;
 import jakarta.validation.Valid;
@@ -54,17 +55,27 @@ public class HotSpotController {
 
     // 게시글 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateHotSpot(@PathVariable("id") Long id,
-                                              @Validated @RequestBody HotSpotUpdateRequest request,
-                                              @RequestPart(value = "files", required = false) MultipartFile[] files) {
+    @NeedNotification
+    public ResponseEntity<Boolean> updateHotSpot(@PathVariable("id") Long id,
+                                              @Validated @RequestPart("request") HotSpotUpdateRequest request,
+                                              @RequestPart(value = "files", required = false) MultipartFile[] files,
+                                              @JwtAuth AuthInfoDto authInfoDto) {
         hotSpotService.HotSpotUpdate(request, files);
-        return ResponseEntity.ok().build();
+        NotificationThreadLocal.setNotificationInfo(authInfoDto.getMemberId(),
+                "명소 추천 글을 수정했습니다",
+                113);
+        return ResponseEntity.ok(true);
     }
 
     // 게시글 삭제
     @DeleteMapping("/{id}")
-    public boolean deleteHotSpot(@PathVariable("id") Long id) {
+    @NeedNotification
+    public boolean deleteHotSpot(@PathVariable("id") Long id,
+                                 @JwtAuth AuthInfoDto authInfoDto) {
         hotSpotService.HotSpotDelete(id);
+        NotificationThreadLocal.setNotificationInfo(authInfoDto.getMemberId(),
+                "명소 추천 글을 삭제했습니다",
+                112);
         return true;
     }
 
