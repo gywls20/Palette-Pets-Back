@@ -1,7 +1,10 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a58d393f07c431c9ba7422c891e1c8411a047407
+=======
+>>>>>>> 654d6089f9b1ba51dfc68fea53ec6f229fa1149f
 //package com.palette.palettepetsback.carrot;
 //
 //import com.palette.palettepetsback.carrot.domain.Carrot;
@@ -59,6 +62,7 @@
 //    }
 //
 //}
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 package com.palette.palettepetsback.carrot;
@@ -121,3 +125,5 @@ public class CarrotTest {
 >>>>>>> 1ad976c293e2de3641e5004610f49a04b6f0aa33
 =======
 >>>>>>> a58d393f07c431c9ba7422c891e1c8411a047407
+=======
+>>>>>>> 654d6089f9b1ba51dfc68fea53ec6f229fa1149f
