@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ChatResponse {
+@NoArgsConstructor
+public class ChatRoomListResponse {
     private String roomId;
+    private Long userId;
     private String nickname;
 }
