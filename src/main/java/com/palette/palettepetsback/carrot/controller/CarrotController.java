@@ -36,9 +36,10 @@ public class CarrotController {
 
     //글 & 이미지 등록
     @PostMapping("/post")
-    public ResponseEntity<?> create(@RequestBody CarrotRequestDTO dto,
+    public ResponseEntity<?> create(@ModelAttribute CarrotRequestDTO dto,
                          @RequestPart(required = false, name = "files") MultipartFile[] files,
                          @JwtAuth AuthInfoDto authInfoDto) {
+
         //security 부터 memberId 값 받아오기
         Long memberId = authInfoDto.getMemberId();
 
@@ -50,7 +51,7 @@ public class CarrotController {
             String carrotImageUrl = carrotService.fileUpload(file, "carrot/img");
             carrotService.saveImg(carrotImageUrl, carrot);
         }
-
+        System.out.println("dto = " + dto.getCarrotTitle());
         return ResponseEntity.ok("글 등록 완료");
     }
 
@@ -84,7 +85,7 @@ public class CarrotController {
         return true;
     }
 
-    //리스트
+    //전체 리스트
     @GetMapping("/test")
     public List<CarrotResponseDTO> test() {
         List<CarrotResponseDTO> carrotList = carrotService.test();
@@ -94,7 +95,7 @@ public class CarrotController {
         return carrotList;
     }
 
-    //리스트 출력(페이징 처리)
+    //페이징, 정렬 처리 된 리스트
     @GetMapping("/list")
     public ResponseEntity<List<CarrotResponseDTO>> List(@ModelAttribute PageableDTO pd) {
         List<CarrotResponseDTO> carrots = carrotService.getList(pd);
@@ -102,12 +103,14 @@ public class CarrotController {
         return ResponseEntity.ok().body(carrots);
     }
 
-    //조회수 증가
-    @GetMapping("/test/{carrotId}")
-    public boolean view(@PathVariable Long carrotId) {
-        carrotService.updateView(carrotId);
+    //상세 보기 & 조회수 증가
+    @GetMapping("/list/{id}")
+    public ResponseEntity<CarrotResponseDTO> view(@PathVariable Long id) {
+        CarrotResponseDTO carrot = carrotService.listDetail(id);
+        //상세 보기를 누르면 자동으로 조회수 증가
+        carrotService.updateView(id);
 
-        return true;
+        return ResponseEntity.ok().body(carrot);
     }
 
     //좋아요 클릭
@@ -132,6 +135,12 @@ public class CarrotController {
     public List<CarrotResponseDTO> searchCarrots(@RequestParam String keyword) {
 
         return carrotService.searchCarrots(keyword);
+    }
+
+    //네이버 공유 기능
+    @GetMapping("http://share.naver.com/web/shareView")
+    public boolean naverShare() {
+        return true;
     }
 
 }

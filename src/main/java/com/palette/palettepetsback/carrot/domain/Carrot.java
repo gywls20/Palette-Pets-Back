@@ -49,6 +49,7 @@ public class Carrot {
     @Column(name = "carrot_view")
     private Integer carrotView;
 
+
     //저장되기 전 실행 메서드(default 값 지정)
     @PrePersist
     public void prePersist() {
@@ -67,7 +68,4 @@ public class Carrot {
         this.carrotLike=this.carrotLike+sum;
     }
 
-    //CarrotImage와 매핑(orphanRemoval : 영속성 전이 설정)
-//    @OneToMany(mappedBy = "Carrot", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<CarrotImage> carrotImages = new ArrayList<>();
 }

@@ -1,14 +1,12 @@
 package com.palette.palettepetsback.carrot.dto;
 
 import com.palette.palettepetsback.carrot.domain.Carrot;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
+@Builder
 @Data
 @ToString
 @NoArgsConstructor
@@ -22,7 +20,6 @@ public class CarrotResponseDTO {
     private String carrotTag;
     private Integer carrotLike;
     private Integer carrotView;
-
     private String img;
 
 
@@ -37,4 +34,5 @@ public class CarrotResponseDTO {
         this.carrotLike = responseDTO.getCarrotLike();
         this.carrotView = responseDTO.getCarrotView();
     }
+
 }
