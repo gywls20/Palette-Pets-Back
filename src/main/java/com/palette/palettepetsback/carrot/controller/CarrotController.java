@@ -62,7 +62,10 @@ public class CarrotController {
         //이미지 수정
         if(file != null) {
             String carrotImg = carrotService.fileUpload(file, "carrot");
-            dto.setCarrotImg(carrotImg);
+
+            CarrotImage carrotImage = new CarrotImage();
+            carrotImage.setCarrotImageUrl(carrotImg);
+            //dto.setCarrotImg(carrotImg);
         }
         //글 수정
         Carrot update = carrotService.update(id, dto);
@@ -83,8 +86,8 @@ public class CarrotController {
 
     //리스트
     @GetMapping("/test")
-    public List<Carrot> test() {
-        List<Carrot> carrotList = carrotService.test();
+    public List<CarrotResponseDTO> test() {
+        List<CarrotResponseDTO> carrotList = carrotService.test();
         //System.out.println(carrotList);
         log.info("carrot {}", carrotList);
 
@@ -95,7 +98,40 @@ public class CarrotController {
     @GetMapping("/list")
     public ResponseEntity<List<CarrotResponseDTO>> List(@ModelAttribute PageableDTO pd) {
         List<CarrotResponseDTO> carrots = carrotService.getList(pd);
+        log.info("carrot = {}", carrots);
         return ResponseEntity.ok().body(carrots);
+    }
+
+    //조회수 증가
+    @GetMapping("/test/{carrotId}")
+    public boolean view(@PathVariable Long carrotId) {
+        carrotService.updateView(carrotId);
+
+        return true;
+    }
+
+    //좋아요 클릭
+    // 상세 페이지에서만 누를 수 있습니다.
+    @PostMapping("/like/{id}")
+    public ResponseEntity<?> like(@PathVariable(name = "id") Long id,
+                                  @JwtAuth AuthInfoDto authInfoDto) {
+        Long memberId= authInfoDto.getMemberId();
+
+        return ResponseEntity.ok(carrotService.like(id,memberId));
+    }
+
+    //멤버별 좋아요 누른 당근 리스트
+    @GetMapping("/like")
+    public List<CarrotResponseDTO> getLike(@JwtAuth AuthInfoDto authInfoDto) {
+        Long memberId= authInfoDto.getMemberId();
+        return carrotService.getLike(memberId);
+    }
+
+    //검색 기능
+    @GetMapping("/search")
+    public List<CarrotResponseDTO> searchCarrots(@RequestParam String keyword) {
+
+        return carrotService.searchCarrots(keyword);
     }
 
 }

@@ -18,10 +18,13 @@ public class CarrotResponseDTO {
     private String carrotContent;
     private Integer carrot_price;
     private LocalDateTime carrot_createdAt;
-    private Long memberId;
+    private String memberId;
     private String carrotTag;
     private Integer carrotLike;
     private Integer carrotView;
+
+    private String img;
+
 
     public CarrotResponseDTO(Carrot responseDTO) {
         this.carrotId = responseDTO.getCarrotId();
@@ -29,7 +32,7 @@ public class CarrotResponseDTO {
         this.carrotContent = responseDTO.getCarrotContent();
         this.carrot_price = responseDTO.getCarrot_price();
         this.carrot_createdAt = responseDTO.getCarrot_createdAt();
-        this.memberId = responseDTO.getMember().getMemberId();
+        this.memberId = responseDTO.getMember().getMemberName();
         this.carrotTag = responseDTO.getCarrotTag();
         this.carrotLike = responseDTO.getCarrotLike();
         this.carrotView = responseDTO.getCarrotView();

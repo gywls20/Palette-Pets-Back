@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "carrot")
 @NoArgsConstructor
+@Getter
 public class Carrot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,6 +61,10 @@ public class Carrot {
     @PreUpdate
     public void preUpdate() {
         this.carrot_createdAt = LocalDateTime.now();
+    }
+
+    public void like(int sum){
+        this.carrotLike=this.carrotLike+sum;
     }
 
     //CarrotImage와 매핑(orphanRemoval : 영속성 전이 설정)
