@@ -6,6 +6,7 @@ import com.palette.palettepetsback.Article.articleView.repository.ArticleReposit
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleLikeRequestDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleLikeResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleLikeRepository;
+
 import com.palette.palettepetsback.Article.articleWrite.repository.LikeArticleRedisRepository;
 import com.palette.palettepetsback.Article.redis.LikeArticleRedis;
 import com.palette.palettepetsback.member.entity.Member;
