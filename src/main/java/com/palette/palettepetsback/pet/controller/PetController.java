@@ -130,12 +130,4 @@ public class PetController {
         log.info("s3Result ={}", s3Result);
         return true;
     }
-
-    // 잠깐 getMemberInfo() 호출 테스트 -> 로그인하고 테스트 or 로그인 안하고 테스트 해보기
-    @GetMapping("/test/memberInfo")
-    public AuthInfoDto test2() {
-        AuthInfoDto memberInfo = JWTUtil.getMemberInfo();
-        log.info("memberInfo={}", memberInfo);
-        return memberInfo;
-    }
 }

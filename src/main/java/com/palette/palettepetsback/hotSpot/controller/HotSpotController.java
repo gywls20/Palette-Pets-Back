@@ -5,15 +5,14 @@ import com.palette.palettepetsback.config.aop.notification.NotificationThreadLoc
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotAddRequest;
+import com.palette.palettepetsback.hotSpot.dto.request.HotSpotStarPointAddRequest;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
-import com.palette.palettepetsback.hotSpot.entity.HotSpot;
 import com.palette.palettepetsback.hotSpot.service.HotSpotService;
 import com.palette.palettepetsback.member.dto.Role;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -106,6 +105,15 @@ public class HotSpotController {
         } else {
             return false;
         }
+    }
+
+    // 별점 등록 요청
+    @PostMapping("/rating")
+    public boolean starRating(@RequestBody HotSpotStarPointAddRequest dto,
+                              @JwtAuth AuthInfoDto authInfoDto) {
+        // 토큰에서 필수 값 가져오기
+        dto.setMemberId(authInfoDto.getMemberId());
+        return hotSpotService.saveHotSpotStarPoint(dto);
     }
 
 }

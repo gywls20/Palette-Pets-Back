@@ -4,11 +4,13 @@ import com.palette.palettepetsback.config.SingleTon.Singleton;
 import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.exceptions.NoMemberExistException;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotAddRequest;
+import com.palette.palettepetsback.hotSpot.dto.request.HotSpotStarPointAddRequest;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
 import com.palette.palettepetsback.hotSpot.entity.HotSpot;
+import com.palette.palettepetsback.hotSpot.entity.HotSpotStarPoint;
 import com.palette.palettepetsback.hotSpot.entity.ImgHotSpot;
 import com.palette.palettepetsback.hotSpot.repository.HotSpotRepository;
 import com.palette.palettepetsback.hotSpot.repository.HotSpotStarPointRepository;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -254,8 +257,35 @@ public class HotSpotService {
                 .build();
     }
 
+    // 명소 글 별점 추천 생성 메서드
+    @Transactional
+    public boolean saveHotSpotStarPoint(HotSpotStarPointAddRequest dto) {
+
+        HotSpot hotSpot = hotSpotRepository.findById(dto.getHotSpotId())
+                .orElseThrow(() -> new RuntimeException("hotSpot not found"));
+        Member member = memberRepository.findById(dto.getMemberId())
+                .orElseThrow(() -> new RuntimeException("memberId not found"));
+
+        // 이미 존재하는 별점이 있다면 없애고 등록
+        Optional<HotSpotStarPoint> alreadyRated = hotSpotStarPointRepository.findAlreadyRated(dto.getHotSpotId(), dto.getMemberId());
+        alreadyRated.ifPresent(hotSpotStarPointRepository::delete);
+
+
+        // 별점 등록
+        HotSpotStarPoint saved = hotSpotStarPointRepository.save(
+                HotSpotStarPoint.builder()
+                        .hotSpot(hotSpot)
+                        .member(member)
+                        .rating(dto.getRating())
+                        .build()
+        );
+
+        return saved.getId() != null;
+    }
+
     private Integer getHotSpotAverageStarPoint(HotSpot hotSpot) {
         // 별점 계산해서 각각 게시물 하나에 별점 결과값 넣어주기 = (총 별점 / 평가자수)
         return hotSpotStarPointRepository.calculateStarPoint(hotSpot.getId());
     }
+
 }
