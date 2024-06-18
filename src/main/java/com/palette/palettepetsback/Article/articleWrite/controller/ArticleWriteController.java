@@ -10,7 +10,10 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.Article.redis.ArticleWriteRedis;
+import com.palette.palettepetsback.Article.redis.service.ArticleRedisService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.validation.Valid;
@@ -35,7 +38,7 @@ public class ArticleWriteController {
     private final ArticleWriteService articleWriteService;
     private final ArticleWriteRepository articleWriteRepository;
     private final ArticleRepository articleRepository;
-
+    private final ArticleRedisService articleRedisService;
 //    @Autowired
 //    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
 //        this.articleWriteService = articleWriteService;
@@ -70,15 +73,27 @@ public class ArticleWriteController {
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
+
+
     //게시글 등록 --- 완료
     @PostMapping(path="/Post/article")
     public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
                                           @RequestPart(value="files",required = false) List<MultipartFile> files){
         log.info("dto = {}", dto);
         log.info("files = {}", files);
+        AuthInfoDto memberInfo = JWTUtil.getMemberInfo(); //토큰을 가져와서 멤버아이디 찾아내기
+//        log.info(String.valueOf(memberInfo.getMemberId()));
+        if(memberInfo == null) {
+            return null;
+        }
+        dto.setCreatedWho(memberInfo.getMemberId());
 
         //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
+
+        //Redis에 글 도배 방지 - 1분 등록
+        articleRedisService.saveArticleWrite(memberInfo.getMemberId());
+
 
         //object storage upload
             if(files != null && !files.isEmpty()){
@@ -123,9 +138,9 @@ public class ArticleWriteController {
                                 @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                 @JwtAuth final AuthInfoDto authInfoDto){
 
-        articleWriteService.editArticle(articleId,req,authInfoDto,files);
 
-        return Response.success("aaaaa");
+
+        return Response.success(articleWriteService.editArticle(articleId,req,authInfoDto,files));
     }
 
 

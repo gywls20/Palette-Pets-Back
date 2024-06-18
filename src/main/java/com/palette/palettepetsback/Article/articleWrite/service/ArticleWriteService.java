@@ -9,8 +9,10 @@ import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleWrit
 import com.palette.palettepetsback.Article.articleWrite.repository.*;
 import com.palette.palettepetsback.Article.exception.type.ArticleNotFoundException;
 import com.palette.palettepetsback.Article.exception.type.MemberNotEqualsException;
+import com.palette.palettepetsback.Article.redis.ArticleWriteRedis;
 import com.palette.palettepetsback.Article.redis.LikeArticleRedis;
 import com.palette.palettepetsback.Article.redis.ReportArticleRedis;
+import com.palette.palettepetsback.Article.redis.repository.ArticleWriteRedisRepository;
 import com.palette.palettepetsback.config.SingleTon.Singleton;
 import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
@@ -42,7 +44,7 @@ public class ArticleWriteService {
     private final ArticleLikeRepository likeArticleRepository;
     private final FileService fileService;
     private final MemberRepository memberRepository;
-
+    private final ArticleWriteRedisRepository articleWriteRedisRepository;
 
 
 
@@ -73,6 +75,8 @@ public class ArticleWriteService {
         return articleWriteRepository.findAll();
     }
 
+
+    // 글 등록
     @Transactional
     public Article create(ArticleWriteDto dto) {
 
@@ -82,7 +86,6 @@ public class ArticleWriteService {
             return null;
         }
 
-        dto.setCreatedWho(memberInfo.getMemberId());//dto를 받아와서 멤버아이디가 없으니까  위에꺼를 가져와서 넣기
 
         StringJoiner joiner = new StringJoiner(",");
         for (String item : dto.getArticleTags()) {
@@ -100,40 +103,41 @@ public class ArticleWriteService {
         if(articleWrite.getArticleId()!=null){
             return null;
         }
+
         return articleWriteRepository.save(articleWrite);
     }
 
-    @Transactional
-    public Article update(Long id, ArticleWriteDto dto) {
-        // 1. DTO -> 엔티티 변환하기
-        Article articleWrite = Article.builder()
-                .createdWho(dto.getCreatedWho())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-//                .articleTags(dto.getArticleTags()   )
-                .build();
-        log.info("id:{}, articleWrite:{}", id, articleWrite.toString());
-
-        // 2. 타깃 조회
-        Article target = articleWriteRepository.findById(id).orElse(null);
-
-        // 3. 잘못된 요청 처리하기
-        if (target == null) {
-            log.info("잘못된 요청! id:{}, articleWrite:{}", id, articleWrite.toString());
-            return null; // 응답은 컨트롤러가 하므로 여기서는 null 반환
-        }
-
-        // 4. 업데이트하기
-        target.patch(articleWrite);
-
-        // 5 .상태 업데이트
-        target.setState("MODIFIED");
-
-        // 6. 수정된 엔티티 저장
-        Article updated = articleWriteRepository.save(target); // 수정된 부분: target을 저장
-
-        return updated; // 응답은 컨트롤러가 하므로 여기서는 수정된 데이터만 반환
-    }
+//    @Transactional
+//    public Article update(Long id, ArticleWriteDto dto) {
+//        // 1. DTO -> 엔티티 변환하기
+//        Article articleWrite = Article.builder()
+//                .createdWho(dto.getCreatedWho())
+//                .title(dto.getTitle())
+//                .content(dto.getContent())
+////                .articleTags(dto.getArticleTags()   )
+//                .build();
+//        log.info("id:{}, articleWrite:{}", id, articleWrite.toString());
+//
+//        // 2. 타깃 조회
+//        Article target = articleWriteRepository.findById(id).orElse(null);
+//
+//        // 3. 잘못된 요청 처리하기
+//        if (target == null) {
+//            log.info("잘못된 요청! id:{}, articleWrite:{}", id, articleWrite.toString());
+//            return null; // 응답은 컨트롤러가 하므로 여기서는 null 반환
+//        }
+//
+//        // 4. 업데이트하기
+//        target.patch(articleWrite);
+//
+//        // 5 .상태 업데이트
+//        target.setState("MODIFIED");
+//
+//        // 6. 수정된 엔티티 저장
+//        Article updated = articleWriteRepository.save(target); // 수정된 부분: target을 저장
+//
+//        return updated; // 응답은 컨트롤러가 하므로 여기서는 수정된 데이터만 반환
+//    }
 
     //DELETE
     @Transactional
@@ -178,7 +182,9 @@ public class ArticleWriteService {
 
         return ArticleUpdateResponseDto.toDto(article);
     }
+    //업데이트 사진이 없는 경우
 
+    //업데이트 이미 업로드한 사진이 있는경우
     @Transactional
     public ArticleWriteResponseDto editArticle(Long articleId, ArticleUpdateRequest req, AuthInfoDto authInfoDto,List<MultipartFile> files) {
 
@@ -196,8 +202,7 @@ public class ArticleWriteService {
 
         //imgArticle 에서 삭제할 이미지 번호 선택
         // Object Storage에서 삭제 , 테이블 에서 삭제
-
-
+        
         // 문제 -> 클라이언트에서 넘어오는 파일의 original name은 uuid가 아니다.
         // 기존 이미지의 url 은 uuid 이며
         // 테이블을 update 하기 전에 upload를 수행 해야 한다.
@@ -326,6 +331,8 @@ public class ArticleWriteService {
         log.info("articleId:{}", article.getArticleId());
         articleWriteRepository.incrementReportCount(article.getArticleId(),article.getCountReport()+1);
     }
+
+
 }
 
 
