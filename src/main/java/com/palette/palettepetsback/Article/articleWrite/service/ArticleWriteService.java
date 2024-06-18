@@ -80,13 +80,6 @@ public class ArticleWriteService {
     @Transactional
     public Article create(ArticleWriteDto dto) {
 
-        AuthInfoDto memberInfo = JWTUtil.getMemberInfo(); //토큰을 가져와서 멤버아이디 찾아내기
-//        log.info(String.valueOf(memberInfo.getMemberId()));
-        if(memberInfo == null) {
-            return null;
-        }
-
-
         StringJoiner joiner = new StringJoiner(",");
         for (String item : dto.getArticleTags()) {
             joiner.add(item);
@@ -182,9 +175,9 @@ public class ArticleWriteService {
 
         return ArticleUpdateResponseDto.toDto(article);
     }
-    //업데이트 사진이 없는 경우
 
-    //업데이트 이미 업로드한 사진이 있는경우
+
+    //업데이트 이미 업로드한 사진이 있고 등록하는 사진이 있을 때
     @Transactional
     public ArticleWriteResponseDto editArticle(Long articleId, ArticleUpdateRequest req, AuthInfoDto authInfoDto,List<MultipartFile> files) {
 
@@ -195,7 +188,22 @@ public class ArticleWriteService {
 
         Member member = memberRepository.findById(authInfoDto.getMemberId()).orElseThrow(()->new IllegalArgumentException("멤버를 찾을수없습니다"));
 
-        //게시글 수정
+        //1. 기본적으로 업데이트 하는 Entity 메소드
+
+        // article.getImages() == null , files != null
+        //2. 기존 이미지가 없고 현재 이미지가 들어올때
+        // Object Storage에 추가 , 테이블에 레코드 추가
+
+        // 오브젝트 추가 메소드 1개 , 테이블 추가 메소드 1개
+
+        // article.getImages() != null , files == null
+        //3. 기존 이미지가 있고 현재 이미지는 없을때
+        // object storage 삭제, 테이블 레코드 삭제
+
+        // 오브젝트 삭제 메소드 1개, 테이블 삭제 메소드 한개
+
+        //4. 기존 이미지가 있고 현재 이미지가 변경되었을때
+        // 기존 이미지 삭제, 테이블에서 삭제 -> Object Storage에 추가 , 테이블에 추가
 
         //추가 할 이미지 선택
         // Object Storage에 추가 , 테이블에 추가

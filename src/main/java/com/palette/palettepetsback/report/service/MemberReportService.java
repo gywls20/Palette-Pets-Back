@@ -28,7 +28,7 @@ public class MemberReportService {
         Member reportedMember = memberRepository.findByMemberNickname(memberReportAddRequest.getMemberNickname())
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
-        isReported(reportedMember);
+        //isReported(reportedMember);
 
         memberReportRepository.save(memberReportAddRequest.toEntity(reportMember,reportedMember, memberReportAddRequest));
 

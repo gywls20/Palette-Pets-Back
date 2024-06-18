@@ -32,9 +32,8 @@ public class ArticleRedisService {
      */
     public void saveArticleWrite(Long memberId){
 
-        // 현재 시간을 가져옴
-        LocalDateTime now = LocalDateTime.now();
-        log.info("now : " + now);
+        // 현재 시간 + 1분 을 가져옴
+        LocalDateTime now = LocalDateTime.now().plusMinutes(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm 분 ss초");
         String formattedDate = now.format(formatter);
         log.info("formattedDate : " + formattedDate);
@@ -43,6 +42,7 @@ public class ArticleRedisService {
                 .expirationTime(formattedDate)
                 .build();
         articleWriteRedisRepository.save(articleWriteRedis);
+
     }
 
     /**
@@ -72,11 +72,9 @@ public class ArticleRedisService {
     public Optional<ReportArticleRedis> findReportArticleById(String reportId){
         return articleReportRedisRepository.findByReportId(reportId);
     }
-
-
+    // redis 등록 확인 테스트용
     public List<ArticleWriteRedis> findAllByMemberId(Long memberId) {
         return (List<ArticleWriteRedis>) articleWriteRedisRepository.findAllByMemberId(memberId);
     }
-
-
+    
 }

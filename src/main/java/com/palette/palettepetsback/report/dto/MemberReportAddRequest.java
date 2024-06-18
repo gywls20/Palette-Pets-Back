@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class MemberReportAddRequest {
 
     private Long memberId;
+    private Long articleId;
     private String memberNickname;
     private String reportReason;
     private String reportContent;

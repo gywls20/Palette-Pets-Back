@@ -138,8 +138,6 @@ public class ArticleWriteController {
                                 @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                 @JwtAuth final AuthInfoDto authInfoDto){
 
-
-
         return Response.success(articleWriteService.editArticle(articleId,req,authInfoDto,files));
     }
 
