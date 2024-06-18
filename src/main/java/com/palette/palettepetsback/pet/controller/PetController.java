@@ -2,6 +2,7 @@ package com.palette.palettepetsback.pet.controller;
 
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.pet.dto.request.ImgPetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetRegistryDto;
 import com.palette.palettepetsback.pet.dto.request.PetUpdateDto;
@@ -25,9 +26,16 @@ public class PetController {
     private final PetService petService;
 
     // 한 회원이 등록한 반려동물 정보 리스트 쿼리
-    @GetMapping("/list/{memberId}")
-    public List<PetResponseDto> getPetListByMemberId(@PathVariable("memberId") Long memberId) {
-        return petService.findAllByMemberId(memberId);
+    @GetMapping("/list")
+    public List<PetResponseDto> getPetListByMemberId(@JwtAuth AuthInfoDto authInfoDto) {
+        return petService.findAllByMemberId(authInfoDto.getMemberId());
+    }
+
+    // 접근 회원이 반려 동물의 주인이 맞는 지 확인
+    @GetMapping("/{petId}/checkMaster")
+    public boolean checkIsMaster(@PathVariable("petId") Long petId,
+                                        @JwtAuth AuthInfoDto authInfoDto) {
+        return petService.checkIsMaster(petId, authInfoDto.getMemberId());
     }
 
     // 등록된 반려동물 정보 상세 정보 쿼리
@@ -38,7 +46,7 @@ public class PetController {
 
     // 펫 이미지 리스트 가져오기
     @GetMapping("/img/list/{petId}")
-    public List<ImgPetResponseDto> getPetImgListByMemberId(@PathVariable("petId") Long petId) {
+    public List<ImgPetResponseDto> getPetImgListByPetId(@PathVariable("petId") Long petId) {
         return petService.findAllPetImgById(petId);
     }
 
