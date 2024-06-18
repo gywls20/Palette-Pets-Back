@@ -41,6 +41,7 @@ public class CarrotController {
                          @JwtAuth AuthInfoDto authInfoDto) {
 
         //security 부터 memberId 값 받아오기
+
         Long memberId = authInfoDto.getMemberId();
 
         //글 등록
