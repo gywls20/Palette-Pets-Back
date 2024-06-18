@@ -178,11 +178,11 @@ public class ArticleWriteController {
 //    }
 
     //게시글 이미지 삭제
-    @DeleteMapping("{id}/img")
-    public boolean deleteArticleImg(@PathVariable ("id")Long id,@RequestBody List<Long>imgIds ){
-        articleWriteService.deleteImgArticle(imgIds);
-        return true;
-    }
+//    @DeleteMapping("{id}/img")
+//    public boolean deleteArticleImg(@PathVariable ("id")Long id,@RequestBody List<Long>imgIds ){
+//        articleWriteService.deleteImgArticle(imgIds);
+//        return true;
+//    }
 
 
 

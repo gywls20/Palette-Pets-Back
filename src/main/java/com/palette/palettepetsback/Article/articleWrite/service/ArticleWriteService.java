@@ -36,16 +36,11 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class ArticleWriteService {
 
-    private static final int PAGE_SIZE = 10;
-    private static final String SORTED_BY_ID="id";
     private final ArticleWriteRepository articleWriteRepository;
     private final NCPObjectStorageService objectStorageService;
-    private final ImgArticleRepository imgArticleRepository;
-    private final ArticleLikeRepository likeArticleRepository;
     private final FileService fileService;
     private final MemberRepository memberRepository;
-    private final ArticleWriteRedisRepository articleWriteRedisRepository;
-
+    private final ImgArticleRepository imgArticleRepository;
 
 
 
@@ -69,38 +64,16 @@ public class ArticleWriteService {
         );
         return saved.getId();
     }
-
-    //get
-    public List<Article> index() {
-        return articleWriteRepository.findAll();
-    }
-
-
-    // 글 등록
-    @Transactional
-    public Article create(ArticleWriteDto dto) {
-
-        StringJoiner joiner = new StringJoiner(",");
-        for (String item : dto.getArticleTags()) {
-            joiner.add(item);
-        }
-
-        Article articleWrite = Article.builder()
-                .createdWho(dto.getCreatedWho())
-                .boardName(Article.ComminityBoard.valueOf(dto.getBoardName()))
-                .articleHead(dto.getArticleHead())
-                .articleTags(joiner.toString())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .build();
-        if(articleWrite.getArticleId()!=null){
-            return null;
-        }
-
-        return articleWriteRepository.save(articleWrite);
-    }
-
+// 게시글 이미지 삭제
 //    @Transactional
+//    public void deleteImgArticle(List<Long> imgIds) {
+//
+//        for(Long imgId : imgIds){
+//            imgArticleRepository.deleteById(imgId);
+//        }
+//    }
+
+    //    @Transactional
 //    public Article update(Long id, ArticleWriteDto dto) {
 //        // 1. DTO -> 엔티티 변환하기
 //        Article articleWrite = Article.builder()
@@ -132,6 +105,36 @@ public class ArticleWriteService {
 //        return updated; // 응답은 컨트롤러가 하므로 여기서는 수정된 데이터만 반환
 //    }
 
+
+    //get
+    public List<Article> index() {
+        return articleWriteRepository.findAll();
+    }
+
+    // 글 등록
+    @Transactional
+    public Article create(ArticleWriteDto dto) {
+
+        StringJoiner joiner = new StringJoiner(",");
+        for (String item : dto.getArticleTags()) {
+            joiner.add(item);
+        }
+
+        Article articleWrite = Article.builder()
+                .createdWho(dto.getCreatedWho())
+                .boardName(Article.ComminityBoard.valueOf(dto.getBoardName()))
+                .articleHead(dto.getArticleHead())
+                .articleTags(joiner.toString())
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .build();
+        if(articleWrite.getArticleId()!=null){
+            return null;
+        }
+
+        return articleWriteRepository.save(articleWrite);
+    }
+
     //DELETE
     @Transactional
     public void delete(Long id) {
@@ -144,15 +147,6 @@ public class ArticleWriteService {
         }
         //3. 대상 삭제하기 대신  상태변경하기
         target.markAsDeleted();
-    }
-
-    // 게시글 이미지 삭제
-    @Transactional
-    public void deleteImgArticle(List<Long> imgIds) {
-
-        for(Long imgId : imgIds){
-            imgArticleRepository.deleteById(imgId);
-        }
     }
 
     //게시글 단건 조회
@@ -177,6 +171,7 @@ public class ArticleWriteService {
     }
 
 
+
     //업데이트 이미 업로드한 사진이 있고 등록하는 사진이 있을 때
     @Transactional
     public ArticleWriteResponseDto editArticle(Long articleId, ArticleUpdateRequest req, AuthInfoDto authInfoDto,List<MultipartFile> files) {
@@ -190,101 +185,71 @@ public class ArticleWriteService {
 
         //1. 기본적으로 업데이트 하는 Entity 메소드
 
-        // article.getImages() == null , files != null
-        //2. 기존 이미지가 없고 현재 이미지가 들어올때
-        // Object Storage에 추가 , 테이블에 레코드 추가
+        article.commonUpdate(req);
 
-        // 오브젝트 추가 메소드 1개 , 테이블 추가 메소드 1개
+        if(article.getImages() == null && files != null) {
+            //2. 기존 이미지가 없고 현재 이미지가 들어올때
+            // Object Storage에 추가 , 테이블에 레코드 추가
+            List<ArticleImage> addList = article.convertImageFilesToImages(fileService.upload(files));
+            article.addImages(addList);
+        }
+        else if(article.getImages() != null && files == null) {
+            //3. 기존 이미지가 있고 현재 이미지는 없을때
+            // object storage 삭제, 테이블 레코드 삭제
+            List<Long> deletedImageIds = article.getImages().stream()
+                    .map(ArticleImage::getId)
+                    .toList();
+            fileService.delete(article.getImages());
+            List<ArticleImage> delList = article.convertImageIdsToImages(deletedImageIds);
+            article.deleteImages(delList);
+        }
+        else if(article.getImages() !=null && files !=null) {
+            //4. 기존 이미지가 있고 현재 이미지가 변경되었을때
+            // 기존 이미지 삭제, 테이블에서 삭제 -> Object Storage에 추가 , 테이블에 추가
 
-        // article.getImages() != null , files == null
-        //3. 기존 이미지가 있고 현재 이미지는 없을때
-        // object storage 삭제, 테이블 레코드 삭제
+            // 기존 이미지 url
+            List<String> imgUrls = article.getImages().stream()
+                    .map(ArticleImage::getImgUrl)
+                    .toList();
+            // 기존 이미지와 클라이언트의 이미지를 비교하여 추가할 이미지를 선택
+            List<MultipartFile> addImages = files.stream()
+                    .filter(file -> !imgUrls.contains(file.getOriginalFilename()))
+                    .toList();
+            // files 이미지 name
+            List<String> originalFileNames = files.stream()
+                    .map(MultipartFile::getOriginalFilename)
+                    .toList();
+            // 기존 이미지와 클라이언트의 이미지를 비교하여 삭제할 이미지를 선택
+            List<Long> deletedImages = article.getImages().stream()
+                    .filter(articleImage -> !originalFileNames.contains(articleImage.getImgUrl()))
+                    .map(ArticleImage::getId)
+                    .toList();
 
-        // 오브젝트 삭제 메소드 1개, 테이블 삭제 메소드 한개
+            List<String> uploadedImageUrls = new ArrayList<>();
+            Article.ImageUpdateResult result = null;
+            // 1. 추가 할 이미지를 업로드
+            try {
+                for (MultipartFile file : addImages) {
+                    String fileName = objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, "article/img", file);
+                    uploadedImageUrls.add(fileName);
+                }
+                req.setAddImages(uploadedImageUrls);
+                req.setDeletedImages(deletedImages);
 
-        //4. 기존 이미지가 있고 현재 이미지가 변경되었을때
-        // 기존 이미지 삭제, 테이블에서 삭제 -> Object Storage에 추가 , 테이블에 추가
+                //2. 데이터 베이스 등록 및 삭제
+                result = article.update(req);
 
-        //추가 할 이미지 선택
-        // Object Storage에 추가 , 테이블에 추가
-
-        //imgArticle 에서 삭제할 이미지 번호 선택
-        // Object Storage에서 삭제 , 테이블 에서 삭제
-        
-        // 문제 -> 클라이언트에서 넘어오는 파일의 original name은 uuid가 아니다.
-        // 기존 이미지의 url 은 uuid 이며
-        // 테이블을 update 하기 전에 upload를 수행 해야 한다.
-
-        // 일반적으로 업로드를 수행 한 후에 삭제를 수행한다.
-        // 로직 순서
-        // 1. 이미지를 업로드
-        // 2. 업로드, 삭제 데이터베이스 업데이트
-        // 3. 이미지 삭제로직이 실패 하면 1 에서 업로드한 이미지 롤백 - 실패시 트랜잭션은 자동 롤백
-        // 4. 수정 전 남아있는 이미지 삭제
-        // 5. 로깅
-
-        // 기존 이미지 url
-        List<String> imgUrls = article.getImages().stream()
-                .map(ArticleImage::getImgUrl)
-                .toList();
-        // 기존 이미지와 클라이언트의 이미지를 비교하여 추가할 이미지를 선택
-        List<MultipartFile> addImages = files.stream()
-                .filter(file -> !imgUrls.contains(file.getOriginalFilename()))
-                .toList();
-        // files 이미지 name
-        List<String> originalFileNames = files.stream()
-                .map(MultipartFile::getOriginalFilename)
-                .toList();
-        // 기존 이미지와 클라이언트의 이미지를 비교하여 삭제할 이미지를 선택
-        List<Long> deletedImages = article.getImages().stream()
-                .filter(articleImage -> !originalFileNames.contains(articleImage.getImgUrl()))
-                .map(ArticleImage::getId)
-                .toList();
-
-        List<String> uploadedImageUrls = new ArrayList<>();
-        Article.ImageUpdateResult result = null;
-        // 1. 추가 할 이미지를 업로드
-        try{
-            for(MultipartFile file : addImages) {
-                String fileName = objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, "article/img", file);
-                uploadedImageUrls.add(fileName);
+            } catch (Exception e) {
+                //3. 실패시 추가 한 이미지 롤백
+                uploadedImageUrls.forEach(imageKey -> objectStorageService.deleteFile(Singleton.S3_BUCKET_NAME, "article/img/" + imageKey));
+                throw e;
             }
-            req.setAddImages(uploadedImageUrls);
-            req.setDeletedImages(deletedImages);
 
-            //2. 데이터 베이스 등록 및 삭제
-            result = article.update(req);
-
+            // 4. 테이터베이스에서 삭제 한 이미지를 삭제
+            result.getDeletedImages().forEach(deletedImage -> objectStorageService.deleteFile(Singleton.S3_BUCKET_NAME, "article/img/" + deletedImage.getImgUrl()));
         }
-        catch(Exception e){
-            //3. 실패시 추가 한 이미지 롤백
-            uploadedImageUrls.forEach(imageKey -> objectStorageService.deleteFile(Singleton.S3_BUCKET_NAME, "article/img/" + imageKey));
-            throw e;
-        }
-
-        // 4. 테이터베이스에서 삭제 한 이미지를 삭제
-        result.getDeletedImages().forEach(deletedImage -> objectStorageService.deleteFile(Singleton.S3_BUCKET_NAME, "article/img/"+deletedImage.getImgUrl()));
-
-        // 5. 로깅
-        log.info("result:{}", result);
-        log.info("req:{}", req);
-
 
         return ArticleWriteResponseDto.toDto(article,member.getMemberNickname(),member.getMemberImage());
-    }
-
-
-
-    private void deleteImages(List<ArticleImage> deletedImages) {
-        deletedImages.forEach(deletedImage-> fileService.delete(String.valueOf(deletedImage.getArticle())));
-    }
-
-    private void uploadImages(List<ArticleImage> uploadedImages, List<MultipartFile> fileImages) {
-        IntStream.range(0, uploadedImages.size())
-                .forEach(uploadedImage -> fileService.upload(
-                        fileImages.get(uploadedImage),
-                        String.valueOf(uploadedImages.get(uploadedImage).getArticle())
-                ));
     }
 
     private void validateArticleOwner(AuthInfoDto authInfoDto, Article article) {
@@ -292,6 +257,17 @@ public class ArticleWriteService {
             throw new MemberNotEqualsException();
         }
     }
+//    private void uploadImages(List<ArticleImage> uploadedImages, List<MultipartFile> fileImages) {
+//        IntStream.range(0, uploadedImages.size())
+//                .forEach(uploadedImage -> fileService.upload(
+//                        fileImages.get(uploadedImage),
+//                        String.valueOf(uploadedImages.get(uploadedImage).getArticle())
+//                ));
+//    }
+
+//    private void deleteImages(List<ArticleImage> deletedImages) {
+//        deletedImages.forEach(deletedImage-> fileService.delete(String.valueOf(deletedImage.getArticle())));
+//    }
 
     //게시글 전체 조회
 //    @Transactional(readOnly = true)
