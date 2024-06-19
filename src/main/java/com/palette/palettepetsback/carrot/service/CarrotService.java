@@ -5,6 +5,7 @@ import com.palette.palettepetsback.carrot.domain.Carrot;
 import com.palette.palettepetsback.carrot.domain.CarrotImage;
 import com.palette.palettepetsback.carrot.domain.CarrotLike;
 import com.palette.palettepetsback.carrot.domain.QCarrot;
+import com.palette.palettepetsback.carrot.dto.CarrotRecentDTO;
 import com.palette.palettepetsback.carrot.dto.CarrotRequestDTO;
 import com.palette.palettepetsback.carrot.dto.CarrotResponseDTO;
 import com.palette.palettepetsback.carrot.repository.CarrotImageRepository;
@@ -332,6 +333,10 @@ public class CarrotService {
         carrot.setCarrotState(carrotState);
 
         carrotRepository.save(carrot);
+    }
+
+    public List<CarrotRecentDTO> getRecentList(){
+        return carrotRepository.findRecentCarrot();
     }
 
     //최신순 리스트 출력
