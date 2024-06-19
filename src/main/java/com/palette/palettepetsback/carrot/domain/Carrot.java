@@ -40,6 +40,9 @@ public class Carrot {
     @Column(name = "carrot_tag")
     private String carrotTag;
 
+    @Column(name = "carrot_image")
+    private String carrotImg;
+
     @Column(name = "carrot_state", columnDefinition = "TINYINT")
     private int carrotState;
 

@@ -23,7 +23,7 @@ public class CarrotResponseDTO {
     private int carrotState;
     private Integer carrotLike;
     private Integer carrotView;
-    private String img;
+    private String carrotImg;
 
 
     public CarrotResponseDTO(Carrot responseDTO) {
@@ -36,6 +36,7 @@ public class CarrotResponseDTO {
         this.carrotTag = responseDTO.getCarrotTag();
         this.carrotLike = responseDTO.getCarrotLike();
         this.carrotView = responseDTO.getCarrotView();
+        this.carrotImg = responseDTO.getCarrotImg();
     }
 
 }
