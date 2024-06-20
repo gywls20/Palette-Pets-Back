@@ -5,6 +5,7 @@ import com.palette.palettepetsback.config.aop.notification.NotificationThreadLoc
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotAddRequest;
+import com.palette.palettepetsback.hotSpot.dto.request.HotSpotStarPointAddRequest;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotResponse;
@@ -12,7 +13,6 @@ import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
 import com.palette.palettepetsback.hotSpot.service.HotSpotService;
 import com.palette.palettepetsback.member.dto.Role;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class HotSpotController {
     // 게시글 추가 (파일 포함)
     @PostMapping
     @NeedNotification
-    public ResponseEntity<Void> addHotSpot(@Valid @RequestPart("request") HotSpotAddRequest request,
+    public ResponseEntity<Boolean> addHotSpot(@Valid @RequestPart("request") HotSpotAddRequest request,
                                            @RequestPart(value = "files", required = false) MultipartFile[] files,
                                            @JwtAuth AuthInfoDto authInfoDto) {
         request.setMemberId(authInfoDto.getMemberId());
@@ -49,22 +49,32 @@ public class HotSpotController {
                 "명소 추천 글을 작성 성공했습니다", 
                 111);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(true);
     }
 
     // 게시글 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateHotSpot(@PathVariable("id") Long id,
-                                              @Validated @RequestBody HotSpotUpdateRequest request,
-                                              @RequestPart(value = "files", required = false) MultipartFile[] files) {
+    @NeedNotification
+    public ResponseEntity<Boolean> updateHotSpot(@PathVariable("id") Long id,
+                                              @Validated @RequestPart("request") HotSpotUpdateRequest request,
+                                              @RequestPart(value = "files", required = false) MultipartFile[] files,
+                                              @JwtAuth AuthInfoDto authInfoDto) {
         hotSpotService.HotSpotUpdate(request, files);
-        return ResponseEntity.ok().build();
+        NotificationThreadLocal.setNotificationInfo(authInfoDto.getMemberId(),
+                "명소 추천 글을 수정했습니다",
+                113);
+        return ResponseEntity.ok(true);
     }
 
     // 게시글 삭제
     @DeleteMapping("/{id}")
-    public boolean deleteHotSpot(@PathVariable("id") Long id) {
+    @NeedNotification
+    public boolean deleteHotSpot(@PathVariable("id") Long id,
+                                 @JwtAuth AuthInfoDto authInfoDto) {
         hotSpotService.HotSpotDelete(id);
+        NotificationThreadLocal.setNotificationInfo(authInfoDto.getMemberId(),
+                "명소 추천 글을 삭제했습니다",
+                112);
         return true;
     }
 
@@ -95,6 +105,23 @@ public class HotSpotController {
         } else {
             return false;
         }
+    }
+
+    // 별점 등록 요청
+    @PostMapping("/rating")
+    public boolean starRating(@RequestBody HotSpotStarPointAddRequest dto,
+                              @JwtAuth AuthInfoDto authInfoDto) {
+        // 토큰에서 필수 값 가져오기
+        dto.setMemberId(authInfoDto.getMemberId());
+        return hotSpotService.saveHotSpotStarPoint(dto);
+    }
+
+    // 별점 정보 가져오기
+    @GetMapping("/rating/{hotSpotId}")
+    public Integer starRating(@PathVariable("hotSpotId") Long hotSpotId,
+                              @JwtAuth AuthInfoDto authInfoDto) {
+
+        return hotSpotService.getHotSpotStarPoint(hotSpotId, authInfoDto.getMemberId());
     }
 
 }
