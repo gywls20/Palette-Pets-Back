@@ -218,18 +218,18 @@ public class CarrotService {
         Carrot carrot = carrotId.get();
 
         List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(carrot);
-
-//        if(!carrotImage.isEmpty()){
-//            carrotResponseDTO.setImg(carrotImage.get(5).getCarrotImageUrl());
-//        }
-
+        List<String> imgList = new ArrayList<>();
+        for (CarrotImage c : carrotImage) {
+            imgList.add(c.getCarrotImageUrl());
+        }
+        System.out.println("imgList.get(0) = " + imgList.get(0));
         return CarrotResponseDTO.builder()
                 .carrotId(carrot.getCarrotId())
                 .memberId(carrot.getMember().getMemberNickname())
                 .carrotTitle(carrot.getCarrotTitle())
                 .carrotContent(carrot.getCarrotContent())
                 .carrot_price(carrot.getCarrot_price())
-                //.img(carrotImage.get().getCarrotImageUrl())
+                .imgList(imgList)
                 .carrot_createdAt(carrot.getCarrot_createdAt())
                 .carrotTag(carrot.getCarrotTag())
                 .carrotLike(carrot.getCarrotLike())

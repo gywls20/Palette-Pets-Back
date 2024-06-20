@@ -5,6 +5,7 @@ import com.palette.palettepetsback.carrot.domain.Carrot;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Builder
@@ -24,7 +25,7 @@ public class CarrotResponseDTO {
     private Integer carrotLike;
     private Integer carrotView;
     private String carrotImg;
-
+    private List<String> imgList;
 
     public CarrotResponseDTO(Carrot responseDTO) {
         this.carrotId = responseDTO.getCarrotId();
