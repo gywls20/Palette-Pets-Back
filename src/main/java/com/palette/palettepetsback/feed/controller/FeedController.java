@@ -60,4 +60,11 @@ public class FeedController {
 
         return ResponseEntity.ok("피드가 삭제 되었습니다.");
     }
+
+    @GetMapping("/feed/friend")
+    public ResponseEntity<?> getFriendFeed (@JwtAuth AuthInfoDto authInfoDto){
+        String nickname=authInfoDto.getMemberNickname();
+        System.out.println("authInfoDto = " + nickname);
+        return ResponseEntity.ok(nickname);
+    }
 }

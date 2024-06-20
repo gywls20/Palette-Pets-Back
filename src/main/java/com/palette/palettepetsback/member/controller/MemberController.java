@@ -5,10 +5,7 @@ import com.palette.palettepetsback.config.Mail.RegisterMail;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
-import com.palette.palettepetsback.member.dto.JoinRequest;
-import com.palette.palettepetsback.member.dto.MemberImgRequest;
-import com.palette.palettepetsback.member.dto.MemberRequest;
-import com.palette.palettepetsback.member.dto.MyPageRespons;
+import com.palette.palettepetsback.member.dto.*;
 import com.palette.palettepetsback.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -212,15 +209,21 @@ public class MemberController {
 
     }
 
-// mypage - 사용자 프로필 이미지, 닉네임 리스폰, 팔로잉, 팔로워 수
-    @GetMapping("/member")
-    public MyPageRespons getMyPage(@JwtAuth AuthInfoDto authInfoDto){
+// mypage - 사용자 프로필 이미지, 닉네임 리스폰, 팔로잉, 팔로워 수, 피드 수, 팔로우 여부
+    @GetMapping("/member/{nickname}")
+    public MyPageRespons getMyPage(@PathVariable("nickname") String nickname,
+                                    @JwtAuth AuthInfoDto authInfoDto){
 
         Long memberId= authInfoDto.getMemberId();
-        return memberService.getMyPage(memberId);
+        return memberService.getMyPage(memberId, nickname);
     }
 
-
+// mypage setting - 닉네임, 이메일 반환
+    @GetMapping("/member/setting")
+    public SettingPageRespone getSettingPage(@JwtAuth AuthInfoDto authInfoDto){
+        Long memberId= authInfoDto.getMemberId();
+        return memberService.getSettingPage(memberId);
+    }
 
     //로그인 페이지 - 사용하지 않습니다. -> loginFilter로 가세요
 //    @GetMapping("/login")
