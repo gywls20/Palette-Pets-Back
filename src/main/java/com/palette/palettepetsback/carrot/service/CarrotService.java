@@ -331,7 +331,9 @@ public class CarrotService {
 
         return carrot.getMember().getMemberId();
     }
-
+    public List<CarrotRecentDTO> getRecentList(){
+        return carrotRepository.findRecentCarrot();
+    }
     //상태 변경 기능
     public void state(Long id, int carrotState) {
         Carrot carrot = carrotRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Not exist Carrot Data by id : ["+id+"]"));
@@ -339,10 +341,6 @@ public class CarrotService {
         carrot.setCarrotState(carrotState);
 
         carrotRepository.save(carrot);
-    }
-
-    public List<CarrotRecentDTO> getRecentList(){
-        return carrotRepository.findRecentCarrot();
     }
 
     //최신순 리스트 출력

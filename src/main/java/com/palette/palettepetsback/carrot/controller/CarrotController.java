@@ -168,6 +168,11 @@ public class CarrotController {
         carrotService.state(id, carrotState);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/recent")
+    public ResponseEntity<List<CarrotRecentDTO>> list() {
+        List<CarrotRecentDTO> list = carrotService.getRecentList();
+        return ResponseEntity.ok().body(list);
+    }
 
     //최신순 리스트 출력
 //    @GetMapping("/recent")
@@ -176,9 +181,5 @@ public class CarrotController {
 //        return ResponseEntity.ok().body(list);
 //    }
 
-    @GetMapping("/recent")
-    public ResponseEntity<List<CarrotRecentDTO>> list() {
-        List<CarrotRecentDTO> list = carrotService.getRecentList();
-        return ResponseEntity.ok().body(list);
-    }
+
 }
