@@ -13,9 +13,11 @@ import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteServ
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static com.palette.palettepetsback.member.entity.QMember.member;
 
@@ -35,6 +39,7 @@ public class ArticleWriteController {
     private final ArticleWriteService articleWriteService;
     private final ArticleWriteRepository articleWriteRepository;
     private final ArticleRepository articleRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
 //    @Autowired
 //    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
@@ -60,13 +65,20 @@ public class ArticleWriteController {
     //게시글 단건 조회
     @GetMapping("/articles/{articleId}")
     @ResponseStatus(HttpStatus.OK)
-    public Response findArticle(@PathVariable final Long articleId
-                                ){
-//        ,@JwtAuth final AuthInfoDto authInfoDto
-//        log.info("authInfo = {}", authInfoDto);
-        //조회수 증가
-        articleWriteService.updateCountViews(articleId);
-        //단건 응답
+    public Response findArticle(@PathVariable final Long articleId,
+                                HttpServletRequest request){
+        //조회수 증가 처리율 제한 추가
+        String sessionId = request.getSession().getId();
+        String key = "session_id_"+sessionId;
+        if(!redisTemplate.hasKey(key)) {
+            System.out.println("=======조회수 상승================");
+            articleWriteService.updateCountViews(articleId);
+            redisTemplate.opsForValue().set(key, sessionId, 600, TimeUnit.SECONDS);
+        }
+        else{
+            System.out.println("=======이미 조회수를 올린 사람입니다.================");
+        }
+        ////단건 응답
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
