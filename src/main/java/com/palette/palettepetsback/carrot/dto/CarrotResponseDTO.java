@@ -16,10 +16,11 @@ public class CarrotResponseDTO {
     private Long carrotId;
     private String carrotTitle;
     private String carrotContent;
-    private Integer carrot_price;
+    private Integer carrotPrice;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime carrot_createdAt;
-    private String memberId;
+    private LocalDateTime carrotCreatedAt;
+    private Long memberId;
+    private String memberNickname;
     private String carrotTag;
     private int carrotState;
     private Integer carrotLike;
@@ -31,13 +32,14 @@ public class CarrotResponseDTO {
         this.carrotId = responseDTO.getCarrotId();
         this.carrotTitle = responseDTO.getCarrotTitle();
         this.carrotContent = responseDTO.getCarrotContent();
-        this.carrot_price = responseDTO.getCarrot_price();
-        this.carrot_createdAt = responseDTO.getCarrot_createdAt();
-        this.memberId = responseDTO.getMember().getMemberName();
+        this.carrotPrice = responseDTO.getCarrot_price();
+        this.carrotCreatedAt = responseDTO.getCarrot_createdAt();
+        this.memberId =responseDTO.getMember().getMemberId();
+        this.memberNickname = responseDTO.getMember().getMemberName();
         this.carrotTag = responseDTO.getCarrotTag();
         this.carrotLike = responseDTO.getCarrotLike();
         this.carrotView = responseDTO.getCarrotView();
-        this.carrotImg = responseDTO.getCarrotImg();
+        this.carrotImg = responseDTO.getCarrotImage();
     }
 
 }

@@ -146,16 +146,18 @@ public class CarrotService {
         for (Carrot c : carrots) {
             List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(c);
 
-            String member = c.getMember().getMemberNickname();
+            Long memberId = c.getMember().getMemberId();
+            String memberNickname = c.getMember().getMemberNickname();
 
             CarrotResponseDTO carrotResponseDTO = new CarrotResponseDTO();
             carrotResponseDTO.setCarrotId(c.getCarrotId());
-            carrotResponseDTO.setMemberId(member);
+            carrotResponseDTO.setMemberId(memberId);
+            carrotResponseDTO.setMemberNickname(memberNickname);
             carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
             carrotResponseDTO.setCarrotContent(c.getCarrotContent());
-            carrotResponseDTO.setCarrot_price(c.getCarrot_price());
+            carrotResponseDTO.setCarrotPrice(c.getCarrot_price());
             carrotResponseDTO.setCarrotState(c.getCarrotState());
-            carrotResponseDTO.setCarrot_createdAt(c.getCarrot_createdAt());
+            carrotResponseDTO.setCarrotCreatedAt(c.getCarrot_createdAt());
             carrotResponseDTO.setCarrotTag(c.getCarrotTag());
             carrotResponseDTO.setCarrotLike(c.getCarrotLike());
             carrotResponseDTO.setCarrotView(c.getCarrotView());
@@ -187,11 +189,12 @@ public class CarrotService {
 
                 CarrotResponseDTO carrotResponseDTO = new CarrotResponseDTO();
                 carrotResponseDTO.setCarrotId(c.getCarrotId());
-                carrotResponseDTO.setMemberId(c.getMember().getMemberNickname());
+                carrotResponseDTO.setMemberId(c.getMember().getMemberId());
+                carrotResponseDTO.setMemberNickname(c.getMember().getMemberNickname());
                 carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
                 carrotResponseDTO.setCarrotContent(c.getCarrotContent());
-                carrotResponseDTO.setCarrot_price(c.getCarrot_price());
-                carrotResponseDTO.setCarrot_createdAt(c.getCarrot_createdAt());
+                carrotResponseDTO.setCarrotPrice(c.getCarrot_price());
+                carrotResponseDTO.setCarrotCreatedAt(c.getCarrot_createdAt());
                 carrotResponseDTO.setCarrotTag(c.getCarrotTag());
                 carrotResponseDTO.setCarrotLike(c.getCarrotLike());
                 carrotResponseDTO.setCarrotView(c.getCarrotView());
@@ -226,12 +229,13 @@ public class CarrotService {
         System.out.println("imgList.get(0) = " + imgList.get(0));
         return CarrotResponseDTO.builder()
                 .carrotId(carrot.getCarrotId())
-                .memberId(carrot.getMember().getMemberNickname())
+                .memberId(carrot.getMember().getMemberId())
+                .memberNickname(carrot.getMember().getMemberNickname())
                 .carrotTitle(carrot.getCarrotTitle())
                 .carrotContent(carrot.getCarrotContent())
-                .carrot_price(carrot.getCarrot_price())
+                .carrotPrice(carrot.getCarrot_price())
                 .imgList(imgList)
-                .carrot_createdAt(carrot.getCarrot_createdAt())
+                .carrotCreatedAt(carrot.getCarrot_createdAt())
                 .carrotTag(carrot.getCarrotTag())
                 .carrotLike(carrot.getCarrotLike())
                 .carrotView(carrot.getCarrotView())
@@ -274,9 +278,10 @@ public class CarrotService {
             carrotResponseDTO.setCarrotId(c.getCarrotId());
             carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
             carrotResponseDTO.setCarrotContent(c.getCarrotContent());
-            carrotResponseDTO.setCarrot_price(c.getCarrot_price());
-            carrotResponseDTO.setCarrot_createdAt(c.getCarrot_createdAt());
-            carrotResponseDTO.setMemberId(memberNickname); // 이건 닉네임임
+            carrotResponseDTO.setCarrotPrice(c.getCarrot_price());
+            carrotResponseDTO.setCarrotCreatedAt(c.getCarrot_createdAt());
+            carrotResponseDTO.setMemberNickname(memberNickname); // 이건 닉네임임
+            carrotResponseDTO.setMemberId(memberId);
             carrotResponseDTO.setCarrotTag(c.getCarrotTag());
             carrotResponseDTO.setCarrotLike(c.getCarrotLike());
             carrotResponseDTO.setCarrotView(c.getCarrotView());
@@ -297,14 +302,16 @@ public class CarrotService {
         for (Carrot c : carrotList) {
             List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(c);
 
-            String member = c.getMember().getMemberNickname();
+            Long memberId = c.getMember().getMemberId();
+            String memberNickname = c.getMember().getMemberNickname();
             CarrotResponseDTO carrotResponseDTO=new CarrotResponseDTO();
             carrotResponseDTO.setCarrotId(c.getCarrotId());
-            carrotResponseDTO.setMemberId(member);
+            carrotResponseDTO.setMemberId(memberId);
+            carrotResponseDTO.setMemberNickname(memberNickname);
             carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
             carrotResponseDTO.setCarrotContent(c.getCarrotContent());
-            carrotResponseDTO.setCarrot_price(c.getCarrot_price());
-            carrotResponseDTO.setCarrot_createdAt(c.getCarrot_createdAt());
+            carrotResponseDTO.setCarrotPrice(c.getCarrot_price());
+            carrotResponseDTO.setCarrotCreatedAt(c.getCarrot_createdAt());
             carrotResponseDTO.setCarrotTag(c.getCarrotTag());
             carrotResponseDTO.setCarrotLike(c.getCarrotLike());
             carrotResponseDTO.setCarrotView(c.getCarrotView());
@@ -354,14 +361,16 @@ public class CarrotService {
         for(Carrot c : carrots) {
             List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(c);
 
-            String member = c.getMember().getMemberNickname();
+            Long memberId = c.getMember().getMemberId();
+            String memberNickname = c.getMember().getMemberNickname();
             CarrotResponseDTO carrotResponseDTO=new CarrotResponseDTO();
             carrotResponseDTO.setCarrotId(c.getCarrotId());
-            carrotResponseDTO.setMemberId(member);
+            carrotResponseDTO.setMemberId(memberId);
+            carrotResponseDTO.setMemberNickname(memberNickname);
             carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
             carrotResponseDTO.setCarrotContent(c.getCarrotContent());
-            carrotResponseDTO.setCarrot_price(c.getCarrot_price());
-            carrotResponseDTO.setCarrot_createdAt(c.getCarrot_createdAt());
+            carrotResponseDTO.setCarrotPrice(c.getCarrot_price());
+            carrotResponseDTO.setCarrotCreatedAt(c.getCarrot_createdAt());
             carrotResponseDTO.setCarrotTag(c.getCarrotTag());
             carrotResponseDTO.setCarrotLike(c.getCarrotLike());
             carrotResponseDTO.setCarrotView(c.getCarrotView());
