@@ -290,6 +290,13 @@ public class HotSpotService {
         return hotSpotStarPoint.getRating();
     }
 
+    @Transactional
+    public void plusCountView(Long hotSpotId) {
+        HotSpot hotSpot = hotSpotRepository.findById(hotSpotId)
+                .orElseThrow(() -> new RuntimeException("hotSpot not found"));
+        hotSpot.plusCountViews();
+    }
+
     private Integer getHotSpotAverageStarPoint(HotSpot hotSpot) {
         // 별점 계산해서 각각 게시물 하나에 별점 결과값 넣어주기 = (총 별점 / 평가자수)
         return hotSpotStarPointRepository.calculateStarPoint(hotSpot.getId());
