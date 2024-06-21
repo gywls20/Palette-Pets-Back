@@ -10,11 +10,17 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.config.SingleTon.BadWordService;
+import com.palette.palettepetsback.config.exceptions.BadWordException;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
+import kr.co.shineware.nlp.komoran.core.Komoran;
+import kr.co.shineware.nlp.komoran.model.KomoranResult;
+import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -40,6 +46,7 @@ public class ArticleWriteController {
     private final ArticleWriteRepository articleWriteRepository;
     private final ArticleRepository articleRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final BadWordService badWordService;
 
 //    @Autowired
 //    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
@@ -84,10 +91,17 @@ public class ArticleWriteController {
 
     //게시글 등록 --- 완료
     @PostMapping(path="/Post/article")
-    public ResponseEntity<Article> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
+    public ResponseEntity<String> create(@Valid @RequestPart("dto") ArticleWriteDto dto,
                                           @RequestPart(value="files",required = false) List<MultipartFile> files){
         log.info("dto = {}", dto);
         log.info("files = {}", files);
+
+        try {
+            badWordService.filterKomoran(dto.getTitle()+"_"+dto.getContent());
+        } catch (BadWordException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+
 
         //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
@@ -106,7 +120,7 @@ public class ArticleWriteController {
             }
 
         return (created != null)?
-                ResponseEntity.status(HttpStatus.OK).body(created):
+                ResponseEntity.status(HttpStatus.OK).body("글 작성이 완료되었습니다."):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build() ;
     }
 
