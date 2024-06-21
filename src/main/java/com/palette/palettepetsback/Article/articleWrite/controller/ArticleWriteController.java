@@ -10,7 +10,10 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
+import com.palette.palettepetsback.Article.redis.ArticleWriteRedis;
+import com.palette.palettepetsback.Article.redis.service.ArticleRedisService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +44,7 @@ public class ArticleWriteController {
     private final ArticleRepository articleRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final ArticleRedisService articleRedisService;
 //    @Autowired
 //    public ArticleWriteController(ArticleWriteService articleWriteService, ArticleWriteRepository articleWriteRepository) {
 //        this.articleWriteService = articleWriteService;
@@ -65,22 +69,17 @@ public class ArticleWriteController {
     //게시글 단건 조회
     @GetMapping("/articles/{articleId}")
     @ResponseStatus(HttpStatus.OK)
-    public Response findArticle(@PathVariable final Long articleId,
-                                HttpServletRequest request){
-        //조회수 증가 처리율 제한 추가
-        String sessionId = request.getSession().getId();
-        String key = "session_id_"+sessionId;
-        if(!redisTemplate.hasKey(key)) {
-            System.out.println("=======조회수 상승================");
-            articleWriteService.updateCountViews(articleId);
-            redisTemplate.opsForValue().set(key, sessionId, 600, TimeUnit.SECONDS);
-        }
-        else{
-            System.out.println("=======이미 조회수를 올린 사람입니다.================");
-        }
-        ////단건 응답
+    public Response findArticle(@PathVariable final Long articleId
+                                ){
+//        ,@JwtAuth final AuthInfoDto authInfoDto
+//        log.info("authInfo = {}", authInfoDto);
+        //조회수 증가
+        articleWriteService.updateCountViews(articleId);
+        //단건 응답
         return Response.success(articleWriteService.findArticle(articleId));
     }
+
+
 
     //게시글 등록 --- 완료
     @PostMapping(path="/Post/article")
@@ -88,9 +87,19 @@ public class ArticleWriteController {
                                           @RequestPart(value="files",required = false) List<MultipartFile> files){
         log.info("dto = {}", dto);
         log.info("files = {}", files);
+        AuthInfoDto memberInfo = JWTUtil.getMemberInfo(); //토큰을 가져와서 멤버아이디 찾아내기
+//        log.info(String.valueOf(memberInfo.getMemberId()));
+        if(memberInfo == null) {
+            return null;
+        }
+        dto.setCreatedWho(memberInfo.getMemberId());
 
         //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
+
+        //Redis에 글 도배 방지 - 1분 등록
+        articleRedisService.saveArticleWrite(memberInfo.getMemberId());
+
 
         //object storage upload
             if(files != null && !files.isEmpty()){
@@ -135,9 +144,7 @@ public class ArticleWriteController {
                                 @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                 @JwtAuth final AuthInfoDto authInfoDto){
 
-        articleWriteService.editArticle(articleId,req,authInfoDto,files);
-
-        return Response.success("aaaaa");
+        return Response.success(articleWriteService.editArticle(articleId,req,authInfoDto,files));
     }
 
 
@@ -177,11 +184,11 @@ public class ArticleWriteController {
 //    }
 
     //게시글 이미지 삭제
-    @DeleteMapping("{id}/img")
-    public boolean deleteArticleImg(@PathVariable ("id")Long id,@RequestBody List<Long>imgIds ){
-        articleWriteService.deleteImgArticle(imgIds);
-        return true;
-    }
+//    @DeleteMapping("{id}/img")
+//    public boolean deleteArticleImg(@PathVariable ("id")Long id,@RequestBody List<Long>imgIds ){
+//        articleWriteService.deleteImgArticle(imgIds);
+//        return true;
+//    }
 
 
 
