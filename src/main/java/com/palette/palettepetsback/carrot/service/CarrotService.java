@@ -223,8 +223,10 @@ public class CarrotService {
 
         List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(carrot);
         List<String> imgList = new ArrayList<>();
-        for (CarrotImage c : carrotImage) {
-            imgList.add(c.getCarrotImageUrl());
+        if(carrotImage!=null) {
+            for (CarrotImage c : carrotImage) {
+                imgList.add(c.getCarrotImageUrl());
+            }
         }
         System.out.println("imgList.get(0) = " + imgList.get(0));
         return CarrotResponseDTO.builder()
@@ -295,6 +297,12 @@ public class CarrotService {
         return carrotResponseDTOList;
     }
 
+    public boolean likeState(Long id, Long memberId) {
+       int like = carrotLikeRepository.likeState(id, memberId);
+
+       return like == 1;
+    }
+
     //검색 기능
     public List<CarrotResponseDTO> searchCarrots(String keyword) {
         List<Carrot> carrotList = carrotRepository.findByCarrotTitleContainingOrCarrotContentContaining(keyword, keyword);
@@ -341,46 +349,8 @@ public class CarrotService {
         carrotRepository.save(carrot);
     }
 
+    //최신순 리스트 출력
     public List<CarrotRecentDTO> getRecentList(){
         return carrotRepository.findRecentCarrot();
-    }
-
-    //최신순 리스트 출력
-    public List<CarrotResponseDTO> recentList(int page) {
-        List<Carrot> carrot = carrotRepository.findAll();
-        QCarrot qCarrot = QCarrot.carrot;
-
-        List<Carrot> carrots = jpaQueryFactory
-                .selectFrom(qCarrot)
-                .orderBy(qCarrot.carrot_createdAt.desc())
-                .limit(page)
-                .fetch();
-
-        List<CarrotResponseDTO> carrotResponseDTOList=new ArrayList<>();
-
-        for(Carrot c : carrots) {
-            List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(c);
-
-            Long memberId = c.getMember().getMemberId();
-            String memberNickname = c.getMember().getMemberNickname();
-            CarrotResponseDTO carrotResponseDTO=new CarrotResponseDTO();
-            carrotResponseDTO.setCarrotId(c.getCarrotId());
-            carrotResponseDTO.setMemberId(memberId);
-            carrotResponseDTO.setMemberNickname(memberNickname);
-            carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
-            carrotResponseDTO.setCarrotContent(c.getCarrotContent());
-            carrotResponseDTO.setCarrotPrice(c.getCarrot_price());
-            carrotResponseDTO.setCarrotCreatedAt(c.getCarrot_createdAt());
-            carrotResponseDTO.setCarrotTag(c.getCarrotTag());
-            carrotResponseDTO.setCarrotLike(c.getCarrotLike());
-            carrotResponseDTO.setCarrotView(c.getCarrotView());
-
-            if(!carrotImage.isEmpty()){
-                carrotResponseDTO.setCarrotImg(carrotImage.get(0).getCarrotImageUrl());
-            }
-
-            carrotResponseDTOList.add(carrotResponseDTO);
-        }
-        return carrotResponseDTOList;
     }
 }

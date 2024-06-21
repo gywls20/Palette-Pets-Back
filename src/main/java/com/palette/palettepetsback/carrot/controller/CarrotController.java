@@ -132,18 +132,20 @@ public class CarrotController {
         return carrotService.getLike(memberId);
     }
 
+    //좋아요 상태 확인
+    @GetMapping("/likeState/{id}")
+    public Boolean likeState(@PathVariable Long id,
+                             @JwtAuth AuthInfoDto authInfoDto) {
+        Long memberId = authInfoDto.getMemberId();
+        return carrotService.likeState(id, memberId);
+    }
+
     //검색 기능
     @GetMapping("/search")
     public ResponseEntity<List<CarrotResponseDTO>> searchCarrots(@RequestParam String keyword) {
 
         List<CarrotResponseDTO> carrot = carrotService.searchCarrots(keyword);
          return ResponseEntity.ok().body(carrot);
-    }
-
-    //네이버 공유 기능
-    @GetMapping("http://share.naver.com/web/shareView")
-    public boolean naverShare() {
-        return true;
     }
 
     //글쓴이 && 로그인 사용자 확인용
@@ -163,17 +165,9 @@ public class CarrotController {
     @PostMapping("/state/{id}")
     public ResponseEntity<?> updateState(@PathVariable Long id,
                                          @RequestBody int carrotState) {
-        log.info("----------------------carrotState {}", carrotState);
         carrotService.state(id, carrotState);
         return ResponseEntity.ok().build();
     }
-
-    //최신순 리스트 출력
-//    @GetMapping("/recent")
-//    public ResponseEntity<List<CarrotResponseDTO>> list(@RequestParam int page) {
-//        List<CarrotResponseDTO> list = carrotService.recentList(page);
-//        return ResponseEntity.ok().body(list);
-//    }
 
     @GetMapping("/recent")
     public ResponseEntity<List<CarrotRecentDTO>> list() {
