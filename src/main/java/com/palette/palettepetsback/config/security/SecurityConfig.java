@@ -73,11 +73,17 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/memberF/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/feed/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                // 명소 추천 인가
+                                .requestMatchers(HttpMethod.GET, "/api/hotspot/list").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/hotspot/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.POST, "/api/hotspot/**").hasRole(Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.PUT, "/api/hotspot/**").hasRole(Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.DELETE, "/api/hotspot/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/join").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
                                 .requestMatchers("/logout", "/").permitAll()
-                                .anyRequest().permitAll()
-//                        .anyRequest().authenticated()
+//                                .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
         http
