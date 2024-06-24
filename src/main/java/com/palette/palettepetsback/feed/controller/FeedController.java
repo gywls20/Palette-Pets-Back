@@ -49,6 +49,7 @@ public class FeedController {
     @GetMapping("/feed/detail/{feedId}")
     public ResponseEntity<?> getFeedDetail(@PathVariable("feedId") Long feedId,
                                            @JwtAuth AuthInfoDto authInfoDto) {
+
         Long memberId = authInfoDto.getMemberId();
         return ResponseEntity.ok(feedService.getFeedDetail(feedId,memberId));
     }

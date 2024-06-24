@@ -6,6 +6,7 @@ import com.palette.palettepetsback.config.SingleTon.Singleton;
 import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.exceptions.NoSuchPetException;
 import com.palette.palettepetsback.feed.dto.FeedListResponse;
+import com.palette.palettepetsback.feed.dto.FeedResponse;
 import com.palette.palettepetsback.feed.entity.Feed;
 import com.palette.palettepetsback.feed.repository.FeedRepository;
 import com.palette.palettepetsback.member.dto.*;
@@ -111,8 +112,8 @@ public class MemberService {
         Optional<Member> optionalMember = memberRepository.findByMemberId(memberId);
         optionalMember.ifPresent(member -> {
             member.updateBirthGender(
+                    BirthGenderRequest.getBirth(),
                     BirthGenderRequest.getGender()
-                    ,BirthGenderRequest.getBirth()
             );
 
             memberRepository.save(member);
@@ -163,8 +164,10 @@ public class MemberService {
     public MyPageRespons getMyPage(Long memberId,String nickname) {
         Optional<Member> optionalMember=memberRepository.findByMemberNickname(nickname);
         Optional<Member> lealMember =memberRepository.findByMemberId(memberId);
-//        Optional<Follow> fllow = followService.getFollowerList(nickname,)
+        List<FollowResponse> follow = followService.getFollowerList(nickname,memberId);
         MyPageRespons myPageRespons = new MyPageRespons();
+
+
 
         optionalMember.ifPresent(member -> {
             List<FollowResponse> list_er = followService.getFollowerList(member.getMemberNickname(), memberId);
@@ -176,6 +179,19 @@ public class MemberService {
             myPageRespons.setFollowing(list_ing.size());
             myPageRespons.setFeed(list_feed.size());
             myPageRespons.setMemberId(lealMember.get().getMemberNickname());
+
+            if(follow.isEmpty()){
+                myPageRespons.setFollowTF(true);
+            }else{
+                for (FollowResponse f : follow) {
+                    if(f.getNickname().equals(lealMember.get().getMemberNickname())){
+                        myPageRespons.setFollowTF(false);
+                    }else{
+                        myPageRespons.setFollowTF(true);
+                    }
+                }
+            }
+
 
         });
 

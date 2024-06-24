@@ -24,6 +24,7 @@ public class JoinRequest { //유저 이탈을 막기위해 최소한의 정보�
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$", message = "닉네임은 특수문자를 제외한 2~10자리여야 합니다.")
     private String nickName;
 
+
     // 비밀번호 암호화
     public Member toEntity(String encodedPassword) {
         return Member.builder()
@@ -32,6 +33,7 @@ public class JoinRequest { //유저 이탈을 막기위해 최소한의 정보�
                 .memberNickname(this.nickName)
                 .role(Role.USER)
                 .loginType("basic")
+                .memberImage("79d846af-2255-40be-a27c-be45b8abbd05")
                 .build();
     }
 
