@@ -216,4 +216,11 @@ public class MemberController {
         Long memberId= authInfoDto.getMemberId();
         return memberService.getMyPage(memberId);
     }
+
+    // 닉네임 가져오기 api
+    @GetMapping("/member/nickname")
+    public ResponseEntity<String> getNickname(@JwtAuth AuthInfoDto authInfoDto){
+        String memberNickname = authInfoDto.getMemberNickname();
+        return ResponseEntity.ok(memberNickname);
+    }
 }

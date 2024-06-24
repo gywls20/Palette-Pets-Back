@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.config.oauth2;
 
+import com.palette.palettepetsback.config.SingleTon.Singleton;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +26,7 @@ public class FailureHandler implements AuthenticationFailureHandler {
 
         // URL 인코딩 추가
         String encodedErrorMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8.toString());
-        response.sendRedirect("http://localhost:3000/login?error=true&exception=" + encodedErrorMessage);
+        response.sendRedirect(Singleton.FRONT_URL + "/login?error=true&exception=" + encodedErrorMessage);
     }
 }
 

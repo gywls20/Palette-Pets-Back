@@ -213,6 +213,11 @@ public class PetService {
                 .toList();
     }
 
+    public List<ImgPetResponseDto> findAllPetImg(Long memberId) {
+
+        return imgPetRepository.findAllByMemberId(memberId);
+    }
+
     // 회원 == 주인 체크 메서드 -> 캐싱
     @Cacheable(value = "checkIsMaster", key = "#checkingMemberId", cacheManager = "cacheManager")
     public boolean checkIsMaster(Long petId, Long checkingMemberId) {
