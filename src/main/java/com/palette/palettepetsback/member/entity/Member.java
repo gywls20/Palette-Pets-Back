@@ -30,7 +30,7 @@ public class Member {
     private String password;
     @Column(name = "member_name")
     private String memberName;
-    @Column(name = "member_nickname")
+    @Column(name = "member_nickname", unique = true)
     private String memberNickname;
     @Column(name = "member_address")
     private String memberAddress;

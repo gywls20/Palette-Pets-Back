@@ -2,10 +2,13 @@ package com.palette.palettepetsback.member.controller;
 
 import com.palette.palettepetsback.config.Mail.EmailResponseDTO;
 import com.palette.palettepetsback.config.Mail.RegisterMail;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.dto.JoinRequest;
 import com.palette.palettepetsback.member.dto.MemberImgRequest;
 import com.palette.palettepetsback.member.dto.MemberRequest;
+import com.palette.palettepetsback.member.dto.MyPageRespons;
 import com.palette.palettepetsback.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +52,8 @@ public class MemberController {
             return ResponseEntity.badRequest().body("이미 존재하는 이메일입니다.");
         }
         memberService.join(joinRequest);
+
+
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
@@ -204,11 +209,16 @@ public class MemberController {
 
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test() {
+// mypage - 사용자 프로필 이미지, 닉네임 리스폰, 팔로잉, 팔로워 수
+    @GetMapping("/member")
+    public MyPageRespons getMyPage(@JwtAuth AuthInfoDto authInfoDto){
 
-        return new ResponseEntity<>("테스트입니다", HttpStatus.OK);
+        Long memberId= authInfoDto.getMemberId();
+        return memberService.getMyPage(memberId);
     }
+
+
+
     //로그인 페이지 - 사용하지 않습니다. -> loginFilter로 가세요
 //    @GetMapping("/login")
 //    public String loginPage() {
