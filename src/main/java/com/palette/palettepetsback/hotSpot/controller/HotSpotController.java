@@ -9,6 +9,7 @@ import com.palette.palettepetsback.hotSpot.dto.request.HotSpotAddRequest;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotStarPointAddRequest;
 import com.palette.palettepetsback.hotSpot.dto.request.HotSpotUpdateRequest;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotListResponse;
+import com.palette.palettepetsback.hotSpot.dto.response.HotSpotRecentDTO;
 import com.palette.palettepetsback.hotSpot.dto.response.HotSpotResponse;
 import com.palette.palettepetsback.hotSpot.dto.response.ImgHotSpotResponse;
 import com.palette.palettepetsback.hotSpot.service.HotSpotService;
@@ -131,4 +132,10 @@ public class HotSpotController {
         return hotSpotService.getHotSpotStarPoint(hotSpotId, authInfoDto.getMemberId());
     }
 
+
+    // 메인페이지 최신순 가져오기
+    @GetMapping("/main")
+    public ResponseEntity<List<HotSpotRecentDTO>> getHotSpotRecent() {
+        return ResponseEntity.ok().body(hotSpotService.getHotSpotRecent());
+    }
 }
