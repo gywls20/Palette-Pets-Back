@@ -24,6 +24,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -87,8 +89,12 @@ public class SecurityConfig {
                                 .requestMatchers("/article/**").permitAll()
                                 .requestMatchers("/articles/**").permitAll()
                                 .requestMatchers("/popular/**").permitAll()
+                                .requestMatchers("/sse/**").permitAll()
                                 // PET 인가
                                 .requestMatchers("/pet/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                // 알림 관련
+                                .requestMatchers("/connect").permitAll()
+                                .requestMatchers("/api/issues/**").permitAll()
 //                                .anyRequest().permitAll()
                         .anyRequest().authenticated()
                 );
