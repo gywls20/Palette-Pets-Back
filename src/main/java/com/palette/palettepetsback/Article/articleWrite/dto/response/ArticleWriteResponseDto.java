@@ -1,7 +1,7 @@
 package com.palette.palettepetsback.Article.articleWrite.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.palette.palettepetsback.Article.Article;
-import com.palette.palettepetsback.Article.articleView.DTO.reponsse.ArticleResponseDTO;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +19,7 @@ public class ArticleWriteResponseDto {
 
     private Long ArticleId;
     private String created_who;
+    private String memberImage;
     private String title;
     private String content;
     private String articleTags;
@@ -26,12 +27,13 @@ public class ArticleWriteResponseDto {
     private Integer countReport;
     private Integer countReview;
     private List<ArticleImageDto>images;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
-
-    public static ArticleWriteResponseDto toDto (Article article, String created_who){
+    public static ArticleWriteResponseDto toDto (Article article, String created_who,String memberImage){
         return new ArticleWriteResponseDto(
                 article.getArticleId(),
                 created_who,
+                memberImage,
                 article.getTitle(),
                 article.getContent(),
                 article.getArticleTags(),

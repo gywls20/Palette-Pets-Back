@@ -1,8 +1,14 @@
 package com.palette.palettepetsback.member.controller;
 
+import com.palette.palettepetsback.config.Mail.EmailResponseDTO;
+import com.palette.palettepetsback.config.Mail.RegisterMail;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
 import com.palette.palettepetsback.member.dto.JoinRequest;
+import com.palette.palettepetsback.member.dto.MemberImgRequest;
 import com.palette.palettepetsback.member.dto.MemberRequest;
+import com.palette.palettepetsback.member.dto.MyPageRespons;
 import com.palette.palettepetsback.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,64 +30,60 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final RegisterMail registerMail;
 
-    //로그인 페이지
-//    @GetMapping("/login")
-//    public String loginPage() {
-//
-//        return "login";
-//    }
-//    @PostMapping("/login")
-//    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
-//
-//        if (bindingResult.hasErrors()) { //에러출력
-//            List<FieldError> list = bindingResult.getFieldErrors();
-//            for(FieldError error : list) {
-//                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
-//            }
-//        }
-//        //보안상 에러메시지는 간소화 했습니다.
-//        if (memberService.login(loginRequest.getUsername(), loginRequest.getPassword())==null) {
-//            return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 잘못되었습니다.");
-//        }
-//
-//        return ResponseEntity.ok("로그인 성공");
-//    }
+    private static Long getMemberId(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long memberId = userDetails.getMember().getMemberId();
+        return memberId;
+    }
+
 
     @PostMapping("/join")
-    public ResponseEntity<String> signup (@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
-
-        log.info("joinRequest.getEmail() = ",joinRequest.getEmail());
-        log.info("joinRequest.getPassword() = ",joinRequest.getPassword());
-        log.info("joinRequest.getNickName() = ",joinRequest.getNickName());
+    public ResponseEntity<String> signup(@Valid @RequestBody JoinRequest joinRequest, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) { //에러출력
             List<FieldError> list = bindingResult.getFieldErrors();
-            for(FieldError error : list) {
-                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
+            for (FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
         }
         if (memberService.checkEmailDuplicate(joinRequest.getEmail())) {
             return ResponseEntity.badRequest().body("이미 존재하는 이메일입니다.");
         }
-
         memberService.join(joinRequest);
-        log.info("joinRequest =", joinRequest.getPassword());
+
+
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
-    //비밀번호 찾기
 
+    //비밀번호 찾기
+    //등록된 이메일로 임시비밀번호를 발송하고 발송된 임시비밀번호로 사용자의 pw를 변경하는 컨트롤러
+    @PostMapping("/memberF/findPw")
+    public ResponseEntity<String> sendEmail(@RequestBody MemberRequest.Email Email) {
+        if (memberService.checkEmailDuplicate(Email.getEmail())) { //이메일 존재
+            EmailResponseDTO.sendPwDto dto = memberService.createMailUpdatePW(Email.getEmail());
+
+            registerMail.mailSend(dto);
+
+            return ResponseEntity.ok("이메일이 전송되었습니다. 메일함에서 확인해 주세요.");
+        } else {
+            return ResponseEntity.badRequest().body("해당하는 이메일이 없습니다. 다시 입력해 주세요.");
+        }
+    }
 
 
     //닉네임 중복확인 버튼
     //중복시 true 반환
-    @PostMapping("/member/checknickname")
-    public Boolean checkNickname(@RequestBody String nickname) {
-        if (memberService.checkNicknameDuplicate(nickname)) {
-            return true;
+    @PostMapping("/memberF/checknickname")
+    public Boolean checkNickname(@RequestBody MemberRequest.Nickname nickname) {
+        log.info("nick={}", nickname.getNickName());
+        if (memberService.checkNicknameDuplicate(nickname.getNickName())) {
+            return true; // 중복되면 true 반환
         }
-        return false;
+        return false; // 중복되지 않으면 false 반환
     }
+
 
     // 비밀번호 수정
     @PutMapping("/member/password")
@@ -104,8 +106,6 @@ public class MemberController {
         }
 
 
-
-
         return ResponseEntity.ok("비밀번호가 수정되었습니다.");
     }
 
@@ -125,8 +125,8 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             Long memberId = getMemberId(authentication);
-            // 서비스 메서드 호출하여 비밀번호 업데이트
-            memberService.updateNickname(memberId,nicknameRequest);
+
+            memberService.updateNickname(memberId, nicknameRequest);
         } else {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
         }
@@ -134,11 +134,6 @@ public class MemberController {
         return ResponseEntity.ok("닉네임이 수정되었습니다.");
     }
 
-    private static Long getMemberId(Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long memberId = userDetails.getMember().getMemberId();
-        return memberId;
-    }
 
     // 주소지 입력 -> 실명, 폰번호, 주소
     @PutMapping("/member/address")
@@ -153,7 +148,7 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             Long memberId = getMemberId(authentication);
-            // 서비스 메서드 호출하여 비밀번호 업데이트
+
             memberService.updateAddress(memberId, addressRequest);
         } else {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
@@ -161,7 +156,6 @@ public class MemberController {
 
         return ResponseEntity.ok("주소지가 입력되었습니다.");
     }
-
 
 
     // 생일, 성별 변경
@@ -177,7 +171,7 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             Long memberId = getMemberId(authentication);
-            // 서비스 메서드 호출하여 비밀번호 업데이트
+
             memberService.updateBirthGender(memberId, birthGenderRequest);
         } else {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
@@ -188,21 +182,38 @@ public class MemberController {
 
 
     // 프로필 이미지 설정
-//    @PutMapping("/member/image")
-//    public ResponseEntity<String> updateProfileImage(@RequestParam("image") MultipartFile image) {
-//        try {
-//            //String imageUrl = memberService.uploadImageToStorage(image);
-//            //memberService.updateProfileImage(memberId, imageUrl);
-//            return ResponseEntity.ok("프로필 이미지가 수정되었습니다.");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.internalServerError().body("프로필 이미지 업데이트에 실패하였습니다.");
-//        }
-//    }
-    @GetMapping("/test")
-    public ResponseEntity<?> test() {
+    //이미지 해상도 자동으로 변경해주는 로직이 추가 .. 예정,,
+    @PostMapping("/member/image")
+    public ResponseEntity<String> updateProfileImage(
+            @RequestPart("files") MultipartFile file) {
+        // SecurityContext에서 인증 정보 추출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof CustomUserDetails) {
+            Long memberId = getMemberId(authentication);
+            try {
+                MemberImgRequest dto = new MemberImgRequest();
+                String imageUrl = memberService.updateProfileImage(file, "member/Profile");
+                dto.setImgUrl(imageUrl);
+                dto.setMemberId(memberId);
 
-        return new ResponseEntity<>("테스트입니다", HttpStatus.OK);
+                memberService.profileSave(dto);
+
+                return ResponseEntity.ok("프로필 이미지가 수정되었습니다.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.internalServerError().body("프로필 이미지 업데이트에 실패하였습니다.");
+            }
+        } else {
+            return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
+        }
+
     }
 
+// mypage - 사용자 프로필 이미지, 닉네임 리스폰, 팔로잉, 팔로워 수
+    @GetMapping("/member")
+    public MyPageRespons getMyPage(@JwtAuth AuthInfoDto authInfoDto){
+
+        Long memberId= authInfoDto.getMemberId();
+        return memberService.getMyPage(memberId);
+    }
 }

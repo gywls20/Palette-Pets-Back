@@ -1,6 +1,6 @@
 package com.palette.palettepetsback.member.entity;
 
-import com.palette.palettepetsback.config.auditing.BaseEntity;
+import com.palette.palettepetsback.carrot.domain.CarrotLike;
 import com.palette.palettepetsback.member.dto.Role;
 import com.palette.palettepetsback.pet.entity.Pet;
 import jakarta.persistence.*;
@@ -20,6 +20,9 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Pet> pets = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member",fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<CarrotLike> carrotLikeList =new ArrayList<>();
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long memberId;
@@ -27,7 +30,7 @@ public class Member {
     private String password;
     @Column(name = "member_name")
     private String memberName;
-    @Column(name = "member_nickname")
+    @Column(name = "member_nickname", unique = true)
     private String memberNickname;
     @Column(name = "member_address")
     private String memberAddress;
@@ -46,6 +49,12 @@ public class Member {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
+    @OneToMany(mappedBy = "followerId", cascade = CascadeType.ALL)
+    private List<Follow> followerList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "followingId", cascade = CascadeType.ALL)
+    private List<Follow> followingList = new ArrayList<>();
+
     @Builder
     public Member(String email, String password, String memberName,String memberNickname, String memberAddress,
                   String memberGender, String memberPhone,
@@ -62,10 +71,12 @@ public class Member {
         this.role = role;
     }
 
-    public Member(Long memberId, String email, Role role) {
+    // 인증용 토큰에 넣을 회원 생성자
+    public Member(Long memberId, String email, Role role, String memberNickname) {
         this.memberId = memberId;
         this.email = email;
         this.role = role;
+        this.memberNickname = memberNickname;
     }
 
     public void existData(String email, String memberName, String memberNickname, String memberBirth, String memberGender, String memberPhone){
@@ -94,5 +105,8 @@ public class Member {
     public void updateBirthGender(String memberBirth, String memberGender) {
         this.memberBirth=memberBirth;
         this.memberGender=memberGender;
+    }
+    public void saveProfile(String memberImage){
+        this.memberImage = memberImage;
     }
 }

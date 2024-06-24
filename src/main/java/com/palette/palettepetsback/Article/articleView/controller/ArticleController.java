@@ -1,11 +1,12 @@
 package com.palette.palettepetsback.Article.articleView.controller;
 
 import com.palette.palettepetsback.Article.Article;
-import com.palette.palettepetsback.Article.articleView.DTO.reponsse.ArticleResponseDTO;
+import com.palette.palettepetsback.Article.articleView.DTO.response.ArticleResponseDTO;
 import com.palette.palettepetsback.Article.articleView.DTO.PageableDTO;
-import com.palette.palettepetsback.Article.articleView.DTO.request.ArticleRequestDTO;
 import com.palette.palettepetsback.Article.articleView.service.ArticleKomoranService;
 import com.palette.palettepetsback.Article.articleView.service.ArticleService;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -46,19 +47,33 @@ public class ArticleController {
         return ResponseEntity.ok().body(articles);
     }
 
-    //리스트 출력하기(페이징, 정렬)
+//    //리스트 출력하기(페이징, 정렬)
+//    @GetMapping("/list")
+//    public ResponseEntity<List<ArticleResponseDTO>> tagSearch(@ModelAttribute PageableDTO pd) {
+//        log.info("pd: {}", pd);
+//        List<ArticleResponseDTO> articles = articleService.searchList(pd);
+//        log.info("articles: {}", articles);
+//        return ResponseEntity.ok().body(articles);
+//    }
+
     @GetMapping("/list")
     public ResponseEntity<List<ArticleResponseDTO>> tagSearch(@ModelAttribute PageableDTO pd) {
+        log.info("pd: {}", pd);
         List<ArticleResponseDTO> articles = articleService.searchList(pd);
+        log.info("articles: {}", articles);
 
         return ResponseEntity.ok().body(articles);
     }
+
+
+
+
+
     //검색 & 리스트 출력(페이징, 정렬, 문장 분리)
     @GetMapping("/listLabel")
     public ResponseEntity<List<ArticleResponseDTO>> labelSearch(@ModelAttribute PageableDTO pd) {
         //Article article = new Article();
         List<ArticleResponseDTO> articles = articleKomoranService.searchLabelList(pd);
-
         return ResponseEntity.ok().body(articles);
 
     }
@@ -75,5 +90,7 @@ public class ArticleController {
     public ResponseEntity<Integer> count(@RequestParam String where) {
         return ResponseEntity.ok().body(articleService.count(where));
     }
+
+
 
 }

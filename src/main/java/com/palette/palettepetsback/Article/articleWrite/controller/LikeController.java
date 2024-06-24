@@ -5,6 +5,9 @@ import com.palette.palettepetsback.Article.ArticleLike;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleLikeRequestDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.response.ArticleLikeResponseDto;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleLikeService;
+import com.palette.palettepetsback.config.jwt.AuthInfoDto;
+import com.palette.palettepetsback.config.jwt.JWTUtil;
+import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.member.dto.UserDTO;
 import com.palette.palettepetsback.member.entity.Member;
 import lombok.Getter;
@@ -27,11 +30,19 @@ public class LikeController {
     private final ArticleLikeService articleLikeService;
 
     //좋아요 등록
+    //좋아요 클릭시 countLove + 1
     @PostMapping("/like")
-    public ResponseEntity<Void>likeArticle(@RequestBody ArticleLikeRequestDto dto){
-        articleLikeService.likeArticle(dto.getArticleId(),dto.getMemberId());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<String>likeArticle(@RequestBody ArticleLikeRequestDto dto,
+                                           @JwtAuth AuthInfoDto authInfoDto){
+
+        if(authInfoDto == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        return ResponseEntity.ok(articleLikeService.likeArticle(dto.getArticleId(),authInfoDto.getMemberId()));
     }
+
+
     //좋아요 취소
     @DeleteMapping("/like/{articleId}/{memberId}")
     public ResponseEntity<Void>unlikeArticle(@PathVariable Long articleId,@PathVariable Long memberId){
@@ -63,6 +74,20 @@ public class LikeController {
                 .createdAt(articleLike.getCreatedAt())
                 .build();
     }
+
+
+    @GetMapping("/like/{articleId}/getLike")
+    public ResponseEntity<Boolean> getLike(@PathVariable Long articleId,
+                                           @JwtAuth AuthInfoDto authInfoDto){
+//        Long memberId = authInfoDto.getMemberId();
+//        if(memberId == null){
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+//        }
+//        return (!articleLikeService.isLike(articleId, memberId))?
+//
+        return null;
+    }
+
 
 }
 

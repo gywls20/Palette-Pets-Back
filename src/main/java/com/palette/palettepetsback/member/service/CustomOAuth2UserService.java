@@ -1,9 +1,11 @@
 package com.palette.palettepetsback.member.service;
 
+import com.palette.palettepetsback.config.exceptions.EmailExistsException;
 import com.palette.palettepetsback.member.dto.*;
 import com.palette.palettepetsback.member.entity.Member;
 import com.palette.palettepetsback.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -13,8 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.palette.palettepetsback.member.entity.QMember.member;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -25,17 +26,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        System.out.println(oAuth2User);
+        log.info("oAuth2User = {}", oAuth2User);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
-
+        String LOGIN_TYPE="";
         if (registrationId.equals("naver")) {
-
+            LOGIN_TYPE="naver";
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
         }
         else if (registrationId.equals("google")) {
-
+            LOGIN_TYPE="google";
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
         }
         else {
@@ -57,10 +58,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             Optional<Member> findEmail = memberRepository.findByEmail(email);
             
             //이메일 중복 확인
-            if (findEmail.isPresent()) { //이메일이 이미 존재하는 경우
-                System.out.println("findEmail = " + findEmail);
-                OAuth2Error oAuth2Error = new OAuth2Error("error");
-                throw new OAuth2AuthenticationException(oAuth2Error, oAuth2Error.toString());
+            if (findEmail.isPresent()) {
+                throw new OAuth2AuthenticationException(new OAuth2Error("email_exists", "이미 존재하는 이메일입니다.", "http://localhost:3000/login"));
             }
 
               Member member = Member.builder()
@@ -73,14 +72,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                       .memberPhone(oAuth2Response.getPhone_number())
                       .memberImage(oAuth2Response.getProfile_image())
                       .role(Role.USER)
+                      .loginType(LOGIN_TYPE)
                       .build();
 
-            memberRepository.save(member);
+            Member savedMember = memberRepository.save(member);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername(username);
             userDTO.setName(oAuth2Response.getName());
             userDTO.setRole("USER");
+            userDTO.setEmail(savedMember.getEmail());
+            userDTO.setMemberId(savedMember.getMemberId());
 
             return new CustomOAuth2User(userDTO);
         }
@@ -95,11 +97,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     oAuth2Response.getPhone_number()
             );
 
-            memberRepository.save(existData);
+            Member savedMember = memberRepository.save(existData);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername(existData.getPassword());
             userDTO.setName(oAuth2Response.getName());
+            userDTO.setRole("USER");
+            userDTO.setEmail(savedMember.getEmail());
+            userDTO.setMemberId(savedMember.getMemberId());
 
             return new CustomOAuth2User(userDTO);
         }
