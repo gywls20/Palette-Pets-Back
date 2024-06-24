@@ -5,39 +5,30 @@ import com.palette.palettepetsback.Article.articleView.repository.ArticleReposit
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleImageDto;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleUpdateRequest;
 import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWriteDto;
-
-
 import com.palette.palettepetsback.Article.articleWrite.repository.ArticleWriteRepository;
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
 import com.palette.palettepetsback.Article.redis.ArticleWriteRedis;
 import com.palette.palettepetsback.Article.redis.service.ArticleRedisService;
 import com.palette.palettepetsback.config.SingleTon.BadWordService;
+import com.palette.palettepetsback.config.SingleTon.ViewerLimit;
 import com.palette.palettepetsback.config.exceptions.BadWordException;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
-import com.palette.palettepetsback.member.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
-import kr.co.shineware.nlp.komoran.core.Komoran;
-import kr.co.shineware.nlp.komoran.model.KomoranResult;
-import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.palette.palettepetsback.member.entity.QMember.member;
 
 @RestController
 @CrossOrigin //리액트에서 넘어올때 포트가 다르면 오류가 생기는걸 해결해줌
@@ -72,12 +63,16 @@ public class ArticleWriteController {
 //    }
 
 
+    private final ViewerLimit viewerLimit;
+
+
     //게시글 단건 조회
     @GetMapping("/articles/{articleId}")
     @ResponseStatus(HttpStatus.OK)
     public Response findArticle(@PathVariable final Long articleId,
                                 HttpServletRequest request) {
         //조회수 증가 처리율 제한 추가
+
         String sessionId = request.getSession().getId();
         String key = "session_id_" + sessionId;
         if (!redisTemplate.hasKey(key)) {
@@ -88,6 +83,13 @@ public class ArticleWriteController {
             System.out.println("=======이미 조회수를 올린 사람입니다.================");
         }
         ////단건 응답
+
+        if (viewerLimit.viewLimit(request)) {
+            articleWriteService.updateCountViews(articleId);
+        }
+
+        //단건 응답
+
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
@@ -111,6 +113,13 @@ public class ArticleWriteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
+        dto.setContent(
+                dto.getContent()
+                        .replaceAll(" ", "&nbsp;")
+                        .replaceAll("<", "&lt;")
+                        .replaceAll(">", "&gt;")
+                        .replaceAll("\n", "<br>")
+        );
 
         //글 정보 DB 등록 -> article table
         Article created = articleWriteService.create(dto);
@@ -189,6 +198,7 @@ public class ArticleWriteController {
         return ResponseEntity.status(HttpStatus.OK).body("게시글이 삭제되었습니다.");
 
     }
+
 
     //게시글 삭제 ->
 //    @DeleteMapping("/article/{articleId}")

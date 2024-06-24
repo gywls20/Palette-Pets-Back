@@ -216,29 +216,4 @@ public class MemberController {
         Long memberId= authInfoDto.getMemberId();
         return memberService.getMyPage(memberId);
     }
-
-
-
-    //로그인 페이지 - 사용하지 않습니다. -> loginFilter로 가세요
-//    @GetMapping("/login")
-//    public String loginPage() {
-//
-//        return "login";
-//    }
-//    @PostMapping("/login")
-//    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
-//
-//        if (bindingResult.hasErrors()) { //에러출력
-//            List<FieldError> list = bindingResult.getFieldErrors();
-//            for(FieldError error : list) {
-//                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
-//            }
-//        }
-//        //보안상 에러메시지는 간소화 했습니다.
-//        if (memberService.login(loginRequest.getUsername(), loginRequest.getPassword())==null) {
-//            return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 잘못되었습니다.");
-//        }
-//
-//        return ResponseEntity.ok("로그인 성공");
-//    }
 }

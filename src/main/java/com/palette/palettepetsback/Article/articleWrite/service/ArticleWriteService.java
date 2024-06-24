@@ -66,47 +66,6 @@ public class ArticleWriteService {
         );
         return saved.getId();
     }
-// 게시글 이미지 삭제
-//    @Transactional
-//    public void deleteImgArticle(List<Long> imgIds) {
-//
-//        for(Long imgId : imgIds){
-//            imgArticleRepository.deleteById(imgId);
-//        }
-//    }
-
-    //    @Transactional
-//    public Article update(Long id, ArticleWriteDto dto) {
-//        // 1. DTO -> 엔티티 변환하기
-//        Article articleWrite = Article.builder()
-//                .createdWho(dto.getCreatedWho())
-//                .title(dto.getTitle())
-//                .content(dto.getContent())
-////                .articleTags(dto.getArticleTags()   )
-//                .build();
-//        log.info("id:{}, articleWrite:{}", id, articleWrite.toString());
-//
-//        // 2. 타깃 조회
-//        Article target = articleWriteRepository.findById(id).orElse(null);
-//
-//        // 3. 잘못된 요청 처리하기
-//        if (target == null) {
-//            log.info("잘못된 요청! id:{}, articleWrite:{}", id, articleWrite.toString());
-//            return null; // 응답은 컨트롤러가 하므로 여기서는 null 반환
-//        }
-//
-//        // 4. 업데이트하기
-//        target.patch(articleWrite);
-//
-//        // 5 .상태 업데이트
-//        target.setState("MODIFIED");
-//
-//        // 6. 수정된 엔티티 저장
-//        Article updated = articleWriteRepository.save(target); // 수정된 부분: target을 저장
-//
-//        return updated; // 응답은 컨트롤러가 하므로 여기서는 수정된 데이터만 반환
-//    }
-
 
     //get
     public List<Article> index() {
@@ -258,37 +217,6 @@ public class ArticleWriteService {
             throw new MemberNotEqualsException();
         }
     }
-//    private void uploadImages(List<ArticleImage> uploadedImages, List<MultipartFile> fileImages) {
-//        IntStream.range(0, uploadedImages.size())
-//                .forEach(uploadedImage -> fileService.upload(
-//                        fileImages.get(uploadedImage),
-//                        String.valueOf(uploadedImages.get(uploadedImage).getArticle())
-//                ));
-//    }
-
-//    private void deleteImages(List<ArticleImage> deletedImages) {
-//        deletedImages.forEach(deletedImage-> fileService.delete(String.valueOf(deletedImage.getArticle())));
-//    }
-
-    //게시글 전체 조회
-//    @Transactional(readOnly = true)
-//    public ArticleFindAllWithPagingResponseDto findAllArticles(Integer page) {
-//        Page<Article> articles = makePageArticles(page);
-//        return responsePagingArticles(articles);
-//    }
-//
-//    private ArticleFindAllWithPagingResponseDto responsePagingArticles(final Page<Article> articles) {
-//        List<ArticleSimpleDto> articleSimpleDtoList = articles.stream()
-//                .map(ArticleSimpleDto::toDto)
-//                .collect(Collectors.toList());
-//
-//        return ArticleFindAllWithPagingResponseDto.toDto(articleSimpleDtoList, new PageInfoDto(articles));
-//    }
-//
-//    private Page<Article> makePageArticles(final Integer page) {
-//        PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, Sort.by(articleId).descending());
-//        return articleWriteRepository.findAll(pageRequest);
-//    }
 
     //게시글 조회시 조회수 up
     @Transactional
