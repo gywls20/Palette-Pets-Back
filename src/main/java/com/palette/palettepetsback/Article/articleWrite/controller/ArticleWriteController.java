@@ -9,6 +9,7 @@ import com.palette.palettepetsback.Article.articleWrite.dto.request.ArticleWrite
 import com.palette.palettepetsback.Article.articleWrite.response.Response;
 import com.palette.palettepetsback.Article.articleWrite.service.ArticleWriteService;
 import com.palette.palettepetsback.config.SingleTon.BadWordService;
+import com.palette.palettepetsback.config.SingleTon.ViewerLimit;
 import com.palette.palettepetsback.config.exceptions.BadWordException;
 import com.palette.palettepetsback.Article.redis.service.ArticleRedisService;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
@@ -35,9 +36,9 @@ import java.util.concurrent.TimeUnit;
 public class ArticleWriteController {
 
     private final ArticleWriteService articleWriteService;
-    private final RedisTemplate<String, String> redisTemplate;
     private final BadWordService badWordService;
     private final ArticleRedisService articleRedisService;
+    private final ViewerLimit viewerLimit;
 
 
     //게시글 단건 조회
@@ -46,17 +47,11 @@ public class ArticleWriteController {
     public Response findArticle(@PathVariable final Long articleId,
                                 HttpServletRequest request){
         //조회수 증가 처리율 제한 추가
-        String sessionId = request.getSession().getId();
-        String key = "session_id_"+sessionId;
-        if(!redisTemplate.hasKey(key)) {
-            System.out.println("=======조회수 상승================");
+        if (viewerLimit.viewLimit(request)) {
             articleWriteService.updateCountViews(articleId);
-            redisTemplate.opsForValue().set(key, sessionId, 600, TimeUnit.SECONDS);
         }
-        else{
-            System.out.println("=======이미 조회수를 올린 사람입니다.================");
-        }
-        ////단건 응답
+
+        //단건 응답
         return Response.success(articleWriteService.findArticle(articleId));
     }
 
