@@ -75,6 +75,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/feed/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                                 // 명소 추천 인가
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/list").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/hotspot/main").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/api/hotspot/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.PUT, "/api/hotspot/**").hasRole(Role.ADMIN.name())
@@ -82,6 +83,12 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/join").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
                                 .requestMatchers("/logout", "/").permitAll()
+                                .requestMatchers("/carrot/**").permitAll()
+                                .requestMatchers("/article/**").permitAll()
+                                .requestMatchers("/articles/**").permitAll()
+                                .requestMatchers("/popular/**").permitAll()
+                                // PET 인가
+                                .requestMatchers("/pet/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
 //                                .anyRequest().permitAll()
                         .anyRequest().authenticated()
                 );
