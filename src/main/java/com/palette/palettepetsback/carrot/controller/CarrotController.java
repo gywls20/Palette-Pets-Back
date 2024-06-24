@@ -42,16 +42,13 @@ public class CarrotController {
                          @JwtAuth AuthInfoDto authInfoDto) {
 
         //security 부터 memberId 값 받아오기
+
         Long memberId = authInfoDto.getMemberId();
 
         //글 등록
-        Carrot carrot = carrotService.create(dto, memberId);
+        Carrot carrot = carrotService.writeCarrot(dto, memberId, files);
 
         //파일 업로드 및 이미지 저장
-        for(MultipartFile file : files) {
-            String carrotImageUrl = carrotService.fileUpload(file, "carrot/img");
-            carrotService.saveImg(carrotImageUrl, carrot);
-        }
         System.out.println("dto = " + dto.getCarrotTitle());
         return ResponseEntity.ok("글 등록 완료");
     }
@@ -60,13 +57,14 @@ public class CarrotController {
     @PostMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
                                          @RequestBody CarrotRequestDTO dto,
-                                         @RequestPart(required = false, value = "file") MultipartFile file) {
+                                         @RequestPart(required = false, value = "file") MultipartFile[] files) {
         //이미지 수정
-        if(file != null) {
-            String carrotImg = carrotService.fileUpload(file, "carrot");
-
-            CarrotImage carrotImage = new CarrotImage();
-            carrotImage.setCarrotImageUrl(carrotImg);
+        if(files != null) {
+            for(MultipartFile file : files) {
+                String carrotImageUrl = carrotService.fileUpload(file, "carrot/img");
+                CarrotImage carrotImage = new CarrotImage();
+                carrotImage.setCarrotImageUrl(carrotImageUrl);
+            }
             //dto.setCarrotImg(carrotImg);
         }
         //글 수정
@@ -168,10 +166,10 @@ public class CarrotController {
         carrotService.state(id, carrotState);
         return ResponseEntity.ok().build();
     }
-
     @GetMapping("/recent")
     public ResponseEntity<List<CarrotRecentDTO>> list() {
         List<CarrotRecentDTO> list = carrotService.getRecentList();
         return ResponseEntity.ok().body(list);
     }
+
 }
