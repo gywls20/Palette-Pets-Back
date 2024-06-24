@@ -62,15 +62,26 @@ public class ArticleLikeService {
         return "좋아요가 등록되었습니다.";
     }
 
-    public void unlikeArticle(Long articleId,Long memberId){
-        Article article =articleRepository.findById(articleId)
-                .orElseThrow(()->new IllegalArgumentException("Article not found"));
-        Member member =memberRepository.findById(memberId)
-                .orElseThrow(()->new IllegalArgumentException("Member not found"));
+    @Transactional
+    public void unlikeArticle(Long articleId, Long memberId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("Article not found"));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
-        Optional<ArticleLike>existingLike = articleLikeRepository.findByArticleAndMember(article,member);
-        existingLike.ifPresent(articleLikeRepository::delete);
+        Optional<ArticleLike> existingLike = articleLikeRepository.findByArticleAndMember(article, member);
+
+        if (existingLike.isPresent()) {
+            articleLikeRepository.delete(existingLike.get());
+
+            int newLoveCount = article.getCountLoves() - 1;
+            if (newLoveCount < 0) {
+                newLoveCount = 0;
+            }
+            articleWriteRepository.decrementLoveCount(article.getArticleId(), newLoveCount);
+        }
     }
+
 
     public List<ArticleLike>getArticleLikes(Long articleId){
         Article article = articleRepository.findById(articleId)
@@ -84,4 +95,18 @@ public class ArticleLikeService {
         return articleLikeRepository.countByArticle(article);
     }
 
+    @Transactional
+    public Boolean isLikeArticle(Long articleId, Long memberId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(()->new IllegalArgumentException("게시글 찾을수없음"));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new IllegalArgumentException("Member not found"));
+        Optional<ArticleLike>existingLike= articleLikeRepository.findByArticleAndMember(article,member);
+        if(existingLike.isPresent()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }
