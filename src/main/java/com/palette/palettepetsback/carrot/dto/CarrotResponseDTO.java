@@ -28,7 +28,6 @@ public class CarrotResponseDTO {
     private Integer carrotView;
     private String carrotImg;
     private List<String> imgList;
-    private String memberImg;
 
     public CarrotResponseDTO(Carrot responseDTO) {
         this.carrotId = responseDTO.getCarrotId();
