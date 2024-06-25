@@ -75,9 +75,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(createCookie("refresh", refresh, true));
         response.setStatus(HttpServletResponse.SC_OK);
 
-//        String token = jwtUtil.createJwt(username, role, 60 * 60 * 60L);
-//        response.addCookie(createCookie("Authorization", token));
-
         /**
          * JSESSIONID 쿠키 삭제
          */
