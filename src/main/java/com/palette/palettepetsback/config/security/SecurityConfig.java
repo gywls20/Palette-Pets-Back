@@ -99,8 +99,8 @@ public class SecurityConfig {
 //                                .anyRequest().permitAll()
                                 // 댓글 관련
                                 .requestMatchers("/Get/comments/**").permitAll()
-                                .requestMatchers("/post/carrot").permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers("/post/carrot").hasAnyRole(Role.USER.name())
+                        .anyRequest().permitAll()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
         http

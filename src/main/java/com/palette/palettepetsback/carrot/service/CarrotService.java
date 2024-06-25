@@ -53,7 +53,7 @@ public class CarrotService {
                 .carrotTitle(dto.getCarrotTitle())
                 .carrotContent(dto.getCarrotContent())
                 .carrotTag(dto.getCarrotTag())
-                .carrot_price(dto.getCarrot_price())
+                .carrot_price(dto.getCarrotPrice())
                 .build();
         if (carrotDTO.getCarrotId() != null)
             return null;
@@ -85,7 +85,7 @@ public class CarrotService {
         //찾은 글에 수정 할 데이터 저장
         carrot.setCarrotTitle(dto.getCarrotTitle());
         carrot.setCarrotContent(dto.getCarrotContent());
-        carrot.setCarrot_price(dto.getCarrot_price());
+        carrot.setCarrot_price(dto.getCarrotPrice());
         carrot.setCarrotTag(dto.getCarrotTag());
         carrot.setCarrotState(dto.getCarrotState());
 
