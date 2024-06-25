@@ -42,17 +42,12 @@ public class CarrotController {
                          @JwtAuth AuthInfoDto authInfoDto) {
 
         //security 부터 memberId 값 받아오기
-
         Long memberId = authInfoDto.getMemberId();
 
         //글 등록
-        Carrot carrot = carrotService.create(dto, memberId);
+        Carrot carrot = carrotService.writeCarrot(dto, memberId, files);
 
         //파일 업로드 및 이미지 저장
-        for(MultipartFile file : files) {
-            String carrotImageUrl = carrotService.fileUpload(file, "carrot/img");
-            carrotService.saveImg(carrotImageUrl, carrot);
-        }
         System.out.println("dto = " + dto.getCarrotTitle());
         return ResponseEntity.ok("글 등록 완료");
     }
@@ -61,15 +56,9 @@ public class CarrotController {
     @PostMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
                                          @RequestBody CarrotRequestDTO dto,
-                                         @RequestPart(required = false, value = "file") MultipartFile file) {
+                                         @RequestPart(required = false, value = "file") MultipartFile[] files) {
         //이미지 수정
-        if(file != null) {
-            String carrotImg = carrotService.fileUpload(file, "carrot");
 
-            CarrotImage carrotImage = new CarrotImage();
-            carrotImage.setCarrotImageUrl(carrotImg);
-            //dto.setCarrotImg(carrotImg);
-        }
         //글 수정
         carrotService.update(id, dto);
 
@@ -133,18 +122,20 @@ public class CarrotController {
         return carrotService.getLike(memberId);
     }
 
+    //좋아요 상태 확인
+    @GetMapping("/likeState/{id}")
+    public Boolean likeState(@PathVariable Long id,
+                             @JwtAuth AuthInfoDto authInfoDto) {
+        Long memberId = authInfoDto.getMemberId();
+        return carrotService.likeState(id, memberId);
+    }
+
     //검색 기능
     @GetMapping("/search")
     public ResponseEntity<List<CarrotResponseDTO>> searchCarrots(@RequestParam String keyword) {
 
         List<CarrotResponseDTO> carrot = carrotService.searchCarrots(keyword);
          return ResponseEntity.ok().body(carrot);
-    }
-
-    //네이버 공유 기능
-    @GetMapping("http://share.naver.com/web/shareView")
-    public boolean naverShare() {
-        return true;
     }
 
     //글쓴이 && 로그인 사용자 확인용
@@ -164,7 +155,6 @@ public class CarrotController {
     @PostMapping("/state/{id}")
     public ResponseEntity<?> updateState(@PathVariable Long id,
                                          @RequestBody int carrotState) {
-        log.info("----------------------carrotState {}", carrotState);
         carrotService.state(id, carrotState);
         return ResponseEntity.ok().build();
     }
@@ -173,13 +163,5 @@ public class CarrotController {
         List<CarrotRecentDTO> list = carrotService.getRecentList();
         return ResponseEntity.ok().body(list);
     }
-
-    //최신순 리스트 출력
-//    @GetMapping("/recent")
-//    public ResponseEntity<List<CarrotResponseDTO>> list(@RequestParam int page) {
-//        List<CarrotResponseDTO> list = carrotService.recentList(page);
-//        return ResponseEntity.ok().body(list);
-//    }
-
 
 }

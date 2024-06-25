@@ -92,8 +92,6 @@ public class MemberController {
             }
         }
 
-
-
         // SecurityContext에서 인증 정보 추출
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {

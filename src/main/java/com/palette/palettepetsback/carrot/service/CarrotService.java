@@ -44,21 +44,32 @@ public class CarrotService {
 
     //글 등록
     @Transactional
-    public Carrot create(CarrotRequestDTO dto, Long memberId) {
-        //멤버 아이디 값 받아오기
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("Not exist Member Data by id : : [" + memberId + "]"));
-
-        Carrot carrotDTO = Carrot.builder()
+    public Carrot writeCarrot(CarrotRequestDTO dto, Long memberId, MultipartFile[] files){
+        String carrotImageUrl = null;
+        if (files != null && files.length > 0) {
+            carrotImageUrl = fileUpload(files[0], "carrot/img");
+            System.out.println("carrot img0 : " + carrotImageUrl);
+        }
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new IllegalArgumentException("Not exist Member Data by id : : [" + memberId + "]"));
+        Carrot carrot = carrotRepository.save(Carrot.builder()
                 .member(member)
                 .carrotTitle(dto.getCarrotTitle())
                 .carrotContent(dto.getCarrotContent())
                 .carrotTag(dto.getCarrotTag())
                 .carrot_price(dto.getCarrotPrice())
-                .build();
-        if (carrotDTO.getCarrotId() != null)
-            return null;
+                .carrotImage(carrotImageUrl)
+                .build());
 
-        return carrotRepository.save(carrotDTO);
+        saveImg(carrotImageUrl, carrot);
+
+        System.out.println("files.length : "+ files.length);
+        // 나머지 파일들 저장
+        for (int i = 1; i < files.length; i++) {
+            String additionalImageUrl = fileUpload(files[i], "carrot/img");
+            saveImg(additionalImageUrl, carrot);
+        }
+        return carrot;
     }
 
     // 파일 저장
@@ -223,10 +234,12 @@ public class CarrotService {
 
         List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(carrot);
         List<String> imgList = new ArrayList<>();
-        for (CarrotImage c : carrotImage) {
-            imgList.add(c.getCarrotImageUrl());
+        if (carrotImage != null && !carrotImage.isEmpty()) {
+            for (CarrotImage c : carrotImage) {
+                imgList.add(c.getCarrotImageUrl());
+            }
         }
-        System.out.println("imgList.get(0) = " + imgList.get(0));
+
         return CarrotResponseDTO.builder()
                 .carrotId(carrot.getCarrotId())
                 .memberId(carrot.getMember().getMemberId())
@@ -234,13 +247,13 @@ public class CarrotService {
                 .carrotTitle(carrot.getCarrotTitle())
                 .carrotContent(carrot.getCarrotContent())
                 .carrotPrice(carrot.getCarrot_price())
-                .memberImg(carrot.getMember().getMemberImage())
                 .imgList(imgList)
                 .carrotCreatedAt(carrot.getCarrot_createdAt())
                 .carrotTag(carrot.getCarrotTag())
                 .carrotLike(carrot.getCarrotLike())
                 .carrotView(carrot.getCarrotView())
                 .carrotState(carrot.getCarrotState())
+                .memberImg(carrot.getMember().getMemberImage())
                 .build();
     }
 
@@ -296,6 +309,12 @@ public class CarrotService {
         return carrotResponseDTOList;
     }
 
+    public boolean likeState(Long id, Long memberId) {
+        int like = carrotLikeRepository.likeState(id, memberId);
+
+        return like == 1;
+    }
+
     //검색 기능
     public List<CarrotResponseDTO> searchCarrots(String keyword) {
         List<Carrot> carrotList = carrotRepository.findByCarrotTitleContainingOrCarrotContentContaining(keyword, keyword);
@@ -332,9 +351,6 @@ public class CarrotService {
 
         return carrot.getMember().getMemberId();
     }
-    public List<CarrotRecentDTO> getRecentList(){
-        return carrotRepository.findRecentCarrot();
-    }
     //상태 변경 기능
     public void state(Long id, int carrotState) {
         Carrot carrot = carrotRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Not exist Carrot Data by id : ["+id+"]"));
@@ -345,41 +361,7 @@ public class CarrotService {
     }
 
     //최신순 리스트 출력
-    public List<CarrotResponseDTO> recentList(int page) {
-        List<Carrot> carrot = carrotRepository.findAll();
-        QCarrot qCarrot = QCarrot.carrot;
-
-        List<Carrot> carrots = jpaQueryFactory
-                .selectFrom(qCarrot)
-                .orderBy(qCarrot.carrot_createdAt.desc())
-                .limit(page)
-                .fetch();
-
-        List<CarrotResponseDTO> carrotResponseDTOList=new ArrayList<>();
-
-        for(Carrot c : carrots) {
-            List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(c);
-
-            Long memberId = c.getMember().getMemberId();
-            String memberNickname = c.getMember().getMemberNickname();
-            CarrotResponseDTO carrotResponseDTO=new CarrotResponseDTO();
-            carrotResponseDTO.setCarrotId(c.getCarrotId());
-            carrotResponseDTO.setMemberId(memberId);
-            carrotResponseDTO.setMemberNickname(memberNickname);
-            carrotResponseDTO.setCarrotTitle(c.getCarrotTitle());
-            carrotResponseDTO.setCarrotContent(c.getCarrotContent());
-            carrotResponseDTO.setCarrotPrice(c.getCarrot_price());
-            carrotResponseDTO.setCarrotCreatedAt(c.getCarrot_createdAt());
-            carrotResponseDTO.setCarrotTag(c.getCarrotTag());
-            carrotResponseDTO.setCarrotLike(c.getCarrotLike());
-            carrotResponseDTO.setCarrotView(c.getCarrotView());
-
-            if(!carrotImage.isEmpty()){
-                carrotResponseDTO.setCarrotImg(carrotImage.get(0).getCarrotImageUrl());
-            }
-
-            carrotResponseDTOList.add(carrotResponseDTO);
-        }
-        return carrotResponseDTOList;
+    public List<CarrotRecentDTO> getRecentList() {
+        return carrotRepository.findRecentCarrot();
     }
 }
