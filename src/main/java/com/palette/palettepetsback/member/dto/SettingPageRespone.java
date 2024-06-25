@@ -7,12 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MyPageRespons {
+public class SettingPageRespone {
     private String nickname;
-    private String img;
-    private int follower;
-    private int following;
-    private int feed;
-    private String memberId;
-    private Boolean followTF;
+    private String email;
 }

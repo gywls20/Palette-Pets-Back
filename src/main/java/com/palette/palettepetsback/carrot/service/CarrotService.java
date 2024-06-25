@@ -44,41 +44,32 @@ public class CarrotService {
 
     //글 등록
     @Transactional
-    public Carrot create(CarrotRequestDTO dto, Long memberId) {
-        //멤버 아이디 값 받아오기
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("Not exist Member Data by id : : [" + memberId + "]"));
-
-        System.out.println("dto = " + dto.getCarrotTitle());
-        Carrot carrotDTO = Carrot.builder()
+    public Carrot writeCarrot(CarrotRequestDTO dto, Long memberId, MultipartFile[] files){
+        String carrotImageUrl = null;
+        if (files != null && files.length > 0) {
+            carrotImageUrl = fileUpload(files[0], "carrot/img");
+            System.out.println("carrot img0 : " + carrotImageUrl);
+        }
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new IllegalArgumentException("Not exist Member Data by id : : [" + memberId + "]"));
+        Carrot carrot = carrotRepository.save(Carrot.builder()
                 .member(member)
                 .carrotTitle(dto.getCarrotTitle())
                 .carrotContent(dto.getCarrotContent())
                 .carrotTag(dto.getCarrotTag())
                 .carrot_price(dto.getCarrotPrice())
-                .build();
-        if (carrotDTO.getCarrotId() != null)
-            return null;
+                .carrotImage(carrotImageUrl)
+                .build());
 
-        return carrotDTO;
-    }
+        saveImg(carrotImageUrl, carrot);
 
-    @Transactional
-    public Carrot writeCarrot(CarrotRequestDTO dto, Long memberId, MultipartFile[] files){
-        Carrot carrot = create(dto, memberId);
         System.out.println("files.length : "+ files.length);
-        if (files != null && files.length > 0) {
-            String carrotImageUrl = fileUpload(files[0], "carrot/img");
-            System.out.println("carrot img0 : "+ carrotImageUrl);
-            carrot.setCarrotImage(carrotImageUrl); // 맨 처음 파일의 URL만 저장
-            saveImg(carrotImageUrl, carrot);
-
-            // 나머지 파일들 저장
-            for (int i = 1; i < files.length; i++) {
-                String additionalImageUrl = fileUpload(files[i], "carrot/img");
-                saveImg(additionalImageUrl, carrot);
-            }
+        // 나머지 파일들 저장
+        for (int i = 1; i < files.length; i++) {
+            String additionalImageUrl = fileUpload(files[i], "carrot/img");
+            saveImg(additionalImageUrl, carrot);
         }
-        return carrotRepository.save(carrot);
+        return carrot;
     }
 
     // 파일 저장
@@ -226,7 +217,7 @@ public class CarrotService {
                 }
             }
         }
-            return carrotResponseDTOList;
+        return carrotResponseDTOList;
     }
 
     //조회수 증가
@@ -262,6 +253,7 @@ public class CarrotService {
                 .carrotLike(carrot.getCarrotLike())
                 .carrotView(carrot.getCarrotView())
                 .carrotState(carrot.getCarrotState())
+                .memberImg(carrot.getMember().getMemberImage())
                 .build();
     }
 
@@ -318,9 +310,9 @@ public class CarrotService {
     }
 
     public boolean likeState(Long id, Long memberId) {
-       int like = carrotLikeRepository.likeState(id, memberId);
+        int like = carrotLikeRepository.likeState(id, memberId);
 
-       return like == 1;
+        return like == 1;
     }
 
     //검색 기능
