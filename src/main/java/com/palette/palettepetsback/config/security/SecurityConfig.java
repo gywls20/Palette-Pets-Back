@@ -79,6 +79,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/list").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/main").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.POST, "/api/hotspot/rating").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                                 .requestMatchers(HttpMethod.POST, "/api/hotspot/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.PUT, "/api/hotspot/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.DELETE, "/api/hotspot/**").hasRole(Role.ADMIN.name())
