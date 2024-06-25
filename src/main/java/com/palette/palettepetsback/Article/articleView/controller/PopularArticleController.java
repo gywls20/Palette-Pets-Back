@@ -1,3 +1,4 @@
+
 package com.palette.palettepetsback.Article.articleView.controller;
 
 import com.palette.palettepetsback.Article.Article;
@@ -17,7 +18,7 @@ public class PopularArticleController {
     private final PopularArticleService articleService;
 
     @GetMapping("/popular")
-    public ResponseEntity<List<PopularArticleDTO>> getPopularArticle(){
-        return ResponseEntity.ok().body(articleService.likeArticle());
+    public ResponseEntity<List<Object>> getPopularArticle(){
+        return ResponseEntity.ok().body(articleService.getPopularPosts());
     }
 }
