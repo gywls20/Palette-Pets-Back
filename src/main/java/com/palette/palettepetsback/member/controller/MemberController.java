@@ -92,6 +92,8 @@ public class MemberController {
             }
         }
 
+
+
         // SecurityContext에서 인증 정보 추출
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
@@ -101,7 +103,6 @@ public class MemberController {
         } else {
             return ResponseEntity.badRequest().body("인증되지 않은 사용자입니다.");
         }
-
 
         return ResponseEntity.ok("비밀번호가 수정되었습니다.");
     }
