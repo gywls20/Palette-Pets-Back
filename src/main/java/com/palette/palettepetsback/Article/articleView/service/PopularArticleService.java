@@ -43,7 +43,6 @@ public class PopularArticleService {
     public List<Object> getPopularPosts() {
         ListOperations<String, Object> ops = redisTemplate.opsForList();
         List<Object> popularList = ops.range(POPULAR_POSTS_KEY, 0, -1);
-
         // 인기글이 없을 경우 인기글 갱신
         if(popularList==null || popularList.isEmpty()){
             likeArticle();
