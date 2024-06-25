@@ -21,7 +21,7 @@ public interface CarrotRepository extends JpaRepository<Carrot, Long> {
 
 
     @Query("select new com.palette.palettepetsback.carrot.dto.CarrotRecentDTO(c.carrotId, c.carrotTitle, " +
-            "c.carrotImage, c.carrotLike, c.carrotView) from Carrot c order by c.carrotId desc " +
+            "c.carrotImage, c.carrotLike, c.carrotView) from Carrot c where c.carrotState = 0 or c.carrotState = 1 order by c.carrotId desc " +
             "LIMIT 5")
     List<CarrotRecentDTO> findRecentCarrot();
 }

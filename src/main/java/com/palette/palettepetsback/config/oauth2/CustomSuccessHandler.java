@@ -35,10 +35,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Long memberId = customUserDetails.getUserDTO().getMemberId();
         String email = customUserDetails.getUserDTO().getEmail();
         String memberNickname = customUserDetails.getUserDTO().getMemberNickname();
-
         log.info("username && = {}", username);
         log.info("memberId && = {}", memberId);
         log.info("email && = {}", email);
+        log.info("nickname && = {}", memberNickname);
 
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -74,9 +74,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // refresh 토큰 : HttpOnly 쿠키에 넣어서 반환
         response.addCookie(createCookie("refresh", refresh, true));
         response.setStatus(HttpServletResponse.SC_OK);
-
-//        String token = jwtUtil.createJwt(username, role, 60 * 60 * 60L);
-//        response.addCookie(createCookie("Authorization", token));
 
         /**
          * JSESSIONID 쿠키 삭제

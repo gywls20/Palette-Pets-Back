@@ -79,6 +79,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/list").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/main").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/hotspot/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.POST, "/api/hotspot/rating").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                                 .requestMatchers(HttpMethod.POST, "/api/hotspot/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.PUT, "/api/hotspot/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.DELETE, "/api/hotspot/**").hasRole(Role.ADMIN.name())
@@ -98,7 +99,8 @@ public class SecurityConfig {
 //                                .anyRequest().permitAll()
                                 // 댓글 관련
                                 .requestMatchers("/Get/comments/**").permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers("/post/carrot").hasAnyRole(Role.USER.name())
+                        .anyRequest().permitAll()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
         http

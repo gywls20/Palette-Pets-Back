@@ -274,6 +274,11 @@ public class HotSpotService {
     }
 
     public List<HotSpotRecentDTO> getHotSpotRecent() {
-        return hotSpotRepository.findTop10ByOrderByCreatedAtDesc();
+        List<HotSpotRecentDTO> recentDTOS = hotSpotRepository.findTop10ByOrderByCreatedAtDesc();
+        for (HotSpotRecentDTO recentDTO : recentDTOS) {
+            ImgHotSpot img = imgHotSpotRepository.findAllByHotSpotId(recentDTO.getHotSpotId()).get(0);
+            recentDTO.setImgUrl(img.getImgUrl());
+        }
+        return recentDTOS;
     }
 }
