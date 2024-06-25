@@ -30,4 +30,10 @@ public interface ArticleWriteRepository extends JpaRepository<Article,Long> {
     @Modifying
     @Query("UPDATE Article e SET e.countLoves = :newValue where e.articleId = :id")
     public void incrementLoveCount(@Param("id")Long id,@Param("newValue") int newValue);
+
+    @Modifying
+    @Query("UPDATE Article e SET e.countLoves = :newValue WHERE e.articleId = :id")
+    public void decrementLoveCount(@Param("id") Long id, @Param("newValue") int newValue);
+
+
 }

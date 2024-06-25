@@ -32,14 +32,15 @@ public class ArticleRedisService {
      */
     public void saveArticleWrite(Long memberId){
 
-        // 현재 시간 + 1분 을 가져옴
-        LocalDateTime now = LocalDateTime.now().plusMinutes(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm 분 ss초");
-        String formattedDate = now.format(formatter);
-        log.info("formattedDate : " + formattedDate);
+        // 현재 시간을 밀리초로 구합니다.
+        long currentTimeMillis = System.currentTimeMillis()+60000;
+
+        // 밀리초 값을 문자열로 변환합니다.
+        String currentTimeMillisString = String.valueOf(currentTimeMillis);
+//        log.info("formattedDate : " + currentTimeMillisString);
         ArticleWriteRedis articleWriteRedis = ArticleWriteRedis.builder()
                 .memberId(memberId)
-                .expirationTime(formattedDate)
+                .expirationTime(currentTimeMillisString)
                 .build();
         articleWriteRedisRepository.save(articleWriteRedis);
 
