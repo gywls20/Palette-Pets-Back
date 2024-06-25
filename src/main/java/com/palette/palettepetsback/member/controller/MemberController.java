@@ -214,8 +214,6 @@ public class MemberController {
         Long memberId= authInfoDto.getMemberId();
         return memberService.getMyPage(memberId, nickname);
     }
-<<<<<<< HEAD
-=======
 
 // mypage setting - 닉네임, 이메일 반환
     @GetMapping("/member/setting")
@@ -246,5 +244,11 @@ public class MemberController {
 //
 //        return ResponseEntity.ok("로그인 성공");
 //    }
->>>>>>> 5bd0009a2d7e8a0ee2cdabd4878cc398d570ba52
+
+    // 닉네임 가져오기 api
+    @GetMapping("/member/nickname")
+    public ResponseEntity<String> getNickname(@JwtAuth AuthInfoDto authInfoDto){
+        String memberNickname = authInfoDto.getMemberNickname();
+        return ResponseEntity.ok(memberNickname);
+    }
 }
