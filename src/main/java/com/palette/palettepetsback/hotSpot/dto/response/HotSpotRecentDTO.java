@@ -8,9 +8,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HotSpotRecentDTO {
-    public Long hotSpotId;
-    public Long userId;
-//    public String placeImg;
-    public String placeName;
-    public Object uploadAt;
+    private Long hotSpotId;
+    private Long userId;
+    private String placeName;
+    private Object uploadAt;
+
+    private String imgUrl;
+    public HotSpotRecentDTO(Long hotSpotId, Long userId, String placeName, Object uploadAt) {
+        this.hotSpotId = hotSpotId;
+        this.userId = userId;
+        this.placeName = placeName;
+        this.uploadAt = uploadAt;
+    }
 }
