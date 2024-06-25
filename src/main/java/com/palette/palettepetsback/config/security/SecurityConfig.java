@@ -24,6 +24,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -73,11 +75,28 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/memberF/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/feed/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                // 명소 추천 인가
+                                .requestMatchers(HttpMethod.GET, "/api/hotspot/list").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/hotspot/main").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/hotspot/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.POST, "/api/hotspot/**").hasRole(Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.PUT, "/api/hotspot/**").hasRole(Role.ADMIN.name())
+                                .requestMatchers(HttpMethod.DELETE, "/api/hotspot/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/join").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/reissue").permitAll()
                                 .requestMatchers("/logout", "/").permitAll()
-                                .anyRequest().permitAll()
-//                        .anyRequest().authenticated()
+                                .requestMatchers("/carrot/**").permitAll()
+                                .requestMatchers("/article/**").permitAll()
+                                .requestMatchers("/articles/**").permitAll()
+                                .requestMatchers("/popular/**").permitAll()
+                                .requestMatchers("/sse/**").permitAll()
+                                // PET 인가
+                                .requestMatchers("/pet/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                // 알림 관련
+                                .requestMatchers("/connect").permitAll()
+                                .requestMatchers("/api/issues/**").permitAll()
+//                                .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
         http

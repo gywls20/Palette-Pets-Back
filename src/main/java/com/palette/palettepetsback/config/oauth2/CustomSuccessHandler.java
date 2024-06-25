@@ -1,5 +1,6 @@
 package com.palette.palettepetsback.config.oauth2;
 
+import com.palette.palettepetsback.config.SingleTon.Singleton;
 import com.palette.palettepetsback.config.jwt.JWTUtil;
 import com.palette.palettepetsback.config.jwt.redis.RefreshTokenRepository;
 import com.palette.palettepetsback.config.jwt.redis.entity.RefreshToken;
@@ -8,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -32,6 +34,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String username = customUserDetails.getUsername();
         Long memberId = customUserDetails.getUserDTO().getMemberId();
         String email = customUserDetails.getUserDTO().getEmail();
+        String memberNickname = customUserDetails.getUserDTO().getMemberNickname();
 
         log.info("username && = {}", username);
         log.info("memberId && = {}", memberId);
@@ -47,11 +50,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         claims.put("memberId", memberId);
         claims.put("email", email);
         claims.put("role", role);
+        claims.put("memberNickname", memberNickname);
 
         // token 발급
-//        String access = jwtUtil.generateToken("access", claims, 10 * 1000L); // 어세스 토큰 - 테스트용 10초 만료
         String access = jwtUtil.generateToken("access", claims, 60 * 60 * 1000L); // 어세스 토큰 - 1시간 만료 (12-24시간)
-//        String refresh = jwtUtil.generateToken("refresh", claims, 60L); // 리프레시 토큰 - 테스트용 바로 만료
         String refresh = jwtUtil.generateToken("refresh", claims, 24 * 60 * 60 * 1000L); // 리프레시 토큰 - 24시간 만료 (1일~한달)
 
         // todo RTR 사용시 -> 레디스 리프레시 토큰 저장소에 발급한 리프레시 토큰 저장
@@ -76,7 +78,29 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //        String token = jwtUtil.createJwt(username, role, 60 * 60 * 60L);
 //        response.addCookie(createCookie("Authorization", token));
 
-        response.sendRedirect("http://localhost:3000?oauthCallback=true");
+        /**
+         * JSESSIONID 쿠키 삭제
+         */
+        // 세션 무효화
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        // JSESSIONID 삭제
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("JSESSIONID".equals(cookie.getName())) {
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+
+        // todo : 서버 배포 시에 Singleton.FRONT_URL를 꼭 서버용 url로 변경하기
+        response.sendRedirect(Singleton.FRONT_URL + "?oauthCallback=true");
     }
 
     private Cookie createCookie(String key, String value, boolean isHttpOnly) {
