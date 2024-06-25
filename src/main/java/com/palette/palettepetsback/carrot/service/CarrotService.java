@@ -234,6 +234,7 @@ public class CarrotService {
                 .carrotTitle(carrot.getCarrotTitle())
                 .carrotContent(carrot.getCarrotContent())
                 .carrotPrice(carrot.getCarrot_price())
+                .memberImg(carrot.getMember().getMemberImage())
                 .imgList(imgList)
                 .carrotCreatedAt(carrot.getCarrot_createdAt())
                 .carrotTag(carrot.getCarrotTag())
