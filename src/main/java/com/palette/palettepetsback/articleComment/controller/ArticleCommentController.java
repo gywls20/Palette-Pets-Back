@@ -43,7 +43,6 @@ public class ArticleCommentController {
         //List<ArticleCommentListResponse>
         //서비스에 위임
         Article article = articleService.findById(articleId);
-        log.info(String.valueOf(articleId));
 
         //결과 응답
         return ResponseEntity.status(HttpStatus.OK).body(articleCommentService.comments(articleId));

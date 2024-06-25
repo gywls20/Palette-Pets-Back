@@ -96,6 +96,8 @@ public class SecurityConfig {
                                 .requestMatchers("/connect").permitAll()
                                 .requestMatchers("/api/issues/**").permitAll()
 //                                .anyRequest().permitAll()
+                                // 댓글 관련
+                                .requestMatchers("/Get/comments/**").permitAll()
                         .anyRequest().authenticated()
                 );
         // jwt 관련 필터들 적용 - 로그인 / username&password 인증 / 로그아웃 필터
