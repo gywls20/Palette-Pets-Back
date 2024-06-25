@@ -10,6 +10,7 @@ public class UserDTO {
     private Long MemberId;
     private String email;
     private String name;
+    private String nickname;
     private String username;
     private String memberNickname;
 

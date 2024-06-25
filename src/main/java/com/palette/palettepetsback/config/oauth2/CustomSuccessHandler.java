@@ -35,10 +35,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Long memberId = customUserDetails.getUserDTO().getMemberId();
         String email = customUserDetails.getUserDTO().getEmail();
         String memberNickname = customUserDetails.getUserDTO().getMemberNickname();
-
         log.info("username && = {}", username);
         log.info("memberId && = {}", memberId);
         log.info("email && = {}", email);
+        log.info("nickname && = {}", memberNickname);
 
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();

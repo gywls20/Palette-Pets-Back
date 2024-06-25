@@ -47,7 +47,7 @@ public class ArticleRedisController {
         Optional<ArticleWriteRedis> articleWriteRedis = articleRedisService.findByMemberId(memberId);
         return articleWriteRedis
                 .map(writeRedis ->
-                        ResponseEntity.badRequest().body(writeRedis.getExpirationTime() + " 이후에 글 작성이 가능합니다."))
+                        ResponseEntity.badRequest().body(writeRedis.getExpirationTime()))
                 .orElseGet(() ->
                         ResponseEntity.ok("글 작성이 가능합니다."));
     }

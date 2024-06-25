@@ -66,6 +66,7 @@ public class FollowService {
             FollowResponse followResponse =new FollowResponse();
             followResponse.setNickname(f.getFollowingId().getMemberNickname());
             followResponse.setProfile(f.getFollowingId().getMemberImage());
+            followResponse.setId(f.getFollowId());
 
             followerList.add(followResponse);
         }
@@ -84,6 +85,7 @@ public class FollowService {
             FollowResponse followResponse = new FollowResponse();
             followResponse.setNickname(f.getFollowerId().getMemberNickname());
             followResponse.setProfile(f.getFollowerId().getMemberImage());
+            followResponse.setId(f.getFollowId());
             followingList.add(followResponse);
         }
         return followingList;

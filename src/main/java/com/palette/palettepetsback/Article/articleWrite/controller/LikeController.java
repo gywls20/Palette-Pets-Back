@@ -42,13 +42,31 @@ public class LikeController {
         return ResponseEntity.ok(articleLikeService.likeArticle(dto.getArticleId(),authInfoDto.getMemberId()));
     }
 
+    //좋아요 눌렀는지 안눌렀는지
+    @PostMapping("/Post/isLike/{articleId}")
+    public ResponseEntity<Boolean> isLikeArticle(@PathVariable final Long articleId
+            , @JwtAuth final AuthInfoDto authInfoDto){
+
+        if(authInfoDto == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+        }
+
+        return ResponseEntity.ok(articleLikeService.isLikeArticle(articleId,authInfoDto.getMemberId()));
+    }
 
     //좋아요 취소
-    @DeleteMapping("/like/{articleId}/{memberId}")
-    public ResponseEntity<Void>unlikeArticle(@PathVariable Long articleId,@PathVariable Long memberId){
-        articleLikeService.unlikeArticle(articleId,memberId);
+    @DeleteMapping("/like/{articleId}")
+    public ResponseEntity<Void> unlikeArticle(@PathVariable Long articleId,
+                                              @JwtAuth AuthInfoDto authInfoDto) {
+        if (authInfoDto == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        articleLikeService.unlikeArticle(articleId, authInfoDto.getMemberId());
+
         return ResponseEntity.noContent().build();
     }
+
     //좋아요 목록 조회
     @GetMapping("/like/{articleId}")
     public ResponseEntity<List<ArticleLikeResponseDto>> getArticleLikes(@PathVariable Long articleId){

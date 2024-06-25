@@ -5,10 +5,7 @@ import com.palette.palettepetsback.config.Mail.RegisterMail;
 import com.palette.palettepetsback.config.jwt.AuthInfoDto;
 import com.palette.palettepetsback.config.jwt.jwtAnnotation.JwtAuth;
 import com.palette.palettepetsback.config.security.CustomUserDetails;
-import com.palette.palettepetsback.member.dto.JoinRequest;
-import com.palette.palettepetsback.member.dto.MemberImgRequest;
-import com.palette.palettepetsback.member.dto.MemberRequest;
-import com.palette.palettepetsback.member.dto.MyPageRespons;
+import com.palette.palettepetsback.member.dto.*;
 import com.palette.palettepetsback.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -209,13 +206,44 @@ public class MemberController {
 
     }
 
-// mypage - 사용자 프로필 이미지, 닉네임 리스폰, 팔로잉, 팔로워 수
-    @GetMapping("/member")
-    public MyPageRespons getMyPage(@JwtAuth AuthInfoDto authInfoDto){
+// mypage - 사용자 프로필 이미지, 닉네임 리스폰, 팔로잉, 팔로워 수, 피드 수, 팔로우 여부
+    @GetMapping("/member/{nickname}")
+    public MyPageRespons getMyPage(@PathVariable("nickname") String nickname,
+                                    @JwtAuth AuthInfoDto authInfoDto){
 
         Long memberId= authInfoDto.getMemberId();
-        return memberService.getMyPage(memberId);
+        return memberService.getMyPage(memberId, nickname);
     }
+
+// mypage setting - 닉네임, 이메일 반환
+    @GetMapping("/member/setting")
+    public SettingPageRespone getSettingPage(@JwtAuth AuthInfoDto authInfoDto){
+        Long memberId= authInfoDto.getMemberId();
+        return memberService.getSettingPage(memberId);
+    }
+
+    //로그인 페이지 - 사용하지 않습니다. -> loginFilter로 가세요
+//    @GetMapping("/login")
+//    public String loginPage() {
+//
+//        return "login";
+//    }
+//    @PostMapping("/login")
+//    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
+//
+//        if (bindingResult.hasErrors()) { //에러출력
+//            List<FieldError> list = bindingResult.getFieldErrors();
+//            for(FieldError error : list) {
+//                return new ResponseEntity<>(error.getDefaultMessage() , HttpStatus.BAD_REQUEST);
+//            }
+//        }
+//        //보안상 에러메시지는 간소화 했습니다.
+//        if (memberService.login(loginRequest.getUsername(), loginRequest.getPassword())==null) {
+//            return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 잘못되었습니다.");
+//        }
+//
+//        return ResponseEntity.ok("로그인 성공");
+//    }
 
     // 닉네임 가져오기 api
     @GetMapping("/member/nickname")
