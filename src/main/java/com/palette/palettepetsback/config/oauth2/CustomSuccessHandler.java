@@ -32,10 +32,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String username = customUserDetails.getUsername();
         Long memberId = customUserDetails.getUserDTO().getMemberId();
         String email = customUserDetails.getUserDTO().getEmail();
-
+        String nickname = customUserDetails.getUserDTO().getNickname();
         log.info("username && = {}", username);
         log.info("memberId && = {}", memberId);
         log.info("email && = {}", email);
+        log.info("nickname && = {}", nickname);
 
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -47,6 +48,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         claims.put("memberId", memberId);
         claims.put("email", email);
         claims.put("role", role);
+        claims.put("memberNickname", nickname);
 
         // token 발급
 //        String access = jwtUtil.generateToken("access", claims, 10 * 1000L); // 어세스 토큰 - 테스트용 10초 만료

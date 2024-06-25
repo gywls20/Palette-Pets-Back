@@ -5,6 +5,10 @@ import com.palette.palettepetsback.config.Mail.RegisterMail;
 import com.palette.palettepetsback.config.SingleTon.Singleton;
 import com.palette.palettepetsback.config.Storage.NCPObjectStorageService;
 import com.palette.palettepetsback.config.exceptions.NoSuchPetException;
+import com.palette.palettepetsback.feed.dto.FeedListResponse;
+import com.palette.palettepetsback.feed.dto.FeedResponse;
+import com.palette.palettepetsback.feed.entity.Feed;
+import com.palette.palettepetsback.feed.repository.FeedRepository;
 import com.palette.palettepetsback.member.dto.*;
 import com.palette.palettepetsback.member.entity.Follow;
 import com.palette.palettepetsback.member.entity.Member;
@@ -33,7 +37,7 @@ public class MemberService {
     private final RegisterMail registerMail;
     private final NCPObjectStorageService objectStorageService;
     private final FollowService followService;
-
+    private final FeedRepository feedRepository;
 
     //이메일 중복확인
     public boolean checkEmailDuplicate(String email) {
@@ -108,8 +112,8 @@ public class MemberService {
         Optional<Member> optionalMember = memberRepository.findByMemberId(memberId);
         optionalMember.ifPresent(member -> {
             member.updateBirthGender(
+                    BirthGenderRequest.getBirth(),
                     BirthGenderRequest.getGender()
-                    ,BirthGenderRequest.getBirth()
             );
 
             memberRepository.save(member);
@@ -157,23 +161,54 @@ public class MemberService {
 
     }
 
-    public MyPageRespons getMyPage(Long memberId) {
-        Optional<Member> optionalMember=memberRepository.findByMemberId(memberId);
-
+    public MyPageRespons getMyPage(Long memberId,String nickname) {
+        Optional<Member> optionalMember=memberRepository.findByMemberNickname(nickname);
+        Optional<Member> lealMember =memberRepository.findByMemberId(memberId);
+        List<FollowResponse> follow = followService.getFollowerList(nickname,memberId);
         MyPageRespons myPageRespons = new MyPageRespons();
+
+
 
         optionalMember.ifPresent(member -> {
             List<FollowResponse> list_er = followService.getFollowerList(member.getMemberNickname(), memberId);
             List<FollowResponse> list_ing = followService.getFollowingList(member.getMemberNickname(), memberId);
+            List<Feed> list_feed = feedRepository.findByMemberId(member);
             myPageRespons.setNickname(member.getMemberNickname());
             myPageRespons.setImg(member.getMemberImage());
             myPageRespons.setFollower(list_er.size());
             myPageRespons.setFollowing(list_ing.size());
+            myPageRespons.setFeed(list_feed.size());
+            myPageRespons.setMemberId(lealMember.get().getMemberNickname());
+
+            if(follow.isEmpty()){
+                myPageRespons.setFollowTF(true);
+            }else{
+                for (FollowResponse f : follow) {
+                    if(f.getNickname().equals(lealMember.get().getMemberNickname())){
+                        myPageRespons.setFollowTF(false);
+                    }else{
+                        myPageRespons.setFollowTF(true);
+                    }
+                }
+            }
+
+
         });
 
         return myPageRespons;
     }
 
+    public SettingPageRespone getSettingPage(Long memberId) {
+        Optional<Member> optionalMember =memberRepository.findByMemberId(memberId);
+
+        SettingPageRespone settingPageRespone = new SettingPageRespone();
+        optionalMember.ifPresent(member -> {
+            settingPageRespone.setEmail(member.getEmail());
+            settingPageRespone.setNickname(member.getMemberNickname());
+        });
+
+        return settingPageRespone;
+    }
     //일반 로그인 -안씀
 //    public Member login(String email, String password) {
 //

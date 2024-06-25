@@ -49,6 +49,7 @@ public class FeedController {
     @GetMapping("/feed/detail/{feedId}")
     public ResponseEntity<?> getFeedDetail(@PathVariable("feedId") Long feedId,
                                            @JwtAuth AuthInfoDto authInfoDto) {
+
         Long memberId = authInfoDto.getMemberId();
         return ResponseEntity.ok(feedService.getFeedDetail(feedId,memberId));
     }
@@ -59,5 +60,12 @@ public class FeedController {
         feedService.deleteFeed(feedId,memberId);
 
         return ResponseEntity.ok("피드가 삭제 되었습니다.");
+    }
+
+    @GetMapping("/feed/friend")
+    public ResponseEntity<?> getFriendFeed (@JwtAuth AuthInfoDto authInfoDto){
+        String nickname=authInfoDto.getMemberNickname();
+        System.out.println("authInfoDto = " + nickname);
+        return ResponseEntity.ok(nickname);
     }
 }
