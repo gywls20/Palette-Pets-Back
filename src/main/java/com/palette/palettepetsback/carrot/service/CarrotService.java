@@ -281,10 +281,16 @@ public class CarrotService {
     }
     public List<CarrotResponseDTO> getLike(Long memberId){
         Optional<Member> member = memberRepository.findByMemberId(memberId);
-        List<Carrot> carrotList = carrotRepository.findByMember(member.get());
+        List<CarrotLike> carrotLikeList = carrotLikeRepository.findByMember(member.get());
+        List<Carrot> id = new ArrayList<>();
+        for (CarrotLike l : carrotLikeList) {
+            id.add(l.getCarrotId());
+        }
+        //List<Carrot> carrotList = carrotRepository.findByMember(member.get());
 
         List<CarrotResponseDTO> carrotResponseDTOList = new ArrayList<>();
-        for (Carrot c : carrotList) {
+
+        for (Carrot c : id) {
             List<CarrotImage> carrotImage = carrotImageRepository.findByCarrotId(c);
 
             String memberNickname = c.getMember().getMemberNickname();
