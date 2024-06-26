@@ -11,12 +11,9 @@ import java.util.Optional;
 
 public interface CarrotLikeRepository extends JpaRepository<CarrotLike, Long> {
     Optional<CarrotLike> findByCarrotIdAndMember (Carrot carrot, Member member);
-<<<<<<< hyojin
-    List<CarrotLike> findByMember (Member member);
-=======
 
     @Query("select count(*) from CarrotLike c where c.carrotId.carrotId = :id and c.member.memberId = :memberId")
     int likeState(Long id, Long memberId);
->>>>>>> dev
 
+    List<CarrotLike> findByMember (Member member);
 }
