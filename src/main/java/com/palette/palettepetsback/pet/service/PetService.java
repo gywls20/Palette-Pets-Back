@@ -219,7 +219,7 @@ public class PetService {
     }
 
     // 회원 == 주인 체크 메서드 -> 캐싱
-    @Cacheable(value = "checkIsMaster", key = "#checkingMemberId", cacheManager = "cacheManager")
+//    @Cacheable(value = "checkIsMaster", key = "#checkingMemberId", cacheManager = "cacheManager")
     public boolean checkIsMaster(Long petId, Long checkingMemberId) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new NoSuchPetException("pet not found"));
