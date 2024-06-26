@@ -20,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -44,11 +45,11 @@ public class LikeController {
 
     //좋아요 눌렀는지 안눌렀는지
     @PostMapping("/Post/isLike/{articleId}")
-    public ResponseEntity<Boolean> isLikeArticle(@PathVariable final Long articleId
+    public ResponseEntity<Map<String, Object>> isLikeArticle(@PathVariable final Long articleId
             , @JwtAuth final AuthInfoDto authInfoDto){
 
         if(authInfoDto == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         return ResponseEntity.ok(articleLikeService.isLikeArticle(articleId,authInfoDto.getMemberId()));
