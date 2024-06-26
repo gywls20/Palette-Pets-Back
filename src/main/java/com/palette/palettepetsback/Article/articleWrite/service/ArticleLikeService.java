@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -96,17 +97,14 @@ public class ArticleLikeService {
     }
 
     @Transactional
-    public Boolean isLikeArticle(Long articleId, Long memberId) {
+    public Map<String,Object> isLikeArticle(Long articleId, Long memberId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(()->new IllegalArgumentException("게시글 찾을수없음"));
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()->new IllegalArgumentException("Member not found"));
         Optional<ArticleLike>existingLike= articleLikeRepository.findByArticleAndMember(article,member);
-        if(existingLike.isPresent()){
-            return true;
-        }
-        else{
-            return false;
-        }
+        Map<String,Object> map= new java.util.HashMap<>(Map.of("isLike", existingLike.isPresent()));
+        map.put("memberNickname",member.getMemberNickname());
+        return map;
     }
 }
