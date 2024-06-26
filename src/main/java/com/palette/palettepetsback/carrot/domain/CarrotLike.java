@@ -19,7 +19,7 @@ public class CarrotLike {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "carrot_id")
     private Carrot carrotId;
 
