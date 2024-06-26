@@ -16,8 +16,8 @@ public interface ImgPetRepository extends JpaRepository<ImgPet, Long> {
             "from ImgPet ip " +
             "join ip.pet p " +
             "join p.member m " +
-            "where m.memberId = :memberId")
-    List<ImgPetResponseDto> findAllByMemberId(@Param("memberId") Long memberId);
+            "where m.memberNickname = :memberNickname")
+    List<ImgPetResponseDto> findAllByMemberId(@Param("memberNickname") String memberNickname);
 
     List<ImgPet> findAllByPetId(Long petId);
     Optional<ImgPet> findByImgUrl(String imgUrl);

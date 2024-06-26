@@ -213,9 +213,9 @@ public class PetService {
                 .toList();
     }
 
-    public List<ImgPetResponseDto> findAllPetImg(Long memberId) {
+    public List<ImgPetResponseDto> findAllPetImg(String memberNickname) {
 
-        return imgPetRepository.findAllByMemberId(memberId);
+        return imgPetRepository.findAllByMemberId(memberNickname);
     }
 
     // 회원 == 주인 체크 메서드 -> 캐싱
