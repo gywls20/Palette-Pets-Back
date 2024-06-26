@@ -53,7 +53,7 @@ public class PetController {
     }
 
     // 마이페이지용 개인 회원별 모든 펫 이미지 리스트 쿼리
-    @GetMapping("/img/list/{memberNickname}")
+    @GetMapping("/img/myPageList/{memberNickname}")
     public List<ImgPetResponseDto> getPetImgListByPetId(@JwtAuth AuthInfoDto authInfoDto,
                                                         @PathVariable("memberNickname") String memberNickname) {
         return petService.findAllPetImg(memberNickname);
