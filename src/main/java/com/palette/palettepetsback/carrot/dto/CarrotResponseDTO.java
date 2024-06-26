@@ -21,6 +21,7 @@ public class CarrotResponseDTO {
     private LocalDateTime carrotCreatedAt;
     private Long memberId;
     private String memberNickname;
+    private String memberImg;
     private String carrotTag;
     private int carrotState;
     private Integer carrotLike;

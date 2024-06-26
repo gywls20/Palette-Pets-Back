@@ -18,9 +18,9 @@ public class ArticleWriteDto {
     private String boardName;
     private String articleHead;
     private List<String> articleTags;
-    @Size(min =2,max = 20)
+    @Size(min =2)
     private String title;
-    @Size(min=10,max=1000)
+    @Size(min=10)
     private String content;
     private Long createdWho;
 }
