@@ -33,11 +33,11 @@ public class FeedService {
         return objectStorageService.uploadFile(Singleton.S3_BUCKET_NAME, dirPath, file);
     }
 
-    public Feed saveFeed(String text, Long memberId) {
+    public Feed saveFeed(String feedContent, Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
         if (member.isPresent()) {
             Feed feed = new Feed();
-            feed.saveFeed(text, member.get());
+            feed.saveFeed(feedContent, member.get());
             return feedRepository.save(feed);
         } else {
             throw new IllegalArgumentException("Member not found with id: " + memberId);
@@ -62,7 +62,7 @@ public class FeedService {
             List<FeedListResponse> list = new ArrayList<>();
 
             for (Feed f : feedList) {
-                String img = f.getFeedImageList().get(0).getImg(); //한 피드에 여러장이면 맨처음 올린 사진만보여줌
+                String img = f.getFeedImageList().get(0).getFeedImg(); //한 피드에 여러장이면 맨처음 올린 사진만보여줌
                 list.add(new FeedListResponse(f.getFeedId(),img));
             }
 
@@ -80,10 +80,10 @@ public class FeedService {
         if (feed!=null) {
             FeedResponse feedResponses = new FeedResponse();
 
-            feedResponses.setText(feed.getText());
+            feedResponses.setText(feed.getFeedContent());
             List<String> imgs = new ArrayList<>();
             for (FeedImg img : feed.getFeedImageList()) {
-                imgs.add(img.getImg());
+                imgs.add(img.getFeedImg());
             }
             feedResponses.setImg(imgs);
             if(feed.getMemberId().getMemberId().equals(memberId)){ //피드를 적은 사람과 피드를 열어본 사람이 같은 사람인지 판별
