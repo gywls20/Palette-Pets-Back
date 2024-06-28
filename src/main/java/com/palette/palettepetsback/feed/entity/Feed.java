@@ -21,7 +21,10 @@ public class Feed {
                                                             //이걸 삭제하면 매핑된 이미지도 같이 삭제
     @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FeedImg> feedImageList = new ArrayList<>();
-    private String text;
+
+    @Column(name = "feed_content")
+    private String feedContent;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member memberId;
@@ -29,8 +32,8 @@ public class Feed {
     @CreationTimestamp
     private LocalDateTime time;
 
-    public void saveFeed(String text, Member memberId) {
-        this.text = text;
+    public void saveFeed(String feedContent, Member memberId) {
+        this.feedContent = feedContent;
         this.memberId=memberId;
     }
 }

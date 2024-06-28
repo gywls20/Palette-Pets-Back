@@ -12,14 +12,15 @@ public class FeedImg {
     @Column(name = "feed_img_id")
     private Long feedImgId;
 
-    private String img;
+    @Column(name = "feed_img")
+    private String feedImg;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     private Feed feed;
 
-    public void saveImg(String img,Feed feed) {
-        this.img = img;
+    public void saveImg(String feedImg,Feed feed) {
+        this.feedImg = feedImg;
         this.feed = feed;
     }
 }
