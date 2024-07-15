@@ -4,14 +4,14 @@
 
 
 ## <a name="section0" />목차
-### 프로젝트 산출물(#section1)
-### 팀원(#section2)
-### 주제 선정(#section4)
-### 사용 기술 & 도구(#section6)
+### 프로젝트 산출물
+### 팀원
+### 주제 선정
+### 사용 기술 & 도구
 
 <br>
 
-### <a name="section1" />프로젝트 산출물
+## <a name="section1" />프로젝트 산출물
 
 [프로젝트 발표.pdf](https://drive.google.com/file/d/1GPaqxSfGh2auJNmV_4I6UD4JXhf7xc5V/view?usp=sharing)
 >
@@ -19,7 +19,7 @@
 
 
 
-### <a name="section2" />팀원 (#section0)
+## <a name="section2" />팀원
 
 <table>
   <tr>
@@ -37,7 +37,7 @@
 </table>
 
  
-## <a name="section4" />기획 주제 선정 (20240215~202403)(#section0)
+## <a name="section3" />기획 주제 선정 (20240215~202403)
 
  **선정 이유**
 
@@ -57,7 +57,7 @@
 
 
 
-## <a name="section6" />사용 기술 & 도구 (#section0)
+## <a name="section4" />사용 기술 & 도구
 
 ### 프론트엔드
 - JavaScript
